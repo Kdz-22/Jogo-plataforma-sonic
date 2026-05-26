@@ -26,6 +26,7 @@ typedef struct ResourceManager {
     Sound somPulo;
 
     Music musicaFase01;
+    float volumeMusicaFase01;
 
 } ResourceManager;
 

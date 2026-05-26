@@ -72,7 +72,8 @@ void loadResourcesResourceManager( void ) {
     rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
 
     rm.musicaFase01 = LoadMusicStream( "resources/sons/musicas/green-hill-zone.mp3" );
-
+    rm.volumeMusicaFase01 = 0.5f;
+    SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
 }
 
 void unloadResourcesResourceManager( void ) {

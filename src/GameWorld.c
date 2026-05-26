@@ -18,7 +18,7 @@
 #include "ResourceManager.h"
 
 #include "raylib/raylib.h"
-//#include "raylib/raymath.h"
+#include "raylib/raymath.h"
 //#define RAYGUI_IMPLEMENTATION    // to use raygui, comment these three lines.
 //#include "raylib/raygui.h"       // other compilation units must only include
 //#undef RAYGUI_IMPLEMENTATION     // raygui.h
@@ -58,6 +58,17 @@ void updateGameWorld( GameWorld *gw, float delta ) {
         PlayMusicStream( rm.musicaFase01 );
     } else {
         UpdateMusicStream( rm.musicaFase01 );
+    }
+    if ( IsMusicStreamPlaying( rm.musicaFase01 ) ) {
+
+        if ( IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT) ) {
+            rm.volumeMusicaFase01 = Clamp( rm.volumeMusicaFase01 - 0.01f, 0.0f, 1.0f );
+            SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
+        } else if ( IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD) ) {
+            rm.volumeMusicaFase01 = Clamp( rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f );
+            SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
+        }
+        printf( "Volume da musica: %.2f\n", rm.volumeMusicaFase01 );
     }
 
     if ( IsKeyPressed( KEY_R ) ) {
