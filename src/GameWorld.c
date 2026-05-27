@@ -29,6 +29,8 @@ static void atualizarCamera( GameWorld *gw );
 static void inicializar( GameWorld *gw );
 static void reiniciar( GameWorld *gw );
 
+static void desenharPontuacao( Texture2D hud, int valor, Vector2 posicao );
+
 /**
  * @brief Cria uma instância alocada dinamicamente da struct GameWorld.
  */
@@ -68,7 +70,6 @@ void updateGameWorld( GameWorld *gw, float delta ) {
             rm.volumeMusicaFase01 = Clamp( rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f );
             SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
         }
-        printf( "Volume da musica: %.2f\n", rm.volumeMusicaFase01 );
     }
 
     if ( IsKeyPressed( KEY_R ) ) {
@@ -98,17 +99,41 @@ void drawGameWorld( GameWorld *gw ) {
     desenharJogador( gw->jogador );
     EndMode2D();
 
-    DrawText( TextFormat( "Anéis: %d", gw->jogador->quantidadeAneis ), 10, 10, 20, ORANGE );
-    DrawText( TextFormat( "Vidas: %d", gw->jogador->quantidadeVidas ), 10, 30, 20, ORANGE );
-    DrawText( 
-        TextFormat( 
-            "Invulnerável: %s%s", 
-            gw->jogador->invulneravel ? "sim" : "não",
-            gw->jogador->invulneravel ? TextFormat( " (%.2fs/%.2fs)", gw->jogador->contadorTempoInvulnerabilidade, gw->jogador->tempoInvulnerabilidade ) : ""
-        ), 
-        10, 50, 20, ORANGE
+    //Score
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 24, 432, 40, 16 },
+        (Rectangle) { 20, 15, 80, 32 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
     );
-    DrawFPS( 10, 70 );
+    //Time
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 24, 456, 32, 16 },
+        (Rectangle) { 20, 45, 64, 32 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
+    );
+    //Rings
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 24, 480, 40, 16 },
+        (Rectangle) { 20, 75, 80, 32 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
+    );
+
+    desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
+    //Aqui eu já adicionei o atributo "time" na struct do jogador, mas não implementei a lógica 
+    //de contagem do tempo no jogo, então ele sempre vai mostrar 0.
+    desenharPontuacao(rm.texturaHUD, gw->jogador->time,  (Vector2){ 94, 45 });
+    desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
+    
+    DrawFPS( 700, 15 );
 
     EndDrawing();
 
@@ -188,4 +213,35 @@ static void reiniciar( GameWorld *gw ) {
 
     inicializar( gw );
 
+}
+
+static void desenharPontuacao( Texture2D hud, int valor, Vector2 posicao ) {
+
+    char buffer[16];
+    sprintf( buffer, "%d", valor );
+
+    int digitoW = 8;
+    int digitoH = 16;
+    int inicioY = 432;
+    int espacamento = 8;
+
+    for (int i = 0; buffer[i] != '\0'; i++) {
+        int digito = buffer[i] - '0';
+
+        Rectangle origem = {
+            (digito * (digitoW + espacamento) ) + 72,
+            inicioY,             
+            digitoW,
+            digitoH
+        };
+
+        Rectangle dest = {
+            posicao.x + i * (digitoW * 2),
+            posicao.y,
+            digitoW * 2,
+            digitoH * 2
+        };
+
+        DrawTexturePro(hud, origem, dest, (Vector2){0, 0}, 0.0f, WHITE);
+    }
 }

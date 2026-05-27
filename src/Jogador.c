@@ -65,10 +65,13 @@ Jogador *criarJogador( float x, float y, float w, float h ) {
 
     novoJogador->quantidadeAneis = 0;
     novoJogador->quantidadeVidas = 3;
+    novoJogador->score = 0;
+    novoJogador->comboAereo = 0;
 
     novoJogador->invulneravel = false;
     novoJogador->tempoInvulnerabilidade = 3.0f;
     novoJogador->contadorTempoInvulnerabilidade = 0.0f;
+    novoJogador->time = 0.0f; // *ainda não implementado, mas adicionei aqui para já deixar pronto para mostrar na HUD
 
     novoJogador->piscaPisca = false;
     novoJogador->tempoPiscaPisca = 0.05f;
@@ -353,6 +356,10 @@ void entradaJogador( Jogador *j, float delta ) {
  */
 void atualizarJogador( Jogador *j, GameWorld *gw, float delta ) {
 
+    if ( j->estado < ESTADO_JOGADOR_PULANDO ) {
+        j->comboAereo = 0;
+    }
+
     if ( j->invulneravel ) {
 
         j->contadorTempoPiscaPisca += delta;
@@ -570,6 +577,7 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
             if ( CheckCollisionRecs( retColCalculado, retColItemCalculado ) ) {
                 itemAnel->estado = ESTADO_ITEM_ANEL_COLETADO;
                 j->quantidadeAneis++;
+                j->score += 10;
                 PlaySound( rm.somAnel );
             }
 
@@ -594,6 +602,7 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
             if ( CheckCollisionRecs( retColCalculado, retColItemCalculado ) ) {
                 itemAnelAzul->estado = ESTADO_ITEM_ANEL_AZUL_COLETADO;
                 j->quantidadeAneis += 10;
+                j->score += 100;
                 PlaySound( rm.somAnel );
             }
 
@@ -608,6 +617,8 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
 static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
 
     ElementoMapa *el = mapa->inimigos;
+    //Max = 7 inimigos mortos em sequencia
+    static int tabelaComboAereo[] = { 100, 200, 500, 1000, 2000, 5000, 10000 };
 
     while ( el != NULL ) {
 
@@ -662,6 +673,10 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
                     j->vel.y = j->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound( rm.somHitInimigo );
+                    int idx = j->comboAereo >= 6 ? 6 : j->comboAereo;
+                    j->score += tabelaComboAereo[idx];
+                    j->comboAereo++;
+
                 } else if ( !j->invulneravel ) {
                     if ( j->quantidadeAneis > 0 ) {
                         j->quantidadeAneis = 0;
@@ -703,11 +718,14 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
             };
 
             if ( CheckCollisionRecs( retColCalculado, retColInimigoCalculado ) ) {
-
                 if ( j->estado >= ESTADO_JOGADOR_PULANDO && j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO ) {
                     j->vel.y = j->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound( rm.somHitInimigo );
+                    int idx = j->comboAereo >= 6 ? 6 : j->comboAereo;
+                    j->score += tabelaComboAereo[idx];
+                    j->comboAereo++;
+
                 } else if ( !j->invulneravel ) {
                     if ( j->quantidadeAneis > 0 ) {
                         j->quantidadeAneis = 0;
@@ -719,11 +737,13 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
                     j->invulneravel = true;
                 }
 
+
                 return; // um inimigo de cada vez!
 
             }
 
         }
+
 
         el = el->proximo;
 
