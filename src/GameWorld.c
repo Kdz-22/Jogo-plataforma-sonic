@@ -30,6 +30,7 @@ static void inicializar( GameWorld *gw );
 static void reiniciar( GameWorld *gw );
 
 static void desenharPontuacao( Texture2D hud, int valor, Vector2 posicao );
+static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao );
 
 /**
  * @brief Cria uma instância alocada dinamicamente da struct GameWorld.
@@ -81,6 +82,9 @@ void updateGameWorld( GameWorld *gw, float delta ) {
     atualizarMapa( gw->mapa, gw, delta );
     entradaJogador( j, delta );
     atualizarJogador( j, gw, delta );
+
+    j->time += delta;
+
     atualizarCamera( gw );
 
 }
@@ -126,11 +130,40 @@ void drawGameWorld( GameWorld *gw ) {
         0.0f,
         WHITE
     );
+    //Life
+    //Sonic
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 40, 400, 16, 16 },
+        (Rectangle) { 620, 15, 32, 32 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
+    );
+    //Texto Sonic
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 57, 401, 40, 8 },
+        (Rectangle) { 620, 15, 80, 16 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
+    );
+    //Multiplicador
+    DrawTexturePro(
+        rm.texturaHUD,
+        (Rectangle) { 62, 410, 8, 8 },
+        (Rectangle) { 620, 35, 16, 16 },
+        (Vector2) { 0, 0 },
+        0.0f,
+        WHITE
+    );
 
+    desenharPontuacao( rm.texturaHUD, gw->jogador->vidas, (Vector2){ 640, 31 } );
     desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
     //Aqui eu já adicionei o atributo "time" na struct do jogador, mas não implementei a lógica 
     //de contagem do tempo no jogo, então ele sempre vai mostrar 0.
-    desenharPontuacao(rm.texturaHUD, gw->jogador->time,  (Vector2){ 94, 45 });
+    desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
     desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
     
     DrawFPS( 700, 15 );
@@ -244,4 +277,70 @@ static void desenharPontuacao( Texture2D hud, int valor, Vector2 posicao ) {
 
         DrawTexturePro(hud, origem, dest, (Vector2){0, 0}, 0.0f, WHITE);
     }
+}
+
+static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao ) {
+
+    int minutos = tempo / 60;
+    int segundos = tempo % 60;
+
+    char buffer[16];
+    sprintf( buffer, "%d:%02d", minutos, segundos );
+    printf("%s\n", buffer);
+
+    int digitoW = 8;
+    int digitoH = 16;
+    int inicioY = 432;
+    int espacamento = 8;
+
+    for( int i = 0; buffer[i] != '\0'; i++ ) {
+
+        if( buffer[i] == ':' ) {
+            DrawRectangle(
+                posicao.x + i * (digitoW * 2) + 6,
+                posicao.y + 8,
+                4,
+                4,
+                WHITE
+            );
+
+            DrawRectangle(
+                posicao.x + i * (digitoW * 2) + 6,
+                posicao.y + 20,
+                4,
+                4,
+                WHITE
+            );
+
+            continue;
+
+        }
+
+        int digito = buffer[i] - '0';
+
+        Rectangle origem = {
+            (digito * (digitoW + espacamento)) + 72,
+            inicioY,
+            digitoW,
+            digitoH
+        };
+
+        Rectangle dest = {
+            posicao.x + i * (digitoW * 2),
+            posicao.y,
+            digitoW * 2,
+            digitoH * 2
+        };
+
+        DrawTexturePro(
+            hud,
+            origem,
+            dest,
+            (Vector2){0, 0},
+            0.0f,
+            WHITE
+        );
+
+    }
+
 }

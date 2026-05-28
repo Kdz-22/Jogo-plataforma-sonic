@@ -336,7 +336,7 @@ else ifeq ($(DETECTED_OS), macOS)
                -framework IOKit -framework CoreVideo -lm
 else
     # Windows (MSYS2 or native) — raylib from local lib/
-    LDFLAGS := -L lib/ -lraylib -lopengl32 -lgdi32 -lwinmm -lm
+    LDFLAGS := -lraylib -lopengl32 -lgdi32 -lwinmm -lm
 endif
 
 
