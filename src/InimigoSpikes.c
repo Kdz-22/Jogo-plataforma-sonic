@@ -21,7 +21,7 @@ static void desenharQuadroAnimacaoInimigoSpikes( InimigoSpikes *inimigo, QuadroA
 static void desenharQuadroAnimacaoInimigoSpikesMorrendo( InimigoSpikes *inimigo, QuadroAnimacao *qa, float escala, Color tonalidade );
 static Animacao *getAnimacaoAtualInimigoSpikes( InimigoSpikes *inimigo );
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 
 /**
  * @brief Cria um novo Inimigo (spikes).
