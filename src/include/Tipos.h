@@ -135,7 +135,7 @@ typedef struct Jogador {
     bool invulneravel;
     float tempoInvulnerabilidade;
     float contadorTempoInvulnerabilidade;
-    float time; // *ainda não implementado, mas adicionei aqui para já deixar pronto para mostrar na HUD
+    float time;
     int vidas;
 
     bool piscaPisca;

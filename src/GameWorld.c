@@ -31,6 +31,7 @@ static void reiniciar( GameWorld *gw );
 
 static void desenharPontuacao( Texture2D hud, int valor, Vector2 posicao );
 static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao );
+static void desenharTexto( Texture2D hud, const char *texto, Vector2 posicao, float escala );
 
 /**
  * @brief Cria uma instância alocada dinamicamente da struct GameWorld.
@@ -74,6 +75,8 @@ void updateGameWorld( GameWorld *gw, float delta ) {
             rm.volumeMusicaFase01 = Clamp( rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f );
             SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
         }
+
+        
     }
 
     if( gw->estado == ESTADO_JOGO_JOGANDO ) {
@@ -126,15 +129,21 @@ void drawGameWorld( GameWorld *gw ) {
 
     BeginDrawing();
 
+    
+    
     if( gw->estado == ESTADO_JOGO_JOGANDO ) {
         ClearBackground( (Color) { 36, 0, 180, 255 } );
-
+        
         BeginMode2D( gw->camera );
         desenharFundo( gw );
         desenharMapa( gw->mapa );
         desenharJogador( gw->jogador );
         EndMode2D();
-
+        
+        //DrawText( "VOL", 160, 48, 16, WHITE );
+        desenharPontuacao( rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100), (Vector2){ 700, 45 } );  
+        desenharTexto( rm.texturaHUD2, "VOL", (Vector2){ 660, 48 }, 2.0f );      
+        
         //Score
         DrawTexturePro(
             rm.texturaHUD,
@@ -162,36 +171,34 @@ void drawGameWorld( GameWorld *gw ) {
             0.0f,
             WHITE
         );
-        //Life
-        //Sonic
+
+        Vector2 posVidas = { 20, 380 }; // muda só aqui para mover tudo junto
+
+        // Life (fotinha do Sonic)
         DrawTexturePro(
             rm.texturaHUD,
             (Rectangle) { 40, 400, 16, 16 },
-            (Rectangle) { 620, 15, 32, 32 },
-            (Vector2) { 0, 0 },
-            0.0f,
-            WHITE
+            (Rectangle) { posVidas.x, posVidas.y, 32, 32 },
+            (Vector2) { 0, 0 }, 0.0f, WHITE
         );
-        //Texto Sonic
+        // Texto "Sonic"
         DrawTexturePro(
             rm.texturaHUD,
-            (Rectangle) { 57, 401, 40, 8 },
-            (Rectangle) { 660, 15, 80, 16 },
-            (Vector2) { 0, 0 },
-            0.0f,
-            WHITE
+            (Rectangle) { 57, 401, 31, 7 },
+            (Rectangle) { posVidas.x + 40, posVidas.y, 80, 16 },
+            (Vector2) { 0, 0 }, 0.0f, WHITE
         );
-        //Multiplicador
+        // Multiplicador "X"
         DrawTexturePro(
             rm.texturaHUD,
             (Rectangle) { 62, 410, 8, 8 },
-            (Rectangle) { 656, 33, 16, 16 },
-            (Vector2) { 0, 0 },
-            0.0f,
-            WHITE
+            (Rectangle) { posVidas.x + 36, posVidas.y + 18, 16, 16 },
+            (Vector2) { 0, 0 }, 0.0f, WHITE
         );
+        // Número de vidas
+        desenharPontuacao( rm.texturaHUD, gw->jogador->quantidadeVidas, 
+            (Vector2){ posVidas.x + 50, posVidas.y + 16 } );
 
-        desenharPontuacao( rm.texturaHUD, gw->jogador->quantidadeVidas, (Vector2){ 666, 31 } );
         desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
         desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
         desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
@@ -384,4 +391,45 @@ static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao ) {
 
     }
 
+}
+
+static void desenharTexto( Texture2D hud, const char *texto, Vector2 posicao, float escala ) {
+
+    int charW  = 7;
+    int charH  = 11;
+    int inicioX = 9;
+    int inicioY = 82;
+    int espacamento = 2;
+
+    for ( int i = 0; texto[i] != '\0'; i++ ) {
+
+        char c = texto[i];
+        int idx = -1;
+
+        if ( c >= 'A' && c <= 'Z' ) {
+            idx = c - 'A';
+        } else if ( c == ' ' ) {
+            continue;
+        }
+
+        if ( idx < 0 ) {
+            continue;
+        }
+        //(digito * (digitoW + espacamento) ) + 72,
+        Rectangle origem = { 
+            inicioX + (idx * charW),
+            inicioY,
+            charW,
+            charH
+        };
+
+        Rectangle dest = {
+            posicao.x + i * (charW * escala),
+            posicao.y,
+            charW * escala,
+            charH * escala
+        };
+
+        DrawTexturePro( hud, origem, dest, (Vector2){0,0}, 0.0f, WHITE );
+    }
 }
