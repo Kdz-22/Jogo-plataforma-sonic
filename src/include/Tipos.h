@@ -45,12 +45,18 @@ typedef enum EstadoInimigoSpikes {
     ESTADO_INIMIGO_SPIKES_MORRENDO,
 } EstadoInimigoSpikes;
 
+typedef enum EstadoInimigoTonTon {
+    ESTADO_INIMIGO_TONTON_ANDANDO,
+    ESTADO_INIMIGO_TONTON_MORRENDO,
+} EstadoInimigoTonTon;
+
 /**
  * @brief Representa o tipo de um inimigo.
  */
 typedef enum TipoInimigo {
     TIPO_INIMIGO_MOTOBUG,
     TIPO_INIMIGO_SPIKES,
+    TIPO_INIMIGO_TONTON,
 } TipoInimigo;
 
 /**
@@ -135,7 +141,7 @@ typedef struct Jogador {
     bool invulneravel;
     float tempoInvulnerabilidade;
     float contadorTempoInvulnerabilidade;
-    float time; // *ainda não implementado, mas adicionei aqui para já deixar pronto para mostrar na HUD
+    float time;
     int vidas;
 
     bool piscaPisca;
@@ -205,6 +211,27 @@ typedef struct InimigoSpikes {
     Animacao animacaoMorrendo;
 
 } InimigoSpikes;
+
+typedef struct InimigoTonTon {
+
+    Rectangle ret;
+    Vector2 vel;
+    Color cor;
+
+    float velAndando;
+    float velMaxQueda;
+
+    EstadoInimigoTonTon estado;
+    bool ativo;
+    bool olhandoParaDireita;
+
+    Animacao *animacoes[2];
+    int quantidadeAnimacoes;
+
+    Animacao animacaoAndando;
+    Animacao animacaoMorrendo;
+
+} InimigoTonTon;
 
 /**
  * @brief Representa um inimigo.
