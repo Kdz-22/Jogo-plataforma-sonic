@@ -71,7 +71,7 @@ Jogador *criarJogador( float x, float y, float w, float h ) {
     novoJogador->invulneravel = false;
     novoJogador->tempoInvulnerabilidade = 3.0f;
     novoJogador->contadorTempoInvulnerabilidade = 0.0f;
-    novoJogador->time = 0.0f; // *ainda não implementado, mas adicionei aqui para já deixar pronto para mostrar na HUD
+    novoJogador->time = 0.0f;
 
     novoJogador->piscaPisca = false;
     novoJogador->tempoPiscaPisca = 0.05f;
@@ -733,6 +733,8 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
                     } else {
                         j->quantidadeVidas--;
                         PlaySound( rm.somMorte );
+
+                        
                     }
                     j->invulneravel = true;
                 }

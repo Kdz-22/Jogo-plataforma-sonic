@@ -25,6 +25,14 @@ typedef enum EstadoJogador {
 } EstadoJogador;
 
 /**
+ * @brief Representa o estado do jogado.
+ */
+typedef enum EstadoJogo {
+    ESTADO_JOGO_JOGANDO,
+    ESTADO_JOGO_GAMEOVER,
+} EstadoJogo;
+
+/**
  * @brief Representa o estado do inimigo do tipo Motobug.
  */
 typedef enum EstadoInimigoMotobug {
@@ -307,5 +315,7 @@ typedef struct GameWorld {
     Camera2D camera;
 
     float gravidade;
+
+    EstadoJogo estado;
 
 } GameWorld;

@@ -38,6 +38,9 @@ static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao );
 GameWorld *createGameWorld( void ) {
     GameWorld *gw = (GameWorld*) malloc( sizeof( GameWorld ) );
     inicializar( gw );
+
+    gw->estado = ESTADO_JOGO_JOGANDO;
+
     return gw;
 }
 
@@ -73,20 +76,47 @@ void updateGameWorld( GameWorld *gw, float delta ) {
         }
     }
 
-    if ( IsKeyPressed( KEY_R ) ) {
-        reiniciar( gw );
-        return;
+    if( gw->estado == ESTADO_JOGO_JOGANDO ) {
+        if ( IsKeyPressed( KEY_R ) ) {
+                reiniciar( gw );
+                return;
+            }
+        Jogador *j = gw->jogador;
+        atualizarMapa( gw->mapa, gw, delta );
+        entradaJogador( j, delta );
+        atualizarJogador( j, gw, delta );
+
+        j->time += delta;
+
+        atualizarCamera( gw );
+
+        //GAMEOVER
+        if( j->quantidadeVidas < 0 ) {
+            gw->estado = ESTADO_JOGO_GAMEOVER;
+        }
+    } else if( gw->estado == ESTADO_JOGO_GAMEOVER ) {
+        
+        //Se GAMEOVER apertar R pp/reiniciar
+        if ( IsKeyPressed( KEY_R ) ) {
+            reiniciar( gw );
+            
+            //reset do jogo
+            Jogador *j = gw->jogador;
+            j->quantidadeVidas = 3;
+            j->quantidadeAneis = 0;
+            j->score = 0;
+            j->comboAereo = 0;
+            j->time = 0.0f;
+            
+            j->invulneravel = false;
+            j->contadorTempoInvulnerabilidade = 0.0f;
+            j->contadorTempoPiscaPisca = 0.0f;
+            j->piscaPisca = false;
+            j->estado = ESTADO_JOGADOR_PARADO;
+
+            gw->estado = ESTADO_JOGO_JOGANDO;
+        }
     }
-
-    Jogador *j = gw->jogador;
-    atualizarMapa( gw->mapa, gw, delta );
-    entradaJogador( j, delta );
-    atualizarJogador( j, gw, delta );
-
-    j->time += delta;
-
-    atualizarCamera( gw );
-
 }
 
 /**
@@ -95,81 +125,92 @@ void updateGameWorld( GameWorld *gw, float delta ) {
 void drawGameWorld( GameWorld *gw ) {
 
     BeginDrawing();
-    ClearBackground( (Color) { 36, 0, 180, 255 } );
 
-    BeginMode2D( gw->camera );
-    desenharFundo( gw );
-    desenharMapa( gw->mapa );
-    desenharJogador( gw->jogador );
-    EndMode2D();
+    if( gw->estado == ESTADO_JOGO_JOGANDO ) {
+        ClearBackground( (Color) { 36, 0, 180, 255 } );
 
-    //Score
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 24, 432, 40, 16 },
-        (Rectangle) { 20, 15, 80, 32 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
-    //Time
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 24, 456, 32, 16 },
-        (Rectangle) { 20, 45, 64, 32 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
-    //Rings
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 24, 480, 40, 16 },
-        (Rectangle) { 20, 75, 80, 32 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
-    //Life
-    //Sonic
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 40, 400, 16, 16 },
-        (Rectangle) { 620, 15, 32, 32 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
-    //Texto Sonic
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 57, 401, 40, 8 },
-        (Rectangle) { 660, 15, 80, 16 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
-    //Multiplicador
-    DrawTexturePro(
-        rm.texturaHUD,
-        (Rectangle) { 62, 410, 8, 8 },
-        (Rectangle) { 656, 33, 16, 16 },
-        (Vector2) { 0, 0 },
-        0.0f,
-        WHITE
-    );
+        BeginMode2D( gw->camera );
+        desenharFundo( gw );
+        desenharMapa( gw->mapa );
+        desenharJogador( gw->jogador );
+        EndMode2D();
 
-    desenharPontuacao( rm.texturaHUD, gw->jogador->vidas, (Vector2){ 666, 31 } );
-    desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
-    //Aqui eu já adicionei o atributo "time" na struct do jogador, mas não implementei a lógica 
-    //de contagem do tempo no jogo, então ele sempre vai mostrar 0.
-    desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
-    desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
-    
-    //DrawFPS( 700, 15 );
+        //Score
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 24, 432, 40, 16 },
+            (Rectangle) { 20, 15, 80, 32 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+        //Time
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 24, 456, 32, 16 },
+            (Rectangle) { 20, 45, 64, 32 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+        //Rings
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 24, 480, 40, 16 },
+            (Rectangle) { 20, 75, 80, 32 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+        //Life
+        //Sonic
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 40, 400, 16, 16 },
+            (Rectangle) { 620, 15, 32, 32 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+        //Texto Sonic
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 57, 401, 40, 8 },
+            (Rectangle) { 660, 15, 80, 16 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+        //Multiplicador
+        DrawTexturePro(
+            rm.texturaHUD,
+            (Rectangle) { 62, 410, 8, 8 },
+            (Rectangle) { 656, 33, 16, 16 },
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
 
+        desenharPontuacao( rm.texturaHUD, gw->jogador->quantidadeVidas, (Vector2){ 666, 31 } );
+        desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
+        desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
+        desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
+        
+        //DrawFPS( 700, 15 );
+    } else if ( gw->estado == ESTADO_JOGO_GAMEOVER ) {
+        
+        ClearBackground( BLACK );
+
+        int larguraTela = GetScreenWidth();
+        int alturaTela = GetScreenHeight();
+
+        int tamTexto1 = MeasureText( "GAME OVER", 40 );
+        DrawText( "GAME OVER", larguraTela / 2 - tamTexto1 / 2, alturaTela / 2 - 40, 40, RED );
+        
+        int tamTexto2 = MeasureText( "PRESSIONE 'R' PARA REINICIAR", 20 );
+        DrawText( "PRESSIONE 'R' PARA REINICIAR", larguraTela / 2 - tamTexto2 / 2, alturaTela / 2 + 20, 20, LIGHTGRAY );
+    }
     EndDrawing();
-
 }
 
 static void desenharFundo( GameWorld *gw ) {
