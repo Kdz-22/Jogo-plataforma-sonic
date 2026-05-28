@@ -144,7 +144,7 @@ void drawGameWorld( GameWorld *gw ) {
     DrawTexturePro(
         rm.texturaHUD,
         (Rectangle) { 57, 401, 40, 8 },
-        (Rectangle) { 620, 15, 80, 16 },
+        (Rectangle) { 660, 15, 80, 16 },
         (Vector2) { 0, 0 },
         0.0f,
         WHITE
@@ -153,20 +153,20 @@ void drawGameWorld( GameWorld *gw ) {
     DrawTexturePro(
         rm.texturaHUD,
         (Rectangle) { 62, 410, 8, 8 },
-        (Rectangle) { 620, 35, 16, 16 },
+        (Rectangle) { 656, 33, 16, 16 },
         (Vector2) { 0, 0 },
         0.0f,
         WHITE
     );
 
-    desenharPontuacao( rm.texturaHUD, gw->jogador->vidas, (Vector2){ 640, 31 } );
+    desenharPontuacao( rm.texturaHUD, gw->jogador->vidas, (Vector2){ 666, 31 } );
     desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
     //Aqui eu já adicionei o atributo "time" na struct do jogador, mas não implementei a lógica 
     //de contagem do tempo no jogo, então ele sempre vai mostrar 0.
     desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
     desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
     
-    DrawFPS( 700, 15 );
+    //DrawFPS( 700, 15 );
 
     EndDrawing();
 
@@ -286,7 +286,7 @@ static void desenharTempo( Texture2D hud, int tempo, Vector2 posicao ) {
 
     char buffer[16];
     sprintf( buffer, "%d:%02d", minutos, segundos );
-    printf("%s\n", buffer);
+    //printf("%s\n", buffer);
 
     int digitoW = 8;
     int digitoH = 16;
