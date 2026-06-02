@@ -119,7 +119,7 @@ void resolverColisaoInimigoObstaculosMapaX( Inimigo *inimigo, Mapa *mapa ) {
             ret = &spikes->ret;
         } else if ( inimigo->tipo == TIPO_INIMIGO_TONTON ) {
             InimigoTonTon *tonton = (InimigoTonTon*) inimigo->objeto;
-            qa = getQuadroAnimacaoAtualInimigoSpikes( tonton );
+            qa = getQuadroAnimacaoAtualInimigoTonTon( tonton );
             olhandoParaDireita = &tonton->olhandoParaDireita;
             ret = &tonton->ret;
         } else {
@@ -187,7 +187,7 @@ void resolverColisaoInimigoObstaculosMapaY( Inimigo *inimigo, Mapa *mapa ) {
             vel = &spikes->vel;
         } else if ( inimigo->tipo == TIPO_INIMIGO_TONTON ) {
             InimigoTonTon *tonton = (InimigoTonTon*) inimigo->objeto;
-            qa = getQuadroAnimacaoAtualInimigoSpikes( tonton );
+            qa = getQuadroAnimacaoAtualInimigoTonTon( tonton );
             olhandoParaDireita = &tonton->olhandoParaDireita;
             ret = &tonton->ret;
             vel = &tonton->vel;

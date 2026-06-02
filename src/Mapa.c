@@ -15,6 +15,7 @@
 #include "Inimigo.h"
 #include "InimigoMotobug.h"
 #include "InimigoSpikes.h"
+#include "InimigoTonTon.h"
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
@@ -184,6 +185,24 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                             inimigo = criarInimigo( TIPO_INIMIGO_SPIKES );
 
                             inimigo->objeto = criarInimigoSpikes( 
+                                (Rectangle) { 
+                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
+                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21, 
+                                    .width = 80, 
+                                    .height = 60
+                                },
+                                BLUE
+                            );
+
+                            el->objeto = inimigo;
+                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+
+                            break;
+                        case '2':
+
+                            inimigo = criarInimigo( TIPO_INIMIGO_TONTON );
+
+                            inimigo->objeto = criarInimigoTonTon( 
                                 (Rectangle) { 
                                     .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
                                     .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21, 
