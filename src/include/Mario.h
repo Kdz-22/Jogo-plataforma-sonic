@@ -10,4 +10,4 @@
 
 #include "Tipos.h"
 
-Personagem *criarMario(float x, float y);
+Personagem *criarMario(float x, float y, float w, float h);

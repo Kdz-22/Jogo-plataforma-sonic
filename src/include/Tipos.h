@@ -29,6 +29,17 @@ typedef enum EstadoJogador {
 } EstadoJogador;
 
 /**
+ * @brief Representa o estado do Mario.
+ */
+typedef enum EstadoMario {
+    ESTADO_MARIO_PARADO,
+    ESTADO_MARIO_ANDANDO,
+    ESTADO_MARIO_CORRENDO,
+    ESTADO_MARIO_PULANDO,
+    ESTADO_MARIO_PULANDO_CORRENDO
+} EstadoMario;
+
+/**
  * @brief Representa o estado do jogado.
  */
 typedef enum EstadoJogo {
@@ -163,6 +174,47 @@ typedef struct Jogador {
     Animacao animacaoPulandoCorrendo;
 
 } Jogador;
+
+typedef struct Mario {
+
+    Rectangle ret;
+    Vector2 vel;
+    Color cor;
+
+    float velAndando;
+    float velCorrendo;
+    float velPulo;
+    float velMaxQueda;
+
+    float frenagem;
+
+    int quantidadePulos;
+    int quantidadeMaxPulos;
+
+    bool invulneravel;
+    float tempoInvulnerabilidade;
+    float contadorTempoInvulnerabilidade;
+    int vidas;
+
+    bool piscaPisca;
+    float tempoPiscaPisca;
+    float contadorTempoPiscaPisca;
+
+    bool freando;
+
+    EstadoJogador estado;
+    bool olhandoParaDireita;
+
+    Animacao *animacoes[20];
+    int quantidadeAnimacoes;
+
+    Animacao animacaoParado;
+    Animacao animacaoAndando;
+    Animacao animacaoCorrendo;
+    Animacao animacaoPulando;
+    Animacao animacaoPulandoCorrendo;
+
+} Mario;
 
 /**
  * @brief Representa um inimigo do tipo Motobug.

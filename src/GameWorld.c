@@ -16,6 +16,7 @@
 #include "Tipos.h"
 #include "ResourceManager.h"
 #include "sonic.h"
+#include "mario.h"
 
 #include "raylib/raylib.h"
 #include "raylib/raymath.h"

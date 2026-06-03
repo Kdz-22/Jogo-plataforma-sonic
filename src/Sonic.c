@@ -1,4 +1,10 @@
-// Sonic.c
+/**
+ * @file Sonic.c
+ * @author Prof. Dr. David Buzatto
+ * @brief Sonic implementation.
+ * 
+ * @copyright Copyright (c) 2026
+ */
 #include <stdlib.h>
 
 #include "Jogador.h"
