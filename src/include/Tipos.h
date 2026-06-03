@@ -11,6 +11,10 @@
 
 #include "raylib/raylib.h"
 
+typedef struct GameWorld GameWorld;
+typedef struct Personagem Personagem;
+
+
 /**
  * @brief Representa o estado do jogador.
  */
@@ -133,15 +137,9 @@ typedef struct Jogador {
     int quantidadePulos;
     int quantidadeMaxPulos;
 
-    int quantidadeAneis;
-    int quantidadeVidas;
-    int score;
-    int comboAereo;
-
     bool invulneravel;
     float tempoInvulnerabilidade;
     float contadorTempoInvulnerabilidade;
-    float time;
     int vidas;
 
     bool piscaPisca;
@@ -331,13 +329,33 @@ typedef struct Mapa {
 
 } Mapa;
 
+typedef struct PersonagemFuncoes {
+    void (*entrada)( void *dados, Personagem *p, float delta );
+    void (*atualizar)( void *dados, Personagem *p, struct GameWorld *gw, float delta );
+    void (*desenhar)(void *dados);
+    void (*destruir)(void *dados);
+    void (*resetar)(void *dados);
+} PersonagemFuncoes;
+
+struct Personagem {
+    void *dados;
+    PersonagemFuncoes *funcoes;
+
+    int quantidadeAneis;
+    int quantidadeVidas;
+    int score;
+    float time;
+    int comboAereo;
+
+};
 /**
  * @brief Representa o mundo do jogo e seus elementos.
  */
-typedef struct GameWorld {
+struct GameWorld {
 
     Mapa *mapa;
-    Jogador *jogador;
+
+    Personagem *personagem;
 
     Camera2D camera;
 
@@ -345,4 +363,6 @@ typedef struct GameWorld {
 
     EstadoJogo estado;
 
-} GameWorld;
+    int personagemSelecionado;
+
+};

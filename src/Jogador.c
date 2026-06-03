@@ -30,8 +30,8 @@ static Animacao *getAnimacaoAtualJogador( Jogador *j );
 static void resolverColisaoJogadorObstaculosMapaX( Jogador *j, Mapa *mapa );
 static void resolverColisaoJogadorObstaculosMapaY( Jogador *j, Mapa *mapa );
 
-static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa );
-static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa );
+static void resolverColisaoJogadorItensMapa( Jogador *j, Personagem *p, Mapa *mapa );
+static void resolverColisaoJogadorInimigosMapa( Jogador *j, Personagem *p, Mapa *mapa );
 
 static const bool MOSTRAR_RETANGULOS = false;
 
@@ -63,15 +63,9 @@ Jogador *criarJogador( float x, float y, float w, float h ) {
     novoJogador->quantidadePulos = 0;
     novoJogador->quantidadeMaxPulos = 1;
 
-    novoJogador->quantidadeAneis = 0;
-    novoJogador->quantidadeVidas = 3;
-    novoJogador->score = 0;
-    novoJogador->comboAereo = 0;
-
     novoJogador->invulneravel = false;
     novoJogador->tempoInvulnerabilidade = 3.0f;
     novoJogador->contadorTempoInvulnerabilidade = 0.0f;
-    novoJogador->time = 0.0f;
 
     novoJogador->piscaPisca = false;
     novoJogador->tempoPiscaPisca = 0.05f;
@@ -259,7 +253,7 @@ void destruirJogador( Jogador *j ) {
 /**
  * @brief Lê a entrada do usuário e atualiza as velocidades do jogador.
  */
-void entradaJogador( Jogador *j, float delta ) {
+void entradaJogador( Jogador *j, Personagem *p, float delta ) {
 
     EstadoJogador estadoAnterior = j->estado;
 
@@ -354,10 +348,10 @@ void entradaJogador( Jogador *j, float delta ) {
 /**
  * @brief Aplica física e resolve colisões do jogador com o mundo.
  */
-void atualizarJogador( Jogador *j, GameWorld *gw, float delta ) {
+void atualizarJogador( Jogador *j, Personagem *p, GameWorld *gw, float delta ) {
 
     if ( j->estado < ESTADO_JOGADOR_PULANDO ) {
-        j->comboAereo = 0;
+        p->comboAereo = 0;
     }
 
     if ( j->invulneravel ) {
@@ -393,8 +387,8 @@ void atualizarJogador( Jogador *j, GameWorld *gw, float delta ) {
     j->ret.y += j->vel.y * delta;
     resolverColisaoJogadorObstaculosMapaY( j, gw->mapa );
 
-    resolverColisaoJogadorItensMapa( j, gw->mapa );
-    resolverColisaoJogadorInimigosMapa( j, gw->mapa );
+    resolverColisaoJogadorItensMapa( j, p, gw->mapa );
+    resolverColisaoJogadorInimigosMapa( j, p, gw->mapa );
 
 }
 
@@ -534,7 +528,7 @@ static void resolverColisaoJogadorObstaculosMapaY( Jogador *j, Mapa *mapa ) {
 
 }
 
-static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
+static void resolverColisaoJogadorItensMapa( Jogador *j, Personagem *p, Mapa *mapa ) {
 
     ElementoMapa *el = mapa->itens;
 
@@ -576,8 +570,8 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
 
             if ( CheckCollisionRecs( retColCalculado, retColItemCalculado ) ) {
                 itemAnel->estado = ESTADO_ITEM_ANEL_COLETADO;
-                j->quantidadeAneis++;
-                j->score += 10;
+                p->quantidadeAneis++;
+                p->score += 10;
                 PlaySound( rm.somAnel );
             }
 
@@ -601,8 +595,8 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
 
             if ( CheckCollisionRecs( retColCalculado, retColItemCalculado ) ) {
                 itemAnelAzul->estado = ESTADO_ITEM_ANEL_AZUL_COLETADO;
-                j->quantidadeAneis += 10;
-                j->score += 100;
+                p->quantidadeAneis += 10;
+                p->score += 100;
                 PlaySound( rm.somAnel );
             }
 
@@ -614,7 +608,7 @@ static void resolverColisaoJogadorItensMapa( Jogador *j, Mapa *mapa ) {
 
 }
 
-static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
+static void resolverColisaoJogadorInimigosMapa( Jogador *j, Personagem *p, Mapa *mapa ) {
 
     ElementoMapa *el = mapa->inimigos;
     //Max = 7 inimigos mortos em sequencia
@@ -673,16 +667,16 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
                     j->vel.y = j->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound( rm.somHitInimigo );
-                    int idx = j->comboAereo >= 6 ? 6 : j->comboAereo;
-                    j->score += tabelaComboAereo[idx];
-                    j->comboAereo++;
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
 
                 } else if ( !j->invulneravel ) {
-                    if ( j->quantidadeAneis > 0 ) {
-                        j->quantidadeAneis = 0;
+                    if ( p->quantidadeAneis > 0 ) {
+                        p->quantidadeAneis = 0;
                         PlaySound( rm.somHitComAnel );
                     } else {
-                        j->quantidadeVidas--;
+                        p->quantidadeVidas--;
                         PlaySound( rm.somMorte );
                     }
                     j->invulneravel = true;
@@ -722,16 +716,16 @@ static void resolverColisaoJogadorInimigosMapa( Jogador *j, Mapa *mapa ) {
                     j->vel.y = j->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound( rm.somHitInimigo );
-                    int idx = j->comboAereo >= 6 ? 6 : j->comboAereo;
-                    j->score += tabelaComboAereo[idx];
-                    j->comboAereo++;
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
 
                 } else if ( !j->invulneravel ) {
-                    if ( j->quantidadeAneis > 0 ) {
-                        j->quantidadeAneis = 0;
+                    if ( p->quantidadeAneis > 0 ) {
+                        p->quantidadeAneis = 0;
                         PlaySound( rm.somHitComAnel );
                     } else {
-                        j->quantidadeVidas--;
+                        p->quantidadeVidas--;
                         PlaySound( rm.somMorte );
 
                         

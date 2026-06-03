@@ -10,12 +10,12 @@
 #include <stdlib.h>
 
 #include "GameWorld.h"
-#include "Jogador.h"
 #include "Macros.h"
 #include "Mapa.h"
 #include "Obstaculo.h"
 #include "Tipos.h"
 #include "ResourceManager.h"
+#include "sonic.h"
 
 #include "raylib/raylib.h"
 #include "raylib/raymath.h"
@@ -51,7 +51,8 @@ GameWorld *createGameWorld( void ) {
 void destroyGameWorld( GameWorld *gw ) {
     if ( gw != NULL ) {
         destruirMapa( gw->mapa );
-        destruirJogador( gw->jogador );
+        gw->personagem->funcoes->destruir( gw->personagem->dados );
+        free( gw->personagem );
         free( gw );
     }
 }
@@ -84,17 +85,18 @@ void updateGameWorld( GameWorld *gw, float delta ) {
                 reiniciar( gw );
                 return;
             }
-        Jogador *j = gw->jogador;
-        atualizarMapa( gw->mapa, gw, delta );
-        entradaJogador( j, delta );
-        atualizarJogador( j, gw, delta );
 
-        j->time += delta;
+        
+        atualizarMapa( gw->mapa, gw, delta );
+        gw->personagem->funcoes->entrada( gw->personagem->dados, gw->personagem, delta );
+        gw->personagem->funcoes->atualizar( gw->personagem->dados, gw->personagem, gw, delta );
+
+        gw->personagem->time += delta;
 
         atualizarCamera( gw );
 
         //GAMEOVER
-        if( j->quantidadeVidas < 0 ) {
+        if( gw->personagem->quantidadeVidas < 0 ) {
             gw->estado = ESTADO_JOGO_GAMEOVER;
         }
     } else if( gw->estado == ESTADO_JOGO_GAMEOVER ) {
@@ -104,19 +106,14 @@ void updateGameWorld( GameWorld *gw, float delta ) {
             reiniciar( gw );
             
             //reset do jogo
-            Jogador *j = gw->jogador;
-            j->quantidadeVidas = 3;
-            j->quantidadeAneis = 0;
-            j->score = 0;
-            j->comboAereo = 0;
-            j->time = 0.0f;
+            gw->personagem->quantidadeVidas = 3;
+            gw->personagem->quantidadeAneis = 0;
+            gw->personagem->score = 0;
+            gw->personagem->comboAereo = 0;
+            gw->personagem->time = 0.0f;
             
-            j->invulneravel = false;
-            j->contadorTempoInvulnerabilidade = 0.0f;
-            j->contadorTempoPiscaPisca = 0.0f;
-            j->piscaPisca = false;
-            j->estado = ESTADO_JOGADOR_PARADO;
-
+            gw->personagem->funcoes->resetar( gw->personagem->dados );
+            
             gw->estado = ESTADO_JOGO_JOGANDO;
         }
     }
@@ -137,7 +134,7 @@ void drawGameWorld( GameWorld *gw ) {
         BeginMode2D( gw->camera );
         desenharFundo( gw );
         desenharMapa( gw->mapa );
-        desenharJogador( gw->jogador );
+        gw->personagem->funcoes->desenhar( gw->personagem->dados );
         EndMode2D();
         
         //DrawText( "VOL", 160, 48, 16, WHITE );
@@ -196,12 +193,12 @@ void drawGameWorld( GameWorld *gw ) {
             (Vector2) { 0, 0 }, 0.0f, WHITE
         );
         // Número de vidas
-        desenharPontuacao( rm.texturaHUD, gw->jogador->quantidadeVidas, 
+        desenharPontuacao( rm.texturaHUD, gw->personagem->quantidadeVidas, 
             (Vector2){ posVidas.x + 50, posVidas.y + 16 } );
 
-        desenharPontuacao(rm.texturaHUD, gw->jogador->score, (Vector2){ 110, 15 });
-        desenharTempo(rm.texturaHUD, (int)gw->jogador->time, (Vector2){ 94, 45 });
-        desenharPontuacao(rm.texturaHUD, gw->jogador->quantidadeAneis, (Vector2){ 110, 75 });
+        desenharPontuacao(rm.texturaHUD, gw->personagem->score, (Vector2){ 110, 15 });
+        desenharTempo(rm.texturaHUD, (int)gw->personagem->time, (Vector2){ 94, 45 });
+        desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeAneis, (Vector2){ 110, 75 });
         
         //DrawFPS( 700, 15 );
     } else if ( gw->estado == ESTADO_JOGO_GAMEOVER ) {
@@ -237,7 +234,7 @@ static void desenharFundo( GameWorld *gw ) {
 
 static void atualizarCamera( GameWorld *gw ) {
 
-    Jogador *j = gw->jogador;
+    Jogador *j = (Jogador*) gw->personagem->dados;
     Camera2D *c = &gw->camera;
 
     c->offset.x = GetScreenWidth() / 2;
@@ -270,7 +267,7 @@ static void inicializar( GameWorld *gw ) {
 
     //gw->mapa = carregarMapa( "resources/mapas/mapaTeste.txt" );
     gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
-    gw->jogador = criarJogador( GetScreenWidth() / 2 + 144, calcularAlturaMapa( gw->mapa ) - 196, 96, 96 );
+    gw->personagem = criarSonic( GetScreenWidth() / 2 + 144, calcularAlturaMapa( gw->mapa ) - 196, 96, 96 );
 
     gw->camera = (Camera2D) {
         .offset = { 0 },    // deslocamento relativo da câmera em relação ao alvo
@@ -286,7 +283,7 @@ static void inicializar( GameWorld *gw ) {
 static void reiniciar( GameWorld *gw ) {
 
     destruirMapa( gw->mapa );
-    destruirJogador( gw->jogador );
+    gw->personagem->funcoes->destruir( gw->personagem->dados );
 
     if ( IsMusicStreamPlaying( rm.musicaFase01 ) ) {
         StopMusicStream( rm.musicaFase01 );
