@@ -68,3 +68,8 @@ void reiniciarAnimacao( Animacao *anim );
  * de quadros; caso contrário, emite um aviso e retorna sem alteração.
  */
 void sincronizarAnimacao( Animacao *destino, Animacao *origem );
+
+/**
+ * @brief Desenha um elemento com animação usando a textura fornecida.
+ */
+void desenharComAnimacao( Animacao *anim, Texture2D textura, Rectangle destino, Color tonalidade );

@@ -19,6 +19,7 @@
 
 static void desenharQuadroAnimacaoInimigoTonTon( InimigoTonTon *inimigo, QuadroAnimacao *qa, Color tonalidade );
 static void desenharQuadroAnimacaoInimigoTonTonMorrendo( InimigoTonTon *inimigo, QuadroAnimacao *qa, float escala, Color tonalidade );
+static void desenharBolaTonTon( BolaTonTon *bola ); 
 static Animacao *getAnimacaoAtualInimigoTonTon( InimigoTonTon *inimigo );
 
 static const bool MOSTRAR_RETANGULOS = true;
@@ -36,6 +37,34 @@ InimigoTonTon *criarInimigoTonTon( Rectangle ret, Color cor ) {
 
     novoInimigo->velAndando = 100;
     novoInimigo->velMaxQueda = 600;
+
+    novoInimigo->contadorTiroBola = 0.0f;
+
+    // Inicializar as 5 bolas
+    for ( int i = 0; i < 5; i++ ) {
+        novoInimigo->bola[i].ativo = false;
+        novoInimigo->bola[i].ret = (Rectangle){ 0 };
+        novoInimigo->bola[i].vel = (Vector2){ 0 };
+        
+        novoInimigo->bola[i].animacao.quantidadeQuadros = 2;
+        novoInimigo->bola[i].animacao.quadroAtual = 0;
+        novoInimigo->bola[i].animacao.contadorTempoQuadro = 0.0f;
+        novoInimigo->bola[i].animacao.pararNoUltimoQuadro = false;
+        novoInimigo->bola[i].animacao.executarUmaVez = false;
+        novoInimigo->bola[i].animacao.finalizada = false;
+        
+        criarQuadrosAnimacao( &novoInimigo->bola[i].animacao, novoInimigo->bola[i].animacao.quantidadeQuadros );
+        inicializarQuadrosAnimacao( 
+            novoInimigo->bola[i].animacao.quadros,
+            novoInimigo->bola[i].animacao.quantidadeQuadros,
+            150,            // duração de cada quadro
+            101, 72,        // posição inicial na spritesheet
+            16, 16,         // dimensões da bola
+            1,              // separação
+            false,          // de trás para frente
+            (Rectangle) { 0, 0, 16, 16 }  // retângulo de colisão
+        );
+    }
 
     novoInimigo->estado = ESTADO_INIMIGO_TONTON_ANDANDO;
     novoInimigo->ativo = true;
@@ -97,6 +126,11 @@ void destruirInimigoTonTon( InimigoTonTon *inimigo ) {
         for ( int i = 0; i < inimigo->quantidadeAnimacoes; i++ ) {
             destruirQuadrosAnimacao( inimigo->animacoes[i] );
         }
+
+        // Destroi as bolas
+        for ( int i = 0; i < 5; i++ ) {
+            destruirQuadrosAnimacao( &inimigo->bola[i].animacao );
+        }
         free( inimigo );
     }
 }
@@ -112,6 +146,68 @@ void atualizarInimigoTonTon( InimigoTonTon *inimigo, GameWorld *gw, float delta 
 
             Animacao *animacaoAtual = getAnimacaoAtualInimigoTonTon( inimigo );
             atualizarAnimacao( animacaoAtual, delta );
+
+            // Incrementar contador de tiro de bola
+            inimigo->contadorTiroBola += delta;
+
+            // Lógica para disparar bola
+            if ( inimigo->contadorTiroBola >= 2.0f ) {
+                printf( "TONTON ATIROU!\n" );
+                
+                // Encontrar uma bola inativa para disparar
+                for ( int i = 0; i < 5; i++ ) {
+                    if ( !inimigo->bola[i].ativo ) {
+                        // Criar bola na posição do TonTon
+                        inimigo->bola[i].ret = (Rectangle){
+                            inimigo->ret.x + inimigo->ret.width / 2 - 8,
+                            inimigo->ret.y + inimigo->ret.height / 2 - 8,
+                            16,  // largura da bola
+                            16   // altura da bola
+                        };
+                        
+                        // Velocidade da bola
+                        if ( inimigo->olhandoParaDireita ) {
+                            inimigo->bola[i].vel = (Vector2){ 200.0f, 0.0f };  // para direita
+                        } else {
+                            inimigo->bola[i].vel = (Vector2){ -200.0f, 0.0f }; // para esquerda
+                        }
+                        
+                        // reset da animação
+                        inimigo->bola[i].animacao.quadroAtual = 0;
+                        inimigo->bola[i].animacao.contadorTempoQuadro = 0.0f;
+                        inimigo->bola[i].animacao.finalizada = false;
+                        
+                        inimigo->bola[i].ativo = true;
+                        break;
+                    }
+                }
+                
+                inimigo->contadorTiroBola = 0.0f;  // reset
+            }
+
+            // atualiza bolas ativas
+            for ( int i = 0; i < 5; i++ ) {
+                if ( inimigo->bola[i].ativo ) {
+                    
+                    atualizarAnimacao( &inimigo->bola[i].animacao, delta );
+                    
+                    inimigo->bola[i].vel.y += gw->gravidade * delta;
+
+                    // velocidade de queda
+                    if ( inimigo->bola[i].vel.y > 600.0f ) {
+                        inimigo->bola[i].vel.y = 600.0f;
+                    }
+
+                    // atualiza posição
+                    inimigo->bola[i].ret.x += inimigo->bola[i].vel.x * delta;
+                    inimigo->bola[i].ret.y += inimigo->bola[i].vel.y * delta;
+
+                    // bola desativada se passar do limite da tela
+                    if ( inimigo->bola[i].ret.y > gw->mapa->linhas * gw->mapa->dimensaoPadraoElementos ) {
+                        inimigo->bola[i].ativo = false;
+                    }
+                }
+            }
 
             Inimigo ini = {
                 .objeto = inimigo,
@@ -163,6 +259,13 @@ void desenharInimigoTonTon( InimigoTonTon *inimigo ) {
             desenharQuadroAnimacaoInimigoTonTon( inimigo, qa, WHITE );
         } else if ( inimigo->estado == ESTADO_INIMIGO_TONTON_MORRENDO ) {
             desenharQuadroAnimacaoInimigoTonTonMorrendo( inimigo, getQuadroAtualAnimacao( &inimigo->animacaoMorrendo ), 2.0f, WHITE );
+        }
+
+        // Desenhar as bolas ativas
+        for ( int i = 0; i < 5; i++ ) {
+            if ( inimigo->bola[i].ativo ) {
+                desenharBolaTonTon( &inimigo->bola[i] );
+            }
         }
 
         if ( MOSTRAR_RETANGULOS ) {
@@ -231,6 +334,20 @@ static void desenharQuadroAnimacaoInimigoTonTonMorrendo( InimigoTonTon *inimigo,
 
     }
 
+}
+
+/**
+ * @brief Desenha uma bola do TonTon com animação.
+ */
+static void desenharBolaTonTon( BolaTonTon *bola ) {
+    
+    if ( bola != NULL ) {
+        desenharComAnimacao( &bola->animacao, rm.texturaBadniks, bola->ret, WHITE );
+        
+        if ( MOSTRAR_RETANGULOS ) {
+            DrawRectangleLines( bola->ret.x, bola->ret.y, bola->ret.width, bola->ret.height, RED );
+        }
+    }
 }
 
 static Animacao *getAnimacaoAtualInimigoTonTon( InimigoTonTon *inimigo ) {

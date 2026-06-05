@@ -1,3 +1,4 @@
+a01 · TXT
 I                                                          L
 C                   a                                      E
 C                  aM                                      E
@@ -11,12 +12,7 @@ C           Ma    aM    KDDDDDDDDDJ    KDDDDDDDDDDDJ       E
 C            M   bM                                        E
 C               aM                                         E
 C               M                                          E
-<<<<<<< Updated upstream
-C                                                          E
-C   0 2 1  M            M                                  E
-=======
 C                            000000000000000               E
 C   0   1  M            M   0    0     0    0   0   0   111E
->>>>>>> Stashed changes
 FBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBG
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

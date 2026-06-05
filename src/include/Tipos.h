@@ -267,6 +267,16 @@ typedef struct InimigoSpikes {
 
 } InimigoSpikes;
 
+typedef struct BolaTonTon {
+
+    Rectangle ret;
+    Vector2 vel;
+    bool ativo;
+
+    Animacao animacao;
+
+} BolaTonTon;
+
 typedef struct InimigoTonTon {
 
     Rectangle ret;
@@ -275,6 +285,9 @@ typedef struct InimigoTonTon {
 
     float velAndando;
     float velMaxQueda;
+
+    BolaTonTon bola[5];
+    float contadorTiroBola;
 
     EstadoInimigoTonTon estado;
     bool ativo;

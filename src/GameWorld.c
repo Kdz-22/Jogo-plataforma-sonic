@@ -15,8 +15,8 @@
 #include "Obstaculo.h"
 #include "Tipos.h"
 #include "ResourceManager.h"
-#include "sonic.h"
-#include "mario.h"
+#include "Sonic.h"
+#include "Mario.h"
 
 #include "raylib/raylib.h"
 #include "raylib/raymath.h"

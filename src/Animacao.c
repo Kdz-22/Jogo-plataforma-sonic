@@ -149,3 +149,22 @@ void sincronizarAnimacao( Animacao *destino, Animacao *origem ) {
     destino->quadroAtual = origem->quadroAtual;
     destino->contadorTempoQuadro = 0.0f;
 }
+
+/**
+ * @brief Desenha um elemento com animação usando a textura fornecida.
+ */
+void desenharComAnimacao( Animacao *anim, Texture2D textura, Rectangle destino, Color tonalidade ) {
+    if ( anim != NULL ) {
+        QuadroAnimacao *qa = getQuadroAtualAnimacao( anim );
+        if ( qa != NULL ) {
+            DrawTexturePro(
+                textura,
+                qa->fonte,
+                destino,
+                (Vector2) { 0 },
+                0.0f,
+                tonalidade
+            );
+        }
+    }
+}
