@@ -36,7 +36,9 @@ typedef enum EstadoMario {
     ESTADO_MARIO_ANDANDO,
     ESTADO_MARIO_CORRENDO,
     ESTADO_MARIO_PULANDO,
-    ESTADO_MARIO_PULANDO_CORRENDO
+    ESTADO_MARIO_PULANDO_CORRENDO,
+    ESTADO_MARIO_PULANDO_GIRANDO,
+    ESTADO_MARIO_CAINDO,
 } EstadoMario;
 
 /**
@@ -187,6 +189,8 @@ typedef struct Mario {
     float velMaxQueda;
 
     float frenagem;
+    float aceleracao;
+    float desaceleracao;
 
     int quantidadePulos;
     int quantidadeMaxPulos;
@@ -202,7 +206,7 @@ typedef struct Mario {
 
     bool freando;
 
-    EstadoJogador estado;
+    EstadoMario estado;
     bool olhandoParaDireita;
 
     Animacao *animacoes[20];
@@ -213,6 +217,7 @@ typedef struct Mario {
     Animacao animacaoCorrendo;
     Animacao animacaoPulando;
     Animacao animacaoPulandoCorrendo;
+    Animacao animacaoCaindo;
 
 } Mario;
 

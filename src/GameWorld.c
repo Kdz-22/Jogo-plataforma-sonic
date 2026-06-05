@@ -268,7 +268,7 @@ static void inicializar( GameWorld *gw ) {
 
     //gw->mapa = carregarMapa( "resources/mapas/mapaTeste.txt" );
     gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
-    gw->personagem = criarSonic( GetScreenWidth() / 2 + 144, calcularAlturaMapa( gw->mapa ) - 196, 96, 96 );
+    gw->personagem = criarMario( GetScreenWidth() / 2 + 144, calcularAlturaMapa( gw->mapa ) - 196, 96, 96 );
 
     gw->camera = (Camera2D) {
         .offset = { 0 },    // deslocamento relativo da câmera em relação ao alvo

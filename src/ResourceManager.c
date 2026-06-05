@@ -30,6 +30,17 @@ void loadResourcesResourceManager( void ) {
         2
     );
 
+    rm.texturaMario = carregarTexturaAlterandoCores( 
+        "resources/imagens/sprites/SNES-SuperMarioWorld-PlayableCharacters-Mario.png",
+        (Color[]) {
+            { 0, 116, 116, 255 },            
+        },
+        (Color[]) {
+            BLANK,
+        },
+        1
+    );
+
     rm.texturaBadniks = carregarTexturaAlterandoCores( 
         "resources/imagens/sprites/badniks.png",
         (Color[]) {
@@ -81,18 +92,19 @@ void loadResourcesResourceManager( void ) {
     // Evita interpolação bilinear nas bordas dos tiles e sprites, que causaria
     // bleeding de cor entre pixels adjacentes — efeito indesejável em pixel art.
     SetTextureFilter( rm.texturaJogador, TEXTURE_FILTER_POINT );
+    SetTextureFilter( rm.texturaMario, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaBadniks, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaItens, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaTerreno, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaFundo, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaHUD, TEXTURE_FILTER_POINT );
 
-    rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
-    rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
-    rm.somHitComAnel = LoadSound( "resources/sons/efeitos/hit-com-anel.wav" );
-    rm.somHitInimigo = LoadSound( "resources/sons/efeitos/hit-inimigo.wav" );
-    rm.somMorte = LoadSound( "resources/sons/efeitos/morte.wav" );
-    rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
+    //rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
+    //rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
+    //rm.somHitComAnel = LoadSound( "resources/sons/efeitos/hit-com-anel.wav" );
+    //rm.somHitInimigo = LoadSound( "resources/sons/efeitos/hit-inimigo.wav" );
+    //rm.somMorte = LoadSound( "resources/sons/efeitos/morte.wav" );
+    //rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
 
     rm.musicaFase01 = LoadMusicStream( "resources/sons/musicas/green-hill-zone.mp3" );
     rm.volumeMusicaFase01 = 0.0f;
@@ -102,6 +114,7 @@ void loadResourcesResourceManager( void ) {
 void unloadResourcesResourceManager( void ) {
 
     UnloadTexture( rm.texturaJogador );
+    UnloadTexture( rm.texturaMario );
     UnloadTexture( rm.texturaBadniks );
     UnloadTexture( rm.texturaItens );
     UnloadTexture( rm.texturaTerreno );
