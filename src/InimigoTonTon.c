@@ -22,7 +22,7 @@ static void desenharQuadroAnimacaoInimigoTonTonMorrendo( InimigoTonTon *inimigo,
 static void desenharBolaTonTon( BolaTonTon *bola ); 
 static Animacao *getAnimacaoAtualInimigoTonTon( InimigoTonTon *inimigo );
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 
 /**
  * @brief Cria um novo Inimigo (tonton).

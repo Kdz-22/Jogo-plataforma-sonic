@@ -15,6 +15,7 @@
 #include "Inimigo.h"
 #include "InimigoMotobug.h"
 #include "InimigoSpikes.h"
+#include "InimigoTonTon.h"
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
