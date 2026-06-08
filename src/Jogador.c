@@ -52,8 +52,8 @@ Jogador *criarJogador( float x, float y, float w, float h ) {
     novoJogador->cor = BLUE;
 
     novoJogador->velAndando = 200;
-    novoJogador->velAndandoRapido = 400;
-    novoJogador->velCorrendo = 800;
+    novoJogador->velAndandoRapido = 800;
+    novoJogador->velCorrendo = 1200;
     novoJogador->velPulo = -550;
     novoJogador->velMaxQueda = 600;
 
@@ -62,7 +62,7 @@ Jogador *criarJogador( float x, float y, float w, float h ) {
     novoJogador->frenagem = 1800;
 
     novoJogador->quantidadePulos = 0;
-    novoJogador->quantidadeMaxPulos = 1;
+    novoJogador->quantidadeMaxPulos = 5;
 
     novoJogador->invulneravel = false;
     novoJogador->tempoInvulnerabilidade = 3.0f;
