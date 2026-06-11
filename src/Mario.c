@@ -1051,11 +1051,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
                             m->invulneravel = true;
                         }
 
-<<<<<<< Updated upstream
-=======
                         return; // um inimigo de cada vez!
                     }
->>>>>>> Stashed changes
                 }
                 el = el->proximo;
             }
