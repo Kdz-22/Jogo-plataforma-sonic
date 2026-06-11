@@ -608,7 +608,8 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if ( !o->solido ) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
@@ -655,7 +656,8 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if ( !o->solido ) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
@@ -1098,7 +1100,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
             }
         }
     }
+}
 
-    /**
-     * @brief Cria uma instância alocada dinamicamente da struct Jogador.
-     */
+/**
+ * @brief Cria uma instância alocada dinamicamente da struct Jogador.
+ */

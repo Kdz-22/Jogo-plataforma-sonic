@@ -16,6 +16,7 @@
 #include "InimigoMotobug.h"
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
+#include "InimigoKoopaRed.h"
 #include "InimigoRex.h"
 #include "Item.h"
 #include "ItemAnel.h"
@@ -532,7 +533,8 @@ static void resolverColisaoJogadorObstaculosMapaX(Jogador *j, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if ( !o->solido ) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
@@ -579,7 +581,8 @@ static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if ( !o->solido ) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
@@ -948,18 +951,19 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
 
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
             {
+                // MUDANÇA COMEÇA AQUI:
                 // Verifica se o Sonic está atacando/pulando por cima (Pulo bem-sucedido)
                 if (j->estado >= ESTADO_JOGADOR_PULANDO && j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
                 {
                     if (rex->estado == ESTADO_REX_ANDANDO)
                     {
-                        // Primeiro pisão: Transforma o Rex no frame achatado e parado
+                        // Primeiro pisão: Transforma o Rex no frame achatado
                         rex->estado = ESTADO_REX_ACHATADO_PARADO;
 
                         // Redimensiona o retângulo físico para o tamanho do frame achatado (16x16)
                         rex->ret.width = 16;
                         rex->ret.height = 16;
-                        rex->ret.y += 8; // Desce 8 pixels (24 de altura - 16 atual) para não flutuar
+                        rex->ret.y += 8; // Desce 8 pixels para não flutuar
 
                         j->vel.y = j->velPulo; // Sonic quica para cima
                         PlaySound(rm.somHitInimigo);
@@ -968,15 +972,19 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                         p->score += tabelaComboAereo[idx];
                         p->comboAereo++;
                     }
-                    else if (rex->estado == ESTADO_REX_ACHATADO_PARADO)
+                    else if (rex->estado == ESTADO_REX_ACHATADO_PARADO || rex->estado == ESTADO_REX_ACHATADO_CORRENDO)
                     {
-                        // Se pular em cima dele já achatado/parado, ele começa a correr
-                        rex->estado = ESTADO_REX_ACHATADO_CORRENDO;
-                        rex->velAndando = 300;
+                        // SEGUNDO PISÃO: O Rex morre e some da tela!
+                        rex->ativo = false;
+
                         j->vel.y = j->velPulo; // Quica novamente
                         PlaySound(rm.somHitInimigo);
+
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx];
+                        p->comboAereo++;
                     }
-                }
+                } // MUDANÇA TERMINA AQUI
                 else if (!j->invulneravel)
                 {
                     // Se o Sonic trombar com o Rex achatado e PARADO pelas laterais, ele CHUTA o inimigo
@@ -1013,8 +1021,8 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                     }
                 }
             }
-        }
 
-        el = el->proximo;
+            el = el->proximo;
+        }
     }
 }
