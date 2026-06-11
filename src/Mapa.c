@@ -104,8 +104,12 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
 
                     inserirObstaculo( novoMapa, el );
 
-                } else if ( c == '!' || c == '@' || c == '#' || c == '$' || c == '%' || c == '&' || c == '*' || c == '(' ) {
-                        // mapeia cada caractere para um tile do cano
+                } else if (c == '!' || c == '@' || c == '#' || c == '$' ||
+                           c == '%' || c == '&' || c == '*' || c == '(' ||
+                           c == ')' || c == '[' || c == ']' || c == '{' ||
+                           c == '}' || c == '?' || c == ';' || c == ':' ||
+                           c == ',' || c == '.' || c == '<' || c == '>' ) {
+                    // mapeia cada caractere para um tile do cano
                     int deslocamento = 0;
                     if      ( c == '!' ) deslocamento = 0; // topo esquerdo do cano
                     else if ( c == '@' ) deslocamento = 1; // topo direito
@@ -115,6 +119,18 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                     else if ( c == '&' ) deslocamento = 5; // corpo direito
                     else if ( c == '*' ) deslocamento = 6; // corpo direito
                     else if ( c == '(' ) deslocamento = 7; // corpo direito
+                    else if ( c == ')' ) deslocamento = 8; // corpo direito
+                    else if ( c == '[' ) deslocamento = 9; // corpo direito
+                    else if ( c == ']' ) deslocamento = 10; // corpo direito
+                    else if ( c == '{' ) deslocamento = 11; // corpo direito
+                    else if ( c == '}' ) deslocamento = 12; // corpo direito
+                    else if ( c == '?' ) deslocamento = 13; // corpo direito
+                    else if ( c == ';' ) deslocamento = 14; // corpo direito
+                    else if ( c == ':' ) deslocamento = 15; // corpo direito
+                    else if ( c == ',' ) deslocamento = 16; // corpo direito
+                    else if ( c == '.' ) deslocamento = 17; // corpo direito
+                    else if ( c == '<' ) deslocamento = 18; // corpo direito
+                    else if ( c == '>' ) deslocamento = 19; // corpo direito
 
                     el->objeto = criarObstaculo(
                         (Rectangle) {
@@ -135,8 +151,8 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo( novoMapa, el );
-                    
-                } else if ( c >= 'a' && c <= 'z' ) {
+
+                } else if (c >= 'a' && c <= 'z') {
 
                     Item *item = NULL;
 
@@ -188,7 +204,7 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
 
                     inserirItem( novoMapa, el );
 
-                } else if ( c >= '0' && c <= '9' ) {
+                } else if (c >= '0' && c <= '9') {
 
                     Inimigo *inimigo = NULL;
 
@@ -280,7 +296,6 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                     TraceLog( LOG_ERROR, "Entidade inválida no mapa." );
                     abort();
                 }
-
             }
 
             colunaAtual++;
