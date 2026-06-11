@@ -55,11 +55,11 @@ InimigoKoopaRed *criarInimigoKoopaRed( Rectangle ret, Color cor ) {
         novoInimigo->animacaoAndando.quadros,
         novoInimigo->animacaoAndando.quantidadeQuadros,
         250,             // duração de cada frame (ms)
-        1, 113,           // Início X, Y na Texture
-        16, 32,          // Dimensões do sprite (Largura, Altura de SNES)
+        1, 115,           // Início X, Y na Texture
+        16, 30,          // Dimensões do sprite (Largura, Altura de SNES)
         1,               // Separação de pixels entre frames
         false, 
-        (Rectangle) { 0, 0, 16, 32 } // Hitbox interna relativa ao sprite
+        (Rectangle) { 2, 2, 68, 58 } // Hitbox interna relativa ao sprite
     );
 
     //CONFIGURAÇÃO DO CASCO PARADO
