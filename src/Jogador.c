@@ -996,7 +996,6 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                     }
                     else
                     {
-<<<<<<< Updated upstream
                         // Se o Rex estiver andando normal ou correndo rápido achatado, o Sonic toma dano
                         if (p->quantidadeAneis > 0)
                         {
@@ -1009,10 +1008,6 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                             //PlaySound(rm.somMorte);
                         }
                         j->invulneravel = true;
-=======
-                        p->quantidadeVidas--;
-                        PlaySound(rm.somMorte);
->>>>>>> Stashed changes
                     }
                     j->invulneravel = true;
                 }
@@ -1021,10 +1016,6 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
             }
 
         }
-<<<<<<< Updated upstream
-    el = el->proximo;
-=======
         el = el->proximo;
->>>>>>> Stashed changes
     }
 }
