@@ -1,18 +1,18 @@
 
 I                                                          L
 C                   a                                      E
-C                  aM                                      E
-C                 aM                         a             E
-C                aM                         aba            E
-C               aM          aaa            ababa           E
-C         a    aM          aLBIa          abababa          E
-C         Ma   M    a    aaLGAFIaa       ababababa         E
-C          Ma      bM   LBBGAAAFBBI    LBBBBBBBBBBBI       E
-C           Ma    aM    KDDDDDDDDDJ    KDDDDDDDDDDDJ       E
-C            M   bM                                        E
-C               aM                                         E
-C               M                                          E
+C                  aY                                      E
+C                 aY                         a             E
+C                aY        aaaaa            aba            E
+C               aY         JBBBK           ababa           E
+C         a    aY         aFAAAGa         abababa          E
+C         Ya   Y    a    aaFAAAGaa       ababababa         E
+C          Ya      bY   JBBBBBBBBBK    JBBBBBBBBBBBK       E
+C           Ya    aY    FAAAAAAAAAG    FAAAAAAAAAAAG       E
+C            Y   bY                                        E
+C               aY                                         E
+C               Y                                          E
 C                            000000000000000               E
-C   0   1  M      2     M   0    0     0    0   0   0   111E
-FBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBG
+C   0   1  Y      2     Y   0    0     0    0   0   0   111E
+VBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBT
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

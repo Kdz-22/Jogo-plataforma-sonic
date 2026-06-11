@@ -83,7 +83,8 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                     bool solido = true;
                     int deslocamento = c - 'A';
 
-                    if ( c == 'A' || c == 'R' || c == 'S' || c == 'U' || c == 'Q' || c == 'P' || c == 'M' ) {
+                    if ( c == 'A' || c == 'R' || c == 'S' || c == 'U' || c == 'Q' || c == 'P' || c == 'M' ||
+                        c == 'F' || c == 'G'  ) {
                         solido = false;
                     }
 
