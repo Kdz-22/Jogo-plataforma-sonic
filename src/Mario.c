@@ -1000,16 +1000,15 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
                 }
                 else if (inimigo->tipo == TIPO_INIMIGO_REX)
                 {
+
                     InimigoRex *rex = (InimigoRex *)inimigo->objeto;
 
-                    // Se o Rex não estiver ativo, pula para o próximo
-                    if (!rex->ativo)
+                    if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO)
                     {
                         el = el->proximo;
                         continue;
                     }
 
-                    // Usando as funções e variáveis corretas do Rex
                     qaInimigo = getQuadroAnimacaoAtualInimigoRex(rex);
                     olhandoParaDireita = &rex->olhandoParaDireita;
                     ret = &rex->ret;
@@ -1027,74 +1026,36 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
 
                     if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
                     {
-                        // Verifica se o Mario está caindo ou pulando em cima dele (Pulo bem-sucedido)
+
                         if (m->estado == ESTADO_MARIO_PULANDO || m->estado == ESTADO_MARIO_PULANDO_CORRENDO || m->estado == ESTADO_MARIO_CAINDO)
                         {
-                            if (rex->estado == ESTADO_REX_ANDANDO)
-                            {
-                                // Primeiro pisão: Transforma o Rex no frame achatado e parado
-                                rex->estado = ESTADO_REX_ACHATADO_PARADO;
-
-                                // Redimensiona o retângulo físico para o tamanho do frame achatado (16x16)
-                                rex->ret.width = 16;
-                                rex->ret.height = 16;
-                                rex->ret.y += 8; // Ajusta 8 pixels (24 de altura - 16 atual) para não flutuar
-
-                                m->vel.y = m->velPulo; // Mario quica para cima
-                                PlaySound(rm.somHitInimigo);
-
-                                int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
-                                p->score += tabelaComboAereo[idx];
-                                p->comboAereo++;
-                            }
-                            else if (rex->estado == ESTADO_REX_ACHATADO_PARADO)
-                            {
-                                // Se já estava achatado e parado, o Mario pula e faz ele correr
-                                rex->estado = ESTADO_REX_ACHATADO_CORRENDO;
-                                rex->velAndando = 300; // Velocidade do chute
-                                m->vel.y = m->velPulo; // Dá mais um quique
-                                PlaySound(rm.somHitInimigo);
-                            }
+                            m->vel.y = m->velPulo;
+                            rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
+                            PlaySound(rm.somHitInimigo);
+                            int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                            p->score += tabelaComboAereo[idx];
+                            p->comboAereo++;
                         }
                         else if (!m->invulneravel)
                         {
-                            // Se o Mario trombar com ele achatado e parado pelo lado, ele CHUTA o Rex
-                            if (rex->estado == ESTADO_REX_ACHATADO_PARADO)
+                            if (p->quantidadeAneis > 0)
                             {
-                                rex->estado = ESTADO_REX_ACHATADO_CORRENDO;
-                                rex->velAndando = 350;
-
-                                // Define a direção baseado na posição do Mario
-                                if (retColCalculado.x < rex->ret.x)
-                                {
-                                    rex->olhandoParaDireita = true;
-                                }
-                                else
-                                {
-                                    rex->olhandoParaDireita = false;
-                                }
-                                PlaySound(rm.somHitInimigo);
+                                p->quantidadeAneis = 0;
+                                PlaySound(rm.somHitComAnel);
                             }
                             else
                             {
-                                // Se o Rex estiver ANDANDO normal ou CORRENDO achatado, o Mario toma dano
-                                if (p->quantidadeAneis > 0)
-                                {
-                                    p->quantidadeAneis = 0;
-                                    PlaySound(rm.somHitComAnel);
-                                }
-                                else
-                                {
-                                    p->quantidadeVidas--;
-                                    PlaySound(rm.somMorte);
-                                }
-                                m->invulneravel = true;
+                                p->quantidadeVidas--;
+                                PlaySound(rm.somMorte);
                             }
-
-                            return; // um inimigo de cada vez!
+                            m->invulneravel = true;
                         }
-                    }
 
+<<<<<<< Updated upstream
+=======
+                        return; // um inimigo de cada vez!
+                    }
+>>>>>>> Stashed changes
                 }
                 el = el->proximo;
             }

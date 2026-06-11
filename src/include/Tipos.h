@@ -82,9 +82,8 @@ typedef enum EstadoInimigoKoopaRed
 
 typedef enum EstadoInimigoRex
 {
-    ESTADO_REX_ANDANDO,
-    ESTADO_REX_ACHATADO_PARADO,
-    ESTADO_REX_ACHATADO_CORRENDO
+    ESTADO_INIMIGO_REX_ANDANDO,
+    ESTADO_INIMIGO_REX_MORRENDO,
 } EstadoInimigoRex;
 
 /**
@@ -367,22 +366,21 @@ typedef struct InimigoKoopaRed
 } InimigoKoopaRed;
 
 typedef struct InimigoRex {
-    Rectangle ret; // Posição e Hitbox física
+
+    Rectangle ret;
     Vector2 vel;
     Color cor;
 
     float velAndando;
     float velMaxQueda;
 
-    // Estado do inimigo
     EstadoInimigoRex estado;
     bool ativo;
     bool olhandoParaDireita;
 
-    // Controle de animações
     Animacao *animacoes[2];
     int quantidadeAnimacoes;
-    
+
     Animacao animacaoAndando;
     Animacao animacaoMorrendo;
 

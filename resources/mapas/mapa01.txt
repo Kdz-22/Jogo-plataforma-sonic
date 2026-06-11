@@ -13,6 +13,10 @@ C            Y   bY                                        E
 C               aY                                         E
 C               Y                                          E
 C                            000000000000000               E
+<<<<<<< Updated upstream
 C   ccc    Y      2     Y   0    0     0    0   0   0   111E
+=======
+C   0 431  Y      2     Y   0    0     0    0   0   0   111E
+>>>>>>> Stashed changes
 VBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBT
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
