@@ -138,10 +138,16 @@ void drawGameWorld(GameWorld *gw) {
         gw->personagem->funcoes->desenhar(gw->personagem->dados);
         EndMode2D();
 
-        // DrawText( "VOL", 160, 48, 16, WHITE );
-        desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
+        DrawText( "VOL", 640, 45, 25, WHITE );
+        DrawText( "AUMENTAR = +", 640, 75, 20, YELLOW );
+        DrawText( "DIMINUIR = -", 640, 105, 20, YELLOW );
+        desenharPontuacao(rm.texturaHUD,
+            (int)(rm.volumeMusicaFase01 * 100),
                           (Vector2){700, 45});
-        desenharTexto(rm.texturaHUD2, "VOL", (Vector2){660, 48}, 2.0f);
+        //desenharTexto(rm.texturaHUD2,
+          //              "VOL",
+            //            (Vector2){660, 48}, 
+              //          2.0f);
 
         // Score
         DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
@@ -339,14 +345,14 @@ static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao) {
     }
 }
 
-static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
-                          float escala) {
+static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao, float escala) {
 
-    int charW = 7;
-    int charH = 11;
-    int inicioX = 9;
-    int inicioY = 82;
+    int charW      = 7;
+    int charH      = 11;
+    int inicioX    = 9;
+    int inicioY    = 82;
     int espacamento = 2;
+    int cursor     = 0; // <-- contador separado para posição X
 
     for (int i = 0; texto[i] != '\0'; i++) {
 
@@ -356,18 +362,27 @@ static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
         if (c >= 'A' && c <= 'Z') {
             idx = c - 'A';
         } else if (c == ' ') {
+            cursor++; // avança o cursor mas não desenha
             continue;
         }
 
-        if (idx < 0) {
-            continue;
-        }
-        //(digito * (digitoW + espacamento) ) + 72,
-        Rectangle origem = {inicioX + (idx * charW), inicioY, charW, charH};
+        if (idx < 0) continue;
 
-        Rectangle dest = {posicao.x + i * (charW * escala), posicao.y,
-                          charW * escala, charH * escala};
+        Rectangle origem = {
+            inicioX + (idx * (charW + espacamento)),
+            inicioY,
+            charW,
+            charH
+        };
+
+        Rectangle dest = {
+            posicao.x + cursor * (charW * escala),
+            posicao.y,
+            charW * escala,
+            charH * escala
+        };
 
         DrawTexturePro(hud, origem, dest, (Vector2){0, 0}, 0.0f, WHITE);
+        cursor++;
     }
 }

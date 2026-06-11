@@ -1036,19 +1036,19 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                         if (p->quantidadeAneis > 0)
                         {
                             p->quantidadeAneis = 0;
-                            PlaySound(rm.somHitComAnel);
+                            //PlaySound(rm.somHitComAnel);
                         }
                         else
                         {
                             p->quantidadeVidas--;
-                            PlaySound(rm.somMorte);
+                            //PlaySound(rm.somMorte);
                         }
                         j->invulneravel = true;
                     }
                 }
             }
 
-            el = el->proximo;
         }
+    el = el->proximo;
     }
 }

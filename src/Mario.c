@@ -1095,8 +1095,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
                         }
                     }
 
-                    el = el->proximo;
                 }
+                el = el->proximo;
             }
         }
     }
