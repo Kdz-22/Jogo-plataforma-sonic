@@ -607,6 +607,10 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
+        if ( !o->solido ) {
+            el = el->proximo;
+            continue;
+        }
         if (CheckCollisionRecs(retColCalculado, o->ret))
         {
             if (retColCalculado.x + retColCalculado.width / 2 < o->ret.x + o->ret.width / 2)
@@ -650,6 +654,10 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
+        if ( !o->solido ) {
+            el = el->proximo;
+            continue;
+        }
         if (CheckCollisionRecs(retColCalculado, o->ret))
         {
             if (retColCalculado.y + retColCalculado.height / 2 < o->ret.y + o->ret.height / 2)

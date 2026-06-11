@@ -80,8 +80,12 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                 el->proximo = NULL;
 
                 if ( c >= 'A' && c <= 'Z' ) {
-
+                    bool solido = true;
                     int deslocamento = c - 'A';
+
+                    if ( c == 'A' || c == 'R' || c == 'S' || c == 'U' || c == 'Q' || c == 'P' || c == 'M' ) {
+                        solido = false;
+                    }
 
                     el->objeto = criarObstaculo( 
                         (Rectangle) { 
@@ -97,7 +101,8 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                             novoMapa->dimensaoPadraoElementos,
                             novoMapa->dimensaoPadraoElementos
                         },
-                        &rm.texturaTerreno
+                        &rm.texturaTerreno,
+                        solido
                     );
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
@@ -132,6 +137,7 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                     else if ( c == '<' ) deslocamento = 18; // corpo direito
                     else if ( c == '>' ) deslocamento = 19; // corpo direito
 
+                    bool solido = true;
                     el->objeto = criarObstaculo(
                         (Rectangle) {
                             .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
@@ -146,7 +152,8 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                             novoMapa->dimensaoPadraoElementos,
                             novoMapa->dimensaoPadraoElementos
                         },
-                        &rm.texturaCanos  // nova textura separada
+                        &rm.texturaCanos,
+                        solido
                     );
                 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;

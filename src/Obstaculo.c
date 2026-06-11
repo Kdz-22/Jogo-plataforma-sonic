@@ -16,7 +16,7 @@
 /**
  * @brief Cria um novo obstáculo.
  */
-Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D *textura ) {
+Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D *textura, bool solido ) {
 
     Obstaculo *novoObstaculo = (Obstaculo*) malloc( sizeof( Obstaculo ) );
 
@@ -24,6 +24,7 @@ Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D 
     novoObstaculo->cor = cor;
     novoObstaculo->fonte = fonte;
     novoObstaculo->textura = textura;
+    novoObstaculo->solido = solido;
 
     return novoObstaculo;
 

@@ -14,7 +14,7 @@
 /**
  * @brief Cria um novo obstáculo.
  */
-Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D *textura );
+Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D *textura, bool solido );
 
 /**
  * @brief Destroi um obstáculo.

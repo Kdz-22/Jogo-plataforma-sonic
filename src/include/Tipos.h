@@ -417,6 +417,7 @@ typedef struct Obstaculo
     Color cor;
     Rectangle fonte;
     Texture2D *textura;
+    bool solido;
 } Obstaculo;
 
 /**
