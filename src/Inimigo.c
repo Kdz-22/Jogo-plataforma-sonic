@@ -162,7 +162,7 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa)
             olhandoParaDireita = &koopared->olhandoParaDireita;
             ret = &koopared->ret;
         }
-         if (inimigo->tipo == TIPO_INIMIGO_REX)
+         else if (inimigo->tipo == TIPO_INIMIGO_REX)
         {
             InimigoRex *rex = (InimigoRex *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoRex(rex);
