@@ -103,6 +103,38 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
 
                     inserirObstaculo( novoMapa, el );
 
+                } else if ( c == '!' || c == '@' || c == '#' || c == '$' || c == '%' || c == '&' || c == '*' || c == '(' ) {
+                        // mapeia cada caractere para um tile do cano
+                    int deslocamento = 0;
+                    if      ( c == '!' ) deslocamento = 0; // topo esquerdo do cano
+                    else if ( c == '@' ) deslocamento = 1; // topo direito
+                    else if ( c == '#' ) deslocamento = 2; // corpo esquerdo
+                    else if ( c == '$' ) deslocamento = 3; // corpo direito
+                    else if ( c == '%' ) deslocamento = 4; // corpo direito
+                    else if ( c == '&' ) deslocamento = 5; // corpo direito
+                    else if ( c == '*' ) deslocamento = 6; // corpo direito
+                    else if ( c == '(' ) deslocamento = 7; // corpo direito
+
+                    el->objeto = criarObstaculo(
+                        (Rectangle) {
+                            .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                            .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
+                            .width = novoMapa->dimensaoPadraoElementos,
+                            .height = novoMapa->dimensaoPadraoElementos
+                        },
+                        GRAY,
+                        (Rectangle) {
+                            1 + ( novoMapa->dimensaoPadraoElementos + 1 ) * deslocamento,
+                            1,
+                            novoMapa->dimensaoPadraoElementos,
+                            novoMapa->dimensaoPadraoElementos
+                        },
+                        &rm.texturaCanos  // nova textura separada
+                    );
+                
+                    el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
+                    inserirObstaculo( novoMapa, el );
+                    
                 } else if ( c >= 'a' && c <= 'z' ) {
 
                     Item *item = NULL;

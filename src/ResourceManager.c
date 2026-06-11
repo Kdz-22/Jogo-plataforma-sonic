@@ -87,6 +87,7 @@ void loadResourcesResourceManager( void ) {
 
     rm.texturaTerreno = LoadTexture( "resources/imagens/tiles/terreno.png" );
     rm.texturaFundo = LoadTexture( "resources/imagens/fundo/fundo.png" );
+    rm.texturaCanos = LoadTexture( "resources/imagens/tiles/canos.png" );
 
     // Filtro de textura nearest-neighbor (ponto) para todas as texturas do jogo.
     // Evita interpolação bilinear nas bordas dos tiles e sprites, que causaria
@@ -98,6 +99,8 @@ void loadResourcesResourceManager( void ) {
     SetTextureFilter( rm.texturaTerreno, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaFundo, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaHUD, TEXTURE_FILTER_POINT );
+    SetTextureFilter( rm.texturaHUD2, TEXTURE_FILTER_POINT );
+    SetTextureFilter( rm.texturaCanos, TEXTURE_FILTER_POINT );
 
     //rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
     //rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
@@ -120,6 +123,8 @@ void unloadResourcesResourceManager( void ) {
     UnloadTexture( rm.texturaTerreno );
     UnloadTexture( rm.texturaFundo );
     UnloadTexture( rm.texturaHUD );
+    UnloadTexture( rm.texturaHUD2 );
+    UnloadTexture( rm.texturaCanos );
 
     UnloadSound( rm.somAnel );
     UnloadSound( rm.somFrenagem );
