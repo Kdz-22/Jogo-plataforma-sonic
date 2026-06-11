@@ -20,6 +20,7 @@
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
+#include "ItemCoguVerm.h"
 #include "Macros.h"
 #include "Jogador.h"
 #include "ResourceManager.h"
@@ -676,6 +677,31 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p, Mapa *map
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
+            }
+        } else if ( item->tipo == TIPO_ITEM_COGUMELO_VERMELHO ) {
+
+            ItemCogumeloVermelho *itemCogumeloVermelho = (ItemCogumeloVermelho *)item->objeto;
+
+            if (!itemCogumeloVermelho->ativo || itemCogumeloVermelho->estado == ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemCogumeloVermelho(itemCogumeloVermelho);
+
+            Rectangle retColItemCalculado = {
+                itemCogumeloVermelho->ret.x + qaItem->retColisao.x,
+                itemCogumeloVermelho->ret.y + qaItem->retColisao.y,
+                qaItem->retColisao.width,
+                qaItem->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
+                itemCogumeloVermelho->estado = ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
+                p->quantidadeAneis += 10;
+                p->score += 100;
+                //PlaySound(rm.somAnel);
             }
         }
 

@@ -13,6 +13,7 @@
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
+#include "ItemCoguVerm.h"
 #include "Tipos.h"
 
 /**
@@ -40,6 +41,9 @@ void destruirItem( Item *item ) {
             case TIPO_ITEM_ANEL_AZUL:
                 destruirItemAnelAzul( (ItemAnelAzul*) item->objeto );
                 break;
+            case TIPO_ITEM_COGUMELO_VERMELHO:
+                destruirItemCogumeloVermelho( (ItemCogumeloVermelho*) item->objeto );
+                break;
             default:
                 break;
         }
@@ -59,6 +63,9 @@ void atualizarItem( Item *item, float delta ) {
         case TIPO_ITEM_ANEL_AZUL:
             atualizarItemAnelAzul( (ItemAnelAzul*) item->objeto, delta );
             break;
+        case TIPO_ITEM_COGUMELO_VERMELHO:
+            atualizarItemCogumeloVermelho( (ItemCogumeloVermelho*) item->objeto, delta );
+            break;
         default:
             return;
     }
@@ -76,6 +83,9 @@ void desenharItem( Item *item ) {
             break;
         case TIPO_ITEM_ANEL_AZUL:
             desenharItemAnelAzul( (ItemAnelAzul*) item->objeto );
+            break;
+        case TIPO_ITEM_COGUMELO_VERMELHO:
+            desenharItemCogumeloVermelho( (ItemCogumeloVermelho*) item->objeto );
             break;
         default:
             return;

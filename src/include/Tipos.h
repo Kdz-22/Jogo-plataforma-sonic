@@ -105,6 +105,12 @@ typedef enum EstadoItemAnelAzul
     ESTADO_ITEM_ANEL_AZUL_COLETADO,
 } EstadoItemAnelAzul;
 
+typedef enum EstadoItemCogumeloVermelho
+{
+    ESTADO_ITEM_COGUMELO_VERMELHO_PARADO,
+    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO,
+} EstadoItemCogumeloVermelho;
+
 /**
  * @brief Representa o tipo de um item.
  */
@@ -112,6 +118,7 @@ typedef enum TipoItem
 {
     TIPO_ITEM_ANEL,
     TIPO_ITEM_ANEL_AZUL,
+    TIPO_ITEM_COGUMELO_VERMELHO
 } TipoItem;
 
 /**
@@ -397,6 +404,23 @@ typedef struct ItemAnelAzul
     Animacao animacaoColetando;
 
 } ItemAnelAzul;
+
+typedef struct ItemCogumeloVermelho
+{
+
+    Rectangle ret;
+    Color cor;
+
+    EstadoItemCogumeloVermelho estado;
+    bool ativo;
+
+    Animacao *animacoes[2];
+    int quantidadeAnimacoes;
+
+    Animacao animacaoParado;
+    Animacao animacaoColetando;
+
+} ItemCogumeloVermelho;
 
 /**
  * @brief Representa um item estático do mapa.
