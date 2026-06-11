@@ -55,7 +55,7 @@ InimigoKoopaRed *criarInimigoKoopaRed( Rectangle ret, Color cor ) {
         novoInimigo->animacaoAndando.quadros,
         novoInimigo->animacaoAndando.quantidadeQuadros,
         250,             // duração de cada frame (ms)
-        1, 72,           // Início X, Y na Texture
+        1, 113,           // Início X, Y na Texture
         16, 32,          // Dimensões do sprite (Largura, Altura de SNES)
         1,               // Separação de pixels entre frames
         false, 
@@ -76,7 +76,7 @@ InimigoKoopaRed *criarInimigoKoopaRed( Rectangle ret, Color cor ) {
         novoInimigo->animacaoCasco.quadros,
         novoInimigo->animacaoCasco.quantidadeQuadros,
         1000,             
-        35, 150,          // MUDAR AQUI: Coloque a posição X, Y exata daquele casco circulado
+        35, 113,          // MUDAR AQUI: Coloque a posição X, Y exata daquele casco circulado
         16, 16,           // O casco sozinho mede 16x16
         0,                
         false,            
