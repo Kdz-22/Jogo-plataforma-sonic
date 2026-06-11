@@ -72,12 +72,20 @@ typedef enum EstadoInimigoTonTon
     ESTADO_INIMIGO_TONTON_MORRENDO,
 } EstadoInimigoTonTon;
 
+/* INIMIGOS MARIO*/
 typedef enum EstadoInimigoKoopaRed
 {
     ESTADO_KOOPA_ANDANDO,
     ESTADO_KOOPA_CASCO_PARADO,
     ESTADO_KOOPA_CASCO_CORRENDO
 } EstadoInimigoKoopaRed;
+
+typedef enum EstadoInimigoRex
+{
+    ESTADO_REX_ANDANDO,
+    ESTADO_REX_ACHATADO_PARADO,
+    ESTADO_REX_ACHATADO_CORRENDO
+} EstadoInimigoRex;
 
 /**
  * @brief Representa o tipo de um inimigo.
@@ -88,6 +96,7 @@ typedef enum TipoInimigo
     TIPO_INIMIGO_SPIKES,
     TIPO_INIMIGO_TONTON,
     TIPO_INIMIGO_KOOPARED,
+    TIPO_INIMIGO_REX,
 } TipoInimigo;
 
 /**
@@ -243,6 +252,7 @@ typedef struct Mario
 
 } Mario;
 
+/* INIMIGOS SONIC */
 /**
  * @brief Representa um inimigo do tipo Motobug.
  */
@@ -327,6 +337,7 @@ typedef struct InimigoTonTon
 
 } InimigoTonTon;
 
+/* INIMIGOS MARIO */
 typedef struct InimigoKoopaRed
 {
 
@@ -347,6 +358,28 @@ typedef struct InimigoKoopaRed
     Animacao animacaoCasco;
 
 } InimigoKoopaRed;
+
+typedef struct InimigoRex {
+    Rectangle ret; // Posição e Hitbox física
+    Vector2 vel;
+    Color cor;
+
+    float velAndando;
+    float velMaxQueda;
+
+    // Estado do inimigo
+    EstadoInimigoRex estado;
+    bool ativo;
+    bool olhandoParaDireita;
+
+    // Controle de animações
+    Animacao *animacoes[2];
+    int quantidadeAnimacoes;
+    
+    Animacao animacaoAndando;
+    Animacao animacaoMorrendo;
+
+} InimigoRex;
 
 /**
  * @brief Representa um inimigo.

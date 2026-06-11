@@ -16,7 +16,7 @@
 #include "InimigoMotobug.h"
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
-#include "InimigoKoopaRed.h"
+#include "InimigoRex.h"
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
@@ -905,6 +905,100 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                     else
                     {
                         // Se o Koopa estiver andando normal ou se o casco estiver correndo rápido, o Sonic toma dano
+                        if (p->quantidadeAneis > 0)
+                        {
+                            p->quantidadeAneis = 0;
+                            PlaySound(rm.somHitComAnel);
+                        }
+                        else
+                        {
+                            p->quantidadeVidas--;
+                            PlaySound(rm.somMorte);
+                        }
+                        j->invulneravel = true;
+                    }
+                }
+            }
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
+            InimigoRex *rex = (InimigoRex *)inimigo->objeto;
+
+            if (!rex->ativo)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            // Usando as funções e variáveis corretas do Rex
+            qaInimigo = getQuadroAnimacaoAtualInimigoRex(rex);
+            olhandoParaDireita = &rex->olhandoParaDireita;
+            ret = &rex->ret;
+
+            float deslocamentoX = *olhandoParaDireita
+                                      ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
+                                      : qaInimigo->retColisao.x;
+            float deslocamentoY = qaInimigo->retColisao.y;
+
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX,
+                ret->y + deslocamentoY,
+                qaInimigo->retColisao.width,
+                qaInimigo->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
+                // Verifica se o Sonic está atacando/pulando por cima (Pulo bem-sucedido)
+                if (j->estado >= ESTADO_JOGADOR_PULANDO && j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
+                    if (rex->estado == ESTADO_REX_ANDANDO)
+                    {
+                        // Primeiro pisão: Transforma o Rex no frame achatado e parado
+                        rex->estado = ESTADO_REX_ACHATADO_PARADO;
+
+                        // Redimensiona o retângulo físico para o tamanho do frame achatado (16x16)
+                        rex->ret.width = 16;
+                        rex->ret.height = 16;
+                        rex->ret.y += 8; // Desce 8 pixels (24 de altura - 16 atual) para não flutuar
+
+                        j->vel.y = j->velPulo; // Sonic quica para cima
+                        PlaySound(rm.somHitInimigo);
+
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx];
+                        p->comboAereo++;
+                    }
+                    else if (rex->estado == ESTADO_REX_ACHATADO_PARADO)
+                    {
+                        // Se pular em cima dele já achatado/parado, ele começa a correr
+                        rex->estado = ESTADO_REX_ACHATADO_CORRENDO;
+                        rex->velAndando = 300;
+                        j->vel.y = j->velPulo; // Quica novamente
+                        PlaySound(rm.somHitInimigo);
+                    }
+                }
+                else if (!j->invulneravel)
+                {
+                    // Se o Sonic trombar com o Rex achatado e PARADO pelas laterais, ele CHUTA o inimigo
+                    if (rex->estado == ESTADO_REX_ACHATADO_PARADO)
+                    {
+                        rex->estado = ESTADO_REX_ACHATADO_CORRENDO;
+                        rex->velAndando = 350;
+
+                        // Direciona dependendo do lado que o Sonic atingiu
+                        if (retColCalculado.x < rex->ret.x)
+                        {
+                            rex->olhandoParaDireita = true;
+                        }
+                        else
+                        {
+                            rex->olhandoParaDireita = false;
+                        }
+                        PlaySound(rm.somHitInimigo);
+                    }
+                    else
+                    {
+                        // Se o Rex estiver andando normal ou correndo rápido achatado, o Sonic toma dano
                         if (p->quantidadeAneis > 0)
                         {
                             p->quantidadeAneis = 0;
