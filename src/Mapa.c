@@ -17,6 +17,7 @@
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
 #include "InimigoKoopaRed.h"
+#include "InimigoRex.h"
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
@@ -306,6 +307,22 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                                 },
                                 BLUE
                             );
+
+                            el->objeto = inimigo;
+                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+
+                            break;
+                        case '4':
+
+                            inimigo = criarInimigo(TIPO_INIMIGO_REX);
+
+                            inimigo->objeto = criarInimigoRex(
+                                (Rectangle){
+                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                    .width = 80,
+                                    .height = 60},
+                                BLUE);
 
                             el->objeto = inimigo;
                             el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;

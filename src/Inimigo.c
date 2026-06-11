@@ -15,6 +15,7 @@
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
 #include "InimigoKoopaRed.h"
+#include "InimigoRex.h"
 #include "Tipos.h"
 
 /**
@@ -51,6 +52,9 @@ void destruirInimigo(Inimigo *inimigo)
         case TIPO_INIMIGO_KOOPARED:
             destruirInimigoKoopaRed((InimigoKoopaRed *)inimigo->objeto);
             break;
+        case TIPO_INIMIGO_REX:
+            destruirInimigoRex((InimigoRex *)inimigo->objeto);
+            break;
         default:
             break;
         }
@@ -78,6 +82,9 @@ void atualizarInimigo(Inimigo *inimigo, GameWorld *gw, float delta)
     case TIPO_INIMIGO_KOOPARED:
         atualizarInimigoKoopaRed((InimigoKoopaRed *)inimigo->objeto, gw, delta);
         break;
+    case TIPO_INIMIGO_REX:
+        atualizarInimigoRex((InimigoRex *)inimigo->objeto, gw, delta);
+        break;
     default:
         return;
     }
@@ -102,6 +109,9 @@ void desenharInimigo(Inimigo *inimigo)
         break;
     case TIPO_INIMIGO_KOOPARED:
         desenharInimigoKoopaRed((InimigoKoopaRed *)inimigo->objeto);
+        break;
+    case TIPO_INIMIGO_REX:
+        desenharInimigoRex((InimigoRex *)inimigo->objeto);
         break;
     default:
         return;
@@ -151,6 +161,13 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa)
             qa = getQuadroAnimacaoAtualInimigoKoopaRed(koopared);
             olhandoParaDireita = &koopared->olhandoParaDireita;
             ret = &koopared->ret;
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
+            InimigoRex *rex = (InimigoRex *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoRex(rex);
+            olhandoParaDireita = &rex->olhandoParaDireita;
+            ret = &rex->ret;
         }
         else
         {
@@ -238,6 +255,14 @@ void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa)
             olhandoParaDireita = &koopared->olhandoParaDireita;
             ret = &koopared->ret;
             vel = &koopared->vel;
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
+            InimigoRex *rex = (InimigoRex *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoRex(rex);
+            olhandoParaDireita = &rex->olhandoParaDireita;
+            ret = &rex->ret;
+            vel = &rex->vel;
         }
         else
         {
