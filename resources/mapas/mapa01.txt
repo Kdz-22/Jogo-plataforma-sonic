@@ -11,8 +11,8 @@ C          Ya      bY   JBBBBBBBBBK    JBBBBBBBBBBBK       E
 C           Ya    aY    FAAAAAAAAAG    FAAAAAAAAAAAG       E
 C            Y   bY                                        E
 C               aY                                         E
-C               Y                                          E
+C               Y                     3 3 3 3              E
 C                                                          E
-C   0 ccc  Y            Y   0    0  3 3 3 4 4 4 0   0   111E
+C   0 ccc  Y            Y   0    0        4 4 4 0   0   111E
 VBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBT
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
