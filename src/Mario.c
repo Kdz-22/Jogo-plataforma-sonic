@@ -57,7 +57,7 @@ Personagem *criarMario(float x, float y, float w, float h)
 
     m->velAndando = 200;
     m->velCorrendo = 500;
-    m->velPulo = -550;
+    m->velPulo = -700;
     m->velMaxQueda = 600;
 
     m->frenagem = 1800;
@@ -65,7 +65,7 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->desaceleracao = 500;
 
     m->quantidadePulos = 0;
-    m->quantidadeMaxPulos = 1;
+    m->quantidadeMaxPulos = 2;
 
     m->invulneravel = false;
     m->tempoInvulnerabilidade = 3.0f;

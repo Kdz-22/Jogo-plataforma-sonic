@@ -102,15 +102,15 @@ void loadResourcesResourceManager( void ) {
     SetTextureFilter( rm.texturaHUD2, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaCanos, TEXTURE_FILTER_POINT );
 
-    //rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
-    //rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
-    //rm.somHitComAnel = LoadSound( "resources/sons/efeitos/hit-com-anel.wav" );
-    //rm.somHitInimigo = LoadSound( "resources/sons/efeitos/hit-inimigo.wav" );
-    //rm.somMorte = LoadSound( "resources/sons/efeitos/morte.wav" );
-    //rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
+    rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
+    rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
+    rm.somHitComAnel = LoadSound( "resources/sons/efeitos/hit-com-anel.wav" );
+    rm.somHitInimigo = LoadSound( "resources/sons/efeitos/hit-inimigo.wav" );
+    rm.somMorte = LoadSound( "resources/sons/efeitos/morte.wav" );
+    rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
 
     rm.musicaFase01 = LoadMusicStream( "resources/sons/musicas/green-hill-zone.mp3" );
-    rm.volumeMusicaFase01 = 0.0f;
+    rm.volumeMusicaFase01 = 0.5f;
     SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
 }
 

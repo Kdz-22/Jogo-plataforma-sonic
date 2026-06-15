@@ -1,18 +1,18 @@
 
-I                                                          L
-C                   a                                      E
-C                  aY                                      E
-C                 aY                         a             E
-C                aY        aaaaa            aba            E
-C               aY         JBBBK           ababa           E
-C         a    aY         aFAAAGa         abababa          E
-C         Ya   Y    a    aaFAAAGaa       ababababa         E
-C          Ya      bY   JBBBBBBBBBK    JBBBBBBBBBBBK       E
-C           Ya    aY    FAAAAAAAAAG    FAAAAAAAAAAAG       E
-C            Y   bY                                        E
-C               aY                                         E
-C               Y                     3 3 3 3              E
-C                                                          E
-C   0 ccc  Y            Y   0    0        4 4 4 0   0   111E
-VBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBT
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+I                                                                                   L
+C                   a                                                               E
+C                  aY                                                               E
+C                 aY                         a                                      E
+C                aY        aaaaa            aba                                     E
+C               aY         JBBBK           ababa                                    E
+C         a    aY         aFAAAGa         abababa                                   E
+C         Ya   Y    a    aaFAAAGaa     Y4abcccccca4Y                                E
+C          Ya      bY   JBBBBBBBBBK    JBBBBBBBBBBBK                                E
+C           Ya    aY    FAAAAAAAAAG    FAAAAAAAAAAAG                             ]{ E
+C            Y   bY                                                             ![)&E
+C               aY                                                             !@#(*E
+C               Y                     3 3 3 3                                 !@#$% E
+C                                                                            !@#$%  E
+C   0 ccc  Y            Y   0    0        4 4 4 0   0   111                 !@#$%   E
+VBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBT
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

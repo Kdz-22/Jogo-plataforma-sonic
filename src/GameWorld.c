@@ -256,8 +256,8 @@ static void atualizarCamera(GameWorld *gw) {
 static void inicializar(GameWorld *gw) {
 
     // gw->mapa = carregarMapa( "resources/mapas/mapaTeste.txt" );
-     gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
-    //gw->mapa = carregarMapa("resources/mapas/yoshi-island-1.txt");
+    //gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
+    gw->mapa = carregarMapa("resources/mapas/yoshi-island-1.txt");
     gw->personagem = criarMario(GetScreenWidth() / 2 + 144,
                                 calcularAlturaMapa(gw->mapa) - 400, 96, 96);
     // - 196

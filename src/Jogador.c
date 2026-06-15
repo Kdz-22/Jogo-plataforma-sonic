@@ -704,7 +704,7 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p, Mapa *map
                 itemCogumeloVermelho->estado = ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
-                //PlaySound(rm.somAnel);
+                PlaySound(rm.somAnel);
             }
         }
 
@@ -1000,12 +1000,12 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                         if (p->quantidadeAneis > 0)
                         {
                             p->quantidadeAneis = 0;
-                            //PlaySound(rm.somHitComAnel);
+                            PlaySound(rm.somHitComAnel);
                         }
                         else
                         {
                             p->quantidadeVidas--;
-                            //PlaySound(rm.somMorte);
+                            PlaySound(rm.somMorte);
                         }
                         j->invulneravel = true;
                     }
