@@ -33,12 +33,16 @@ void loadResourcesResourceManager( void ) {
     rm.texturaMario = carregarTexturaAlterandoCores( 
         "resources/imagens/sprites/SNES-SuperMarioWorld-PlayableCharacters-Mario.png",
         (Color[]) {
-            { 0, 116, 116, 255 },            
+            { 0, 116, 116, 255 },
+            { 0, 84, 84, 255 },
+            { 0, 52, 52, 255 },
         },
         (Color[]) {
             BLANK,
+            BLANK,
+            BLANK,
         },
-        1
+        3
     );
 
     rm.texturaBadniks = carregarTexturaAlterandoCores( 
@@ -110,7 +114,7 @@ void loadResourcesResourceManager( void ) {
     rm.somPulo = LoadSound( "resources/sons/efeitos/pulo.wav" );
 
     rm.musicaFase01 = LoadMusicStream( "resources/sons/musicas/green-hill-zone.mp3" );
-    rm.volumeMusicaFase01 = 0.5f;
+    rm.volumeMusicaFase01 = 0.0f;
     SetMusicVolume( rm.musicaFase01, rm.volumeMusicaFase01 );
 }
 

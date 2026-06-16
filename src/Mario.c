@@ -5,29 +5,30 @@
  *
  * @copyright Copyright (c) 2026
  */
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "raylib/raylib.h"
 
-#include "Mario.h"
 #include "Animacao.h"
 #include "Inimigo.h"
-#include "InimigoMotobug.h"
-#include "InimigoSpikes.h"
 #include "InimigoKoopaRed.h"
+#include "InimigoMotobug.h"
 #include "InimigoRex.h"
+#include "InimigoSpikes.h"
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
 #include "ItemCoguVerm.h"
-#include "Macros.h"
 #include "Jogador.h"
+#include "Macros.h"
+#include "Mario.h"
 #include "ResourceManager.h"
 #include "Tipos.h"
 
-static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa, Color tonalidade);
+static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa,
+                                        Color tonalidade);
 static QuadroAnimacao *getQuadroAnimacaoAtualMario(Mario *m);
 static Animacao *getAnimacaoAtualMario(Mario *m);
 
@@ -35,13 +36,13 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa);
 static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa);
 
 static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa);
-static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa);
+static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
+                                             Mapa *mapa);
 
-static const bool MOSTRAR_RETANGULOS = false;
+static const bool MOSTRAR_RETANGULOS = true;
 static PersonagemFuncoes marioFuncoes;
 
-Personagem *criarMario(float x, float y, float w, float h)
-{
+Personagem *criarMario(float x, float y, float w, float h) {
 
     Personagem *p = (Personagem *)malloc(sizeof(Personagem));
 
@@ -51,6 +52,10 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->ret.y = y;
     m->ret.width = w;
     m->ret.height = h;
+    m->retOriginal.x = x;
+    m->retOriginal.y = y;
+    m->retOriginal.width = w;
+    m->retOriginal.height = h;
     m->vel = (Vector2){0};
 
     m->cor = BLUE;
@@ -67,6 +72,7 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->quantidadePulos = 0;
     m->quantidadeMaxPulos = 2;
 
+    m->grande = false;
     m->invulneravel = false;
     m->tempoInvulnerabilidade = 3.0f;
     m->contadorTempoInvulnerabilidade = 0.0f;
@@ -88,18 +94,18 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoParado.pararNoUltimoQuadro = false;
     m->animacaoParado.executarUmaVez = false;
     m->animacaoParado.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoParado, m->animacaoParado.quantidadeQuadros); // OK
+    criarQuadrosAnimacao(&m->animacaoParado,
+                         m->animacaoParado.quantidadeQuadros); // OK
     inicializarQuadrosAnimacao(
-        m->animacaoParado.quadros,
-        m->animacaoParado.quantidadeQuadros,
+        m->animacaoParado.quadros, m->animacaoParado.quantidadeQuadros,
         1000,   // duração padrão para todos os quadros
-        24, 48, // início
-        16, 24, // dimensões
+        8, 33, // início
+        48, 48, // dimensões
         4,      // separação
         true,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 20, 42, 76
+            30, 28, 40, 50
             // 18, 20, 54, 76
         });
 
@@ -109,18 +115,18 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoAndando.pararNoUltimoQuadro = false;
     m->animacaoAndando.executarUmaVez = false;
     m->animacaoAndando.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoAndando, m->animacaoAndando.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(&m->animacaoAndando,
+                         m->animacaoAndando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoAndando.quadros,
-        m->animacaoAndando.quantidadeQuadros,
+        m->animacaoAndando.quadros, m->animacaoAndando.quantidadeQuadros,
         150,     // duração padrão para cada quadro
-        232, 48, // início
-        16, 24,  // dimensões
-        36,      // separação
+        216, 33, // início
+        48, 48,  // dimensões
+        4,      // separação
         false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 20, 42, 76
+            30, 28, 40, 50
             // 18, 20, 54, 76
         });
 
@@ -130,18 +136,18 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoCorrendo.pararNoUltimoQuadro = false;
     m->animacaoCorrendo.executarUmaVez = false;
     m->animacaoCorrendo.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoCorrendo, m->animacaoCorrendo.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(&m->animacaoCorrendo,
+                         m->animacaoCorrendo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoCorrendo.quadros,
-        m->animacaoCorrendo.quantidadeQuadros,
+        m->animacaoCorrendo.quadros, m->animacaoCorrendo.quantidadeQuadros,
         50,      // duração padrão para cada quadro
-        388, 48, // início
-        16, 24,  // dimensões
-        36,      // separação
+        372, 33, // início
+        48, 48,  // dimensões
+        4,      // separação
         false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 20, 42, 76
+            30, 28, 40, 50
             // 18, 20, 54, 76
         });
 
@@ -151,18 +157,18 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoPulando.pararNoUltimoQuadro = false;
     m->animacaoPulando.executarUmaVez = false;
     m->animacaoPulando.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoPulando, m->animacaoPulando.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(&m->animacaoPulando,
+                         m->animacaoPulando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoPulando.quadros,
-        m->animacaoPulando.quantidadeQuadros,
+        m->animacaoPulando.quadros, m->animacaoPulando.quantidadeQuadros,
         40,      // duração padrão para cada quadro
-        76, 112, // início
-        16, 24,  // dimensões
+        60, 97,  // início
+        48, 48,  // dimensões
         4,       // separação
         false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 46, 42, 50
+            30, 35, 40, 50
             // 18, 36, 60, 60
         });
 
@@ -172,18 +178,19 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoPulandoCorrendo.pararNoUltimoQuadro = false;
     m->animacaoPulandoCorrendo.executarUmaVez = false;
     m->animacaoPulandoCorrendo.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoPulandoCorrendo, m->animacaoPulandoCorrendo.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(&m->animacaoPulandoCorrendo,
+                         m->animacaoPulandoCorrendo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
         m->animacaoPulandoCorrendo.quadros,
         m->animacaoPulandoCorrendo.quantidadeQuadros,
         15,       // duração padrão para cada quadro
-        180, 112, // início
-        16, 24,   // dimensões
+        164, 97, // início
+        48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 46, 42, 50
+            30, 35, 40, 50
             // 18, 36, 60, 60
         });
 
@@ -193,18 +200,205 @@ Personagem *criarMario(float x, float y, float w, float h)
     m->animacaoCaindo.pararNoUltimoQuadro = false;
     m->animacaoCaindo.executarUmaVez = false;
     m->animacaoCaindo.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoCaindo, m->animacaoCaindo.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(&m->animacaoCaindo,
+                         m->animacaoCaindo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoCaindo.quadros,
-        m->animacaoCaindo.quantidadeQuadros,
+        m->animacaoCaindo.quadros, m->animacaoCaindo.quantidadeQuadros,
         15,       // duração padrão para cada quadro
-        128, 112, // início
-        16, 24,   // dimensões
+        112, 97, // início
+        48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
-            32, 46, 42, 50
+            30, 35, 40, 50
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoAbaixado.quantidadeQuadros = 1;
+    m->animacaoAbaixado.quadroAtual = 0;
+    m->animacaoAbaixado.contadorTempoQuadro = 0.0f;
+    m->animacaoAbaixado.pararNoUltimoQuadro = false;
+    m->animacaoAbaixado.executarUmaVez = false;
+    m->animacaoAbaixado.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoAbaixado,
+                         m->animacaoAbaixado.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoAbaixado.quadros, m->animacaoAbaixado.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        112, 33, // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            32, 46, 32, 32
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoCrescendo.quantidadeQuadros = 3;
+    m->animacaoCrescendo.quadroAtual = 0;
+    m->animacaoCrescendo.contadorTempoQuadro = 0.0f;
+    m->animacaoCrescendo.pararNoUltimoQuadro = true;
+    m->animacaoCrescendo.executarUmaVez = true;
+    m->animacaoCrescendo.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoCrescendo,
+                         m->animacaoCrescendo.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoCrescendo.quadros, m->animacaoCrescendo.quantidadeQuadros,
+        50,       // duração padrão para cada quadro
+        580, 251, // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            30, 28, 40, 50
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoGrandeParado.quantidadeQuadros = 1;
+    m->animacaoGrandeParado.quadroAtual = 0;
+    m->animacaoGrandeParado.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandeParado.pararNoUltimoQuadro = false;
+    m->animacaoGrandeParado.executarUmaVez = false;
+    m->animacaoGrandeParado.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandeParado,
+                         m->animacaoGrandeParado.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandeParado.quadros, m->animacaoGrandeParado.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        8, 576, // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 23, 40, 71
+            // 18, 36, 60, 60
+        });
+    m->animacaoGrandeAndando.quantidadeQuadros = 3;
+    m->animacaoGrandeAndando.quadroAtual = 0;
+    m->animacaoGrandeAndando.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandeAndando.pararNoUltimoQuadro = false;
+    m->animacaoGrandeAndando.executarUmaVez = false;
+    m->animacaoGrandeAndando.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandeAndando,
+                         m->animacaoGrandeAndando.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandeAndando.quadros, m->animacaoGrandeAndando.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        164, 576, // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 23, 40, 71
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoGrandeCorrendo.quantidadeQuadros = 3;
+    m->animacaoGrandeCorrendo.quadroAtual = 0;
+    m->animacaoGrandeCorrendo.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandeCorrendo.pararNoUltimoQuadro = false;
+    m->animacaoGrandeCorrendo.executarUmaVez = false;
+    m->animacaoGrandeCorrendo.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandeCorrendo,
+                         m->animacaoGrandeCorrendo.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandeCorrendo.quadros, m->animacaoGrandeCorrendo.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        320, 576, // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 23, 40, 71
+            // 18, 36, 60, 60
+        });
+    m->animacaoGrandePulando.quantidadeQuadros = 1;
+    m->animacaoGrandePulando.quadroAtual = 0;
+    m->animacaoGrandePulando.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandePulando.pararNoUltimoQuadro = false;
+    m->animacaoGrandePulando.executarUmaVez = false;
+    m->animacaoGrandePulando.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandePulando,
+                         m->animacaoGrandePulando.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandePulando.quadros, m->animacaoGrandePulando.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        60, 647,  // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 23, 40, 71
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoGrandePulandoCorrendo.quantidadeQuadros = 1;
+    m->animacaoGrandePulandoCorrendo.quadroAtual = 0;
+    m->animacaoGrandePulandoCorrendo.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandePulandoCorrendo.pararNoUltimoQuadro = false;
+    m->animacaoGrandePulandoCorrendo.executarUmaVez = false;
+    m->animacaoGrandePulandoCorrendo.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandePulandoCorrendo,
+                         m->animacaoGrandePulandoCorrendo.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandePulandoCorrendo.quadros, m->animacaoGrandePulandoCorrendo.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        164, 647,  // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 23, 40, 71
+            // 18, 36, 60, 60
+        });
+
+    m->animacaoGrandeCaindo.quantidadeQuadros = 1;
+    m->animacaoGrandeCaindo.quadroAtual = 0;
+    m->animacaoGrandeCaindo.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandeCaindo.pararNoUltimoQuadro = false;
+    m->animacaoGrandeCaindo.executarUmaVez = false;
+    m->animacaoGrandeCaindo.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandeCaindo,
+                         m->animacaoGrandeCaindo.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandeCaindo.quadros, m->animacaoGrandeCaindo.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        112, 647,  // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            38, 28, 45, 78
+            // 18, 36, 60, 60
+        });
+    
+    m->animacaoGrandeAbaixado.quantidadeQuadros = 1;
+    m->animacaoGrandeAbaixado.quadroAtual = 0;
+    m->animacaoGrandeAbaixado.contadorTempoQuadro = 0.0f;
+    m->animacaoGrandeAbaixado.pararNoUltimoQuadro = false;
+    m->animacaoGrandeAbaixado.executarUmaVez = false;
+    m->animacaoGrandeAbaixado.finalizada = false;
+    criarQuadrosAnimacao(&m->animacaoGrandeAbaixado,
+                         m->animacaoGrandeAbaixado.quantidadeQuadros); // ok
+    inicializarQuadrosAnimacao(
+        m->animacaoGrandeAbaixado.quadros, m->animacaoGrandeAbaixado.quantidadeQuadros,
+        15,       // duração padrão para cada quadro
+        112, 576,  // início
+        48, 48,   // dimensões
+        4,        // separação
+        false,    // de trás para frente
+        (Rectangle){
+            // retângulo de colisão padrão para cada quadro
+            32, 56, 45, 38
             // 18, 36, 60, 60
         });
 
@@ -220,6 +414,25 @@ Personagem *criarMario(float x, float y, float w, float h)
     quantidadeAnimacoes++;
     m->animacoes[ESTADO_MARIO_CAINDO] = &m->animacaoCaindo;
     quantidadeAnimacoes++;
+    m->animacoes[ESTADO_MARIO_ABAIXADO] = &m->animacaoAbaixado;
+    quantidadeAnimacoes++;
+    m->animacoes[ESTADO_MARIO_CRESCENDO] = &m->animacaoCrescendo;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_PARADO] = &m->animacaoGrandeParado;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_ANDANDO] = &m->animacaoGrandeAndando;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_CORRENDO] = &m->animacaoGrandeCorrendo;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_PULANDO] = &m->animacaoGrandePulando;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_PULANDO_CORRENDO] = &m->animacaoGrandePulandoCorrendo;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_CAINDO] = &m->animacaoGrandeCaindo;
+    quantidadeAnimacoes++;
+    m->animacoesGrande[ESTADO_MARIO_ABAIXADO] = &m->animacaoGrandeAbaixado;
+    quantidadeAnimacoes++;
+
     m->quantidadeAnimacoes = quantidadeAnimacoes;
 
     p->dados = m;
@@ -236,13 +449,10 @@ Personagem *criarMario(float x, float y, float w, float h)
 /**
  * @brief Destrói um objeto Jogador e libera seus recursos.
  */
-void destruirMario(void *dados)
-{
+void destruirMario(void *dados) {
     Mario *m = (Mario *)dados;
-    if (m != NULL)
-    {
-        for (int i = 0; i < m->quantidadeAnimacoes; i++)
-        {
+    if (m != NULL) {
+        for (int i = 0; i < m->quantidadeAnimacoes; i++) {
             destruirQuadrosAnimacao(m->animacoes[i]);
         }
         free(m);
@@ -252,195 +462,154 @@ void destruirMario(void *dados)
 /**
  * @brief Lê a entrada do usuário e atualiza as velocidades do jogador.
  */
-void entradaMario(void *dados, Personagem *p, float delta)
-{
+void entradaMario(void *dados, Personagem *p, float delta) {
     Mario *m = (Mario *)dados;
 
     // EstadoJogador estadoAnterior = m->estado;
 
-    bool direitaDown = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D) || (IsGamepadAvailable(0) && IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT));
-    bool esquerdaDown = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A) || (IsGamepadAvailable(0) && IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT));
-    bool cimaDown = IsKeyDown(KEY_UP) || IsKeyDown(KEY_W) || (IsGamepadAvailable(0) && IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP));
-    bool baixoDown = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S) || (IsGamepadAvailable(0) && IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN));
-    bool puloPressed = IsKeyPressed(KEY_SPACE) || (IsGamepadAvailable(0) && IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN));
+    bool direitaDown = IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D) ||
+                       (IsGamepadAvailable(0) &&
+                        IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT));
+    bool esquerdaDown = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A) ||
+                        (IsGamepadAvailable(0) &&
+                         IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT));
+    bool cimaDown = IsKeyDown(KEY_UP) || IsKeyDown(KEY_W) ||
+                    (IsGamepadAvailable(0) &&
+                     IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP));
+    bool baixoDown = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S) ||
+                     (IsGamepadAvailable(0) &&
+                      IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN));
+    bool puloPressed = IsKeyPressed(KEY_SPACE) ||
+                       (IsGamepadAvailable(0) &&
+                        IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN));
     bool shiftDown = IsKeyDown(KEY_LEFT_SHIFT);
 
-    if (direitaDown)
-    {
+    if (direitaDown) {
 
-        if (!shiftDown)
-        {
-            if (m->vel.x < 0)
-            {
+        if (!shiftDown) {
+            if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
                     PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x > 0)
-                {
+                if (m->vel.x > 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x += m->aceleracao * delta;
-                if (m->vel.x > m->velAndando)
-                {
+                if (m->vel.x > m->velAndando) {
                     m->vel.x = m->velAndando;
                 }
             }
             m->olhandoParaDireita = true;
-        }
-        else
-        {
-            if (m->vel.x < 0)
-            {
+        } else {
+            if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
                     PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x > 0)
-                {
+                if (m->vel.x > 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x += m->aceleracao * delta;
-                if (m->vel.x > m->velCorrendo)
-                {
+                if (m->vel.x > m->velCorrendo) {
                     m->vel.x = m->velCorrendo;
                 }
             }
             m->olhandoParaDireita = true;
         }
-    }
-    else if (esquerdaDown)
-    {
+    } else if (esquerdaDown) {
 
-        if (!shiftDown)
-        {
-            if (m->vel.x > 0)
-            {
+        if (!shiftDown) {
+            if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
                     PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x < 0)
-                {
+                if (m->vel.x < 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x -= m->aceleracao * delta;
-                if (m->vel.x < -m->velAndando)
-                {
+                if (m->vel.x < -m->velAndando) {
                     m->vel.x = -m->velAndando;
                 }
             }
             m->olhandoParaDireita = false;
-        }
-        else
-        { // shiftdown
-            if (m->vel.x > 0)
-            {
+        } else { // shiftdown
+            if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
                     PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
 
-                if (m->vel.x < 0)
-                {
+                if (m->vel.x < 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            { // velo > 0
+            } else { // velo > 0
                 m->vel.x -= m->aceleracao * delta;
-                if (m->vel.x < -m->velCorrendo)
-                {
+                if (m->vel.x < -m->velCorrendo) {
                     m->vel.x = -m->velCorrendo;
                 }
             }
             m->olhandoParaDireita = false;
         }
-    }
-    else
-    { // esquerdadown
-        if (m->vel.x > 0)
-        {
+    } else { // esquerdadown
+        if (m->vel.x > 0) {
             m->vel.x -= m->desaceleracao * delta;
-            if (m->vel.x < 0)
-            {
+            if (m->vel.x < 0) {
                 m->vel.x = 0;
             }
-        }
-        else if (m->vel.x < 0)
-        {
+        } else if (m->vel.x < 0) {
             m->vel.x += m->desaceleracao * delta;
-            if (m->vel.x > 0)
-            {
+            if (m->vel.x > 0) {
                 m->vel.x = 0;
             }
         }
     }
 
     float absVelX = fabsf(m->vel.x);
-    if (m->quantidadePulos > 0)
-    {
-        if (m->vel.y < 0)
-        {
-            if (absVelX <= m->velAndando)
-            {
+    if (m->quantidadePulos > 0) {
+        if (m->vel.y < 0) {
+            if (absVelX <= m->velAndando) {
                 m->estado = ESTADO_MARIO_PULANDO;
-            }
-            else
-            {
+            } else {
                 m->estado = ESTADO_MARIO_PULANDO_CORRENDO;
             }
-        }
-        else
-        {
+        } else {
             m->estado = ESTADO_MARIO_CAINDO;
         }
-    }
-    else if (absVelX < 1.0f)
-    {
+    } else if (baixoDown) {
+        m->estado = ESTADO_MARIO_ABAIXADO;
+        m->vel.x = 0;
+    } else if (absVelX < 1.0f) {
         m->estado = ESTADO_MARIO_PARADO;
-    }
-    else if (absVelX <= m->velAndando)
-    {
+    } else if (absVelX <= m->velAndando) {
         m->estado = ESTADO_MARIO_ANDANDO;
-    }
-    else
-    {
+    } else {
         m->estado = ESTADO_MARIO_CORRENDO;
     }
 
-    if (puloPressed && m->quantidadePulos < m->quantidadeMaxPulos)
-    {
+    if (puloPressed && m->quantidadePulos < m->quantidadeMaxPulos) {
         m->vel.y = m->velPulo;
         m->quantidadePulos++;
         // PlaySound( rm.somPulo );
     }
 
     // sincronização de animações andando e andando rápido
-    /*if ( estadoAnterior == ESTADO_MARIO_ANDANDO && m->estado == ESTADO_MARIO_ANDANDO_RAPIDO ) {
-         sincronizarAnimacao( &m->animacaoAndandoRapido, &m->animacaoAndando );
-    } else if ( estadoAnterior == ESTADO_MARIO_ANDANDO_RAPIDO && m->estado == ESTADO_MARIO_ANDANDO ) {
+    /*if ( estadoAnterior == ESTADO_MARIO_ANDANDO && m->estado ==
+    ESTADO_MARIO_ANDANDO_RAPIDO ) { sincronizarAnimacao(
+    &m->animacaoAndandoRapido, &m->animacaoAndando ); } else if ( estadoAnterior
+    == ESTADO_MARIO_ANDANDO_RAPIDO && m->estado == ESTADO_MARIO_ANDANDO ) {
         sincronizarAnimacao( &m->animacaoAndando, &m->animacaoAndandoRapido );
     } */
 }
@@ -448,31 +617,29 @@ void entradaMario(void *dados, Personagem *p, float delta)
 /**
  * @brief Aplica física e resolve colisões do jogador com o mundo.
  */
-void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
-{
+void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta) {
     Mario *m = (Mario *)dados;
 
-    if (m->estado < ESTADO_MARIO_PULANDO)
-    {
+    if (m->estado < ESTADO_MARIO_PULANDO) {
         p->comboAereo = 0;
     }
+    if (m->estado == ESTADO_MARIO_CRESCENDO &&
+        m->animacaoCrescendo.finalizada) {
+        m->estado = ESTADO_MARIO_PARADO;
+        m->invulneravel = false;
+        // aqui você redimensiona o ret para o tamanho grande
+        m->ret.y -= m->ret.height;
+        m->ret.width *= 1.2;
+        m->ret.height *= 1.2;
+    }
+    if (m->invulneravel) {
 
-    if (m->invulneravel)
-    {
-
-        m->contadorTempoPiscaPisca += delta;
-        if (m->contadorTempoPiscaPisca >= m->tempoPiscaPisca)
-        {
-            m->contadorTempoPiscaPisca = 0.0f;
-            m->piscaPisca = !m->piscaPisca;
-        }
+        m->piscaPisca = false;
 
         m->contadorTempoInvulnerabilidade += delta;
-        if (m->contadorTempoInvulnerabilidade >= m->tempoInvulnerabilidade)
-        {
+        if (m->contadorTempoInvulnerabilidade >= m->tempoInvulnerabilidade) {
             m->contadorTempoInvulnerabilidade = 0.0f;
             m->invulneravel = false;
-            m->contadorTempoPiscaPisca = 0.0f;
             m->piscaPisca = false;
         }
     }
@@ -486,8 +653,7 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
 
     // fase Y: aplica gravidade, move verticalmente e resolve colisões verticais
     m->vel.y += gw->gravidade * delta;
-    if (m->vel.y > m->velMaxQueda)
-    {
+    if (m->vel.y > m->velMaxQueda) {
         m->vel.y = m->velMaxQueda;
     }
     m->ret.y += m->vel.y * delta;
@@ -500,26 +666,23 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
 /**
  * @brief Desenha o jogador.
  */
-void desenharMario(void *dados)
-{
+void desenharMario(void *dados) {
 
     Mario *m = (Mario *)dados;
 
-    if (!m->piscaPisca)
-    {
+    if (!m->piscaPisca) {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
         desenharQuadroAnimacaoMario(m, qa, WHITE);
     }
 
-    if (MOSTRAR_RETANGULOS)
-    {
+    if (MOSTRAR_RETANGULOS) {
         DrawRectangleRec(m->ret, Fade(m->cor, 0.5f));
-        DrawRectangleLines(m->ret.x, m->ret.y, m->ret.width, m->ret.height, BLACK);
+        DrawRectangleLines(m->ret.x, m->ret.y, m->ret.width, m->ret.height,
+                           BLACK);
     }
 }
 
-void resetarMario(void *dados)
-{
+void resetarMario(void *dados) {
     Mario *m = (Mario *)dados;
 
     m->invulneravel = false;
@@ -528,9 +691,13 @@ void resetarMario(void *dados)
     m->piscaPisca = false;
     m->estado = ESTADO_MARIO_PARADO;
 
+    if (m->grande) {
+        m->grande = false;
+        m->ret.width /= 2;
+        m->ret.height /= 2;
+    }
     // animações
-    for (int i = 0; i < m->quantidadeAnimacoes; i++)
-    {
+    for (int i = 0; i < m->quantidadeAnimacoes; i++) {
         m->animacoes[i]->quadroAtual = 0;
         m->animacoes[i]->contadorTempoQuadro = 0.0f;
         m->animacoes[i]->finalizada = false;
@@ -538,90 +705,78 @@ void resetarMario(void *dados)
 }
 
 static PersonagemFuncoes marioFuncoes = {
-    entradaMario,
-    atualizarMario,
-    desenharMario,
-    destruirMario,
-    resetarMario};
+    entradaMario, atualizarMario, desenharMario, destruirMario, resetarMario};
 
-static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa, Color tonalidade)
-{
+static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa,
+                                        Color tonalidade) {
 
-    if (qa != NULL)
-    {
+    if (qa != NULL) {
 
-        DrawTexturePro(
-            rm.texturaMario,
-            (Rectangle){
-                qa->fonte.x,
-                qa->fonte.y,
-                m->olhandoParaDireita ? -qa->fonte.width : qa->fonte.width,
-                qa->fonte.height},
-            m->ret,
-            (Vector2){0},
-            0.0f,
-            tonalidade);
+        DrawTexturePro(rm.texturaMario,
+                       (Rectangle){qa->fonte.x, qa->fonte.y,
+                                   m->olhandoParaDireita ? -qa->fonte.width
+                                                         : qa->fonte.width,
+                                   qa->fonte.height},
+                       m->ret, (Vector2){0}, 0.0f, tonalidade);
 
-        if (MOSTRAR_RETANGULOS)
-        {
+        if (MOSTRAR_RETANGULOS) {
             float xDesenho = m->olhandoParaDireita
                                  ? m->ret.x + qa->retColisao.x
-                                 : m->ret.x + m->ret.width - qa->retColisao.x - qa->retColisao.width;
+                                 : m->ret.x + m->ret.width - qa->retColisao.x -
+                                       qa->retColisao.width;
             float yDesenho = m->ret.y + qa->retColisao.y;
-            DrawRectangle(xDesenho, yDesenho, qa->retColisao.width, qa->retColisao.height, Fade(GREEN, 0.5f));
+            DrawRectangle(xDesenho, yDesenho, qa->retColisao.width,
+                          qa->retColisao.height, Fade(GREEN, 0.5f));
         }
     }
 }
 
-static QuadroAnimacao *getQuadroAnimacaoAtualMario(Mario *m)
-{
+static QuadroAnimacao *getQuadroAnimacaoAtualMario(Mario *m) {
     return getQuadroAtualAnimacao(getAnimacaoAtualMario(m));
 }
 
-static Animacao *getAnimacaoAtualMario(Mario *m)
-{
+static Animacao *getAnimacaoAtualMario(Mario *m) {
+    if (m->estado == ESTADO_MARIO_CRESCENDO) {
+        return &m->animacaoCrescendo;
+    }
+    if (m->grande) {
+        return m->animacoesGrande[m->estado];
+    }
     return m->animacoes[m->estado];
 }
 
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo X.
  */
-static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
-{
+static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa) {
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
-        float deslocamentoX = m->olhandoParaDireita
-                                  ? qa->retColisao.x
-                                  : m->ret.width - qa->retColisao.x - qa->retColisao.width;
+        float deslocamentoX =
+            m->olhandoParaDireita
+                ? qa->retColisao.x
+                : m->ret.width - qa->retColisao.x - qa->retColisao.width;
         float deslocamentoY = qa->retColisao.y;
 
         Rectangle retColCalculado = {
-            m->ret.x + deslocamentoX,
-            m->ret.y + deslocamentoY,
-            qa->retColisao.width,
-            qa->retColisao.height};
+            m->ret.x + deslocamentoX, m->ret.y + deslocamentoY,
+            qa->retColisao.width, qa->retColisao.height};
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido)
-        {
+        if (!o->solido) {
             el = el->proximo;
             continue;
         }
-        if (CheckCollisionRecs(retColCalculado, o->ret))
-        {
-            if (retColCalculado.x + retColCalculado.width / 2 < o->ret.x + o->ret.width / 2)
-            {
+        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+            if (retColCalculado.x + retColCalculado.width / 2 <
+                o->ret.x + o->ret.width / 2) {
                 m->ret.x = o->ret.x - qa->retColisao.width - deslocamentoX;
-            }
-            else
-            {
+            } else {
                 m->ret.x = o->ret.x + o->ret.width - deslocamentoX;
             }
             m->vel.x = 0;
@@ -634,43 +789,36 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo Y.
  */
-static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
-{
+static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
-        float deslocamentoX = m->olhandoParaDireita
-                                  ? qa->retColisao.x
-                                  : m->ret.width - qa->retColisao.x - qa->retColisao.width;
+        float deslocamentoX =
+            m->olhandoParaDireita
+                ? qa->retColisao.x
+                : m->ret.width - qa->retColisao.x - qa->retColisao.width;
         float deslocamentoY = qa->retColisao.y;
 
         Rectangle retColCalculado = {
-            m->ret.x + deslocamentoX,
-            m->ret.y + deslocamentoY,
-            qa->retColisao.width,
-            qa->retColisao.height};
+            m->ret.x + deslocamentoX, m->ret.y + deslocamentoY,
+            qa->retColisao.width, qa->retColisao.height};
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido)
-        {
+        if (!o->solido) {
             el = el->proximo;
             continue;
         }
-        if (CheckCollisionRecs(retColCalculado, o->ret))
-        {
-            if (retColCalculado.y + retColCalculado.height / 2 < o->ret.y + o->ret.height / 2)
-            {
+        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+            if (retColCalculado.y + retColCalculado.height / 2 <
+                o->ret.y + o->ret.height / 2) {
                 m->ret.y = o->ret.y - qa->retColisao.height - deslocamentoY;
                 m->quantidadePulos = 0;
-            }
-            else
-            {
+            } else {
                 m->ret.y = o->ret.y + o->ret.height - deslocamentoY;
             }
             m->vel.y = 0;
@@ -680,36 +828,32 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
     }
 }
 
-static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
-{
+static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa) {
 
     ElementoMapa *el = mapa->itens;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
-        float deslocamentoX = m->olhandoParaDireita
-                                  ? qa->retColisao.x
-                                  : m->ret.width - qa->retColisao.x - qa->retColisao.width;
+        float deslocamentoX =
+            m->olhandoParaDireita
+                ? qa->retColisao.x
+                : m->ret.width - qa->retColisao.x - qa->retColisao.width;
         float deslocamentoY = qa->retColisao.y;
 
         Rectangle retColCalculado = {
-            m->ret.x + deslocamentoX,
-            m->ret.y + deslocamentoY,
-            qa->retColisao.width,
-            qa->retColisao.height};
+            m->ret.x + deslocamentoX, m->ret.y + deslocamentoY,
+            qa->retColisao.width, qa->retColisao.height};
 
         Item *item = (Item *)el->objeto;
 
-        if (item->tipo == TIPO_ITEM_ANEL)
-        {
+        if (item->tipo == TIPO_ITEM_ANEL) {
 
             ItemAnel *itemAnel = (ItemAnel *)item->objeto;
 
-            if (!itemAnel->ativo || itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO)
-            {
+            if (!itemAnel->ativo ||
+                itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO) {
                 el = el->proximo;
                 continue;
             }
@@ -719,69 +863,74 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
             Rectangle retColItemCalculado = {
                 itemAnel->ret.x + qaItem->retColisao.x,
                 itemAnel->ret.y + qaItem->retColisao.y,
-                qaItem->retColisao.width,
-                qaItem->retColisao.height};
+                qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemAnel->estado = ESTADO_ITEM_ANEL_COLETADO;
                 p->quantidadeAneis++;
                 p->score += 10;
                 PlaySound(rm.somAnel);
             }
-        }
-        else if (item->tipo == TIPO_ITEM_ANEL_AZUL)
-        {
+        } else if (item->tipo == TIPO_ITEM_ANEL_AZUL) {
 
             ItemAnelAzul *itemAnelAzul = (ItemAnelAzul *)item->objeto;
 
-            if (!itemAnelAzul->ativo || itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO)
-            {
+            if (!itemAnelAzul->ativo ||
+                itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO) {
                 el = el->proximo;
                 continue;
             }
 
-            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemAnelAzul(itemAnelAzul);
+            QuadroAnimacao *qaItem =
+                getQuadroAnimacaoAtualItemAnelAzul(itemAnelAzul);
 
             Rectangle retColItemCalculado = {
                 itemAnelAzul->ret.x + qaItem->retColisao.x,
                 itemAnelAzul->ret.y + qaItem->retColisao.y,
-                qaItem->retColisao.width,
-                qaItem->retColisao.height};
+                qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemAnelAzul->estado = ESTADO_ITEM_ANEL_AZUL_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
             }
-        }
-        else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO)
-        {
+        } else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO) {
 
-            ItemCogumeloVermelho *itemCogumeloVermelho = (ItemCogumeloVermelho *)item->objeto;
+            ItemCogumeloVermelho *itemCogumeloVermelho =
+                (ItemCogumeloVermelho *)item->objeto;
 
-            if (!itemCogumeloVermelho->ativo || itemCogumeloVermelho->estado == ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO)
-            {
+            if (!itemCogumeloVermelho->ativo ||
+                itemCogumeloVermelho->estado ==
+                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO) {
                 el = el->proximo;
                 continue;
             }
 
-            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemCogumeloVermelho(itemCogumeloVermelho);
+            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemCogumeloVermelho(
+                itemCogumeloVermelho);
 
             Rectangle retColItemCalculado = {
                 itemCogumeloVermelho->ret.x + qaItem->retColisao.x,
                 itemCogumeloVermelho->ret.y + qaItem->retColisao.y,
-                qaItem->retColisao.width,
-                qaItem->retColisao.height};
+                qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemCogumeloVermelho->estado = ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
+                printf("Cogumelo vermelho coletado!\n");
+
+                // faz o Mario crescer
+                if (!m->grande) {
+                    m->grande = true;
+                    m->estado = ESTADO_MARIO_CRESCENDO;
+                    m->invulneravel = true;
+                    m->ret.y -= m->ret.height; // sobe para não entrar no chão
+                    m->ret.height *= 1.2;
+                    m->ret.width *= 1.2;
+                }
             }
         }
 
@@ -789,28 +938,24 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
     }
 }
 
-static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa)
-{
-
+static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
+                                             Mapa *mapa) {
     ElementoMapa *el = mapa->inimigos;
     // Max = 7 inimigos mortos em sequencia
     static int tabelaComboAereo[] = {100, 200, 500, 1000, 2000, 5000, 10000};
 
-    while (el != NULL)
-    {
-
+    while (el != NULL) {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
-        float deslocamentoX = m->olhandoParaDireita
-                                  ? qa->retColisao.x
-                                  : m->ret.width - qa->retColisao.x - qa->retColisao.width;
+        float deslocamentoX =
+            m->olhandoParaDireita
+                ? qa->retColisao.x
+                : m->ret.width - qa->retColisao.x - qa->retColisao.width;
         float deslocamentoY = qa->retColisao.y;
 
         Rectangle retColCalculado = {
-            m->ret.x + deslocamentoX,
-            m->ret.y + deslocamentoY,
-            qa->retColisao.width,
-            qa->retColisao.height};
+            m->ret.x + deslocamentoX, m->ret.y + deslocamentoY,
+            qa->retColisao.width, qa->retColisao.height};
 
         Inimigo *inimigo = (Inimigo *)el->objeto;
 
@@ -818,13 +963,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
         bool *olhandoParaDireita = NULL;
         Rectangle *ret = NULL;
 
-        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG)
-        {
-
+        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG) {
             InimigoMotobug *motobug = (InimigoMotobug *)inimigo->objeto;
 
-            if (!motobug->ativo || motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO)
-            {
+            if (!motobug->ativo ||
+                motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO) {
                 el = el->proximo;
                 continue;
             }
@@ -834,37 +977,39 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
             ret = &motobug->ret;
 
             float deslocamentoX = *olhandoParaDireita
-                                      ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
+                                      ? ret->width - qaInimigo->retColisao.x -
+                                            qaInimigo->retColisao.width
                                       : qaInimigo->retColisao.x;
             float deslocamentoY = qaInimigo->retColisao.y;
 
             Rectangle retColInimigoCalculado = {
-                ret->x + deslocamentoX,
-                ret->y + deslocamentoY,
-                qaInimigo->retColisao.width,
-                qaInimigo->retColisao.height};
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
-
-                if (m->estado == ESTADO_MARIO_PULANDO || m->estado == ESTADO_MARIO_PULANDO_CORRENDO || m->estado == ESTADO_MARIO_CAINDO)
-                {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+                if (m->estado == ESTADO_MARIO_PULANDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
+                    m->estado == ESTADO_MARIO_CAINDO) {
                     m->vel.y = m->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound(rm.somHitInimigo);
                     int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
-                }
-                else if (!m->invulneravel)
-                {
-                    if (p->quantidadeAneis > 0)
-                    {
+                } else if (!m->invulneravel) {
+
+                    if (m->grande) {
+                        // encolhe ao invés de perder vida
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->invulneravel = true;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel); // ou um som de encolher
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -873,14 +1018,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
 
                 return; // um inimigo de cada vez!
             }
-        }
-        else if (inimigo->tipo == TIPO_INIMIGO_SPIKES)
-        {
-
+        } else if (inimigo->tipo == TIPO_INIMIGO_SPIKES) {
             InimigoSpikes *spikes = (InimigoSpikes *)inimigo->objeto;
 
-            if (!spikes->ativo || spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO)
-            {
+            if (!spikes->ativo ||
+                spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO) {
                 el = el->proximo;
                 continue;
             }
@@ -890,199 +1032,150 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p, Mapa *mapa
             ret = &spikes->ret;
 
             float deslocamentoX = *olhandoParaDireita
-                                      ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
+                                      ? ret->width - qaInimigo->retColisao.x -
+                                            qaInimigo->retColisao.width
                                       : qaInimigo->retColisao.x;
             float deslocamentoY = qaInimigo->retColisao.y;
 
             Rectangle retColInimigoCalculado = {
-                ret->x + deslocamentoX,
-                ret->y + deslocamentoY,
-                qaInimigo->retColisao.width,
-                qaInimigo->retColisao.height};
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
-                if (m->estado == ESTADO_MARIO_PULANDO || m->estado == ESTADO_MARIO_PULANDO_CORRENDO || m->estado == ESTADO_MARIO_CAINDO)
-                {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+                if (m->estado == ESTADO_MARIO_PULANDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
+                    m->estado == ESTADO_MARIO_CAINDO) {
                     m->vel.y = m->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound(rm.somHitInimigo);
                     int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
-                }
-                else if (!m->invulneravel)
-                {
-                    if (p->quantidadeAneis > 0)
-                    {
+                } else if (!m->invulneravel) {
+
+                    if (m->grande) {
+                        // encolhe ao invés de perder vida
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->invulneravel = true;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel); // ou um som de encolher
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
                     m->invulneravel = true;
                 }
             }
-            else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED)
-            {
+        } else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED) {
+            InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
 
-                InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
+            if (!koopared->ativo) {
+                el = el->proximo;
+                continue;
+            }
 
-                // Se o Koopa não estiver ativo, pula para o próximo
-                if (!koopared->ativo)
-                {
-                    el = el->proximo;
-                    continue;
+            qaInimigo = getQuadroAnimacaoAtualInimigoKoopaRed(koopared);
+            olhandoParaDireita = &koopared->olhandoParaDireita;
+            ret = &koopared->ret;
+
+            float deslocamentoX = *olhandoParaDireita
+                                      ? ret->width - qaInimigo->retColisao.x -
+                                            qaInimigo->retColisao.width
+                                      : qaInimigo->retColisao.x;
+            float deslocamentoY = qaInimigo->retColisao.y;
+
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+                if (m->estado == ESTADO_MARIO_PULANDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
+                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->vel.y = m->velPulo;
+                    koopared->estado = ESTADO_KOOPA_MORRENDO;
+                    PlaySound(rm.somHitInimigo);
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
+                } else if (!m->invulneravel) {
+                    if (m->grande) {
+                        // encolhe ao invés de perder vida
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->invulneravel = true;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel); // ou um som de encolher
+                    } else if (p->quantidadeAneis > 0) {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    } else {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+                    m->invulneravel = true;
                 }
+            }
+        } else if (inimigo->tipo == TIPO_INIMIGO_REX) {
 
-                // CORREÇÃO: Usando as funções e variáveis corretas do KoopaRed
-                qaInimigo = getQuadroAnimacaoAtualInimigoKoopaRed(koopared);
-                olhandoParaDireita = &koopared->olhandoParaDireita;
-                ret = &koopared->ret;
+            InimigoRex *rex = (InimigoRex *)inimigo->objeto;
 
-                float deslocamentoX = *olhandoParaDireita
-                                          ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
-                                          : qaInimigo->retColisao.x;
-                float deslocamentoY = qaInimigo->retColisao.y;
+            if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO) {
+                el = el->proximo;
+                continue;
+            }
 
-                Rectangle retColInimigoCalculado = {
-                    ret->x + deslocamentoX,
-                    ret->y + deslocamentoY,
-                    qaInimigo->retColisao.width,
-                    qaInimigo->retColisao.height};
+            qaInimigo = getQuadroAnimacaoAtualInimigoRex(rex);
+            olhandoParaDireita = &rex->olhandoParaDireita;
+            ret = &rex->ret;
 
-                if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-                {
+            float deslocamentoX = *olhandoParaDireita
+                                      ? ret->width - qaInimigo->retColisao.x -
+                                            qaInimigo->retColisao.width
+                                      : qaInimigo->retColisao.x;
+            float deslocamentoY = qaInimigo->retColisao.y;
 
-                    // Verifica se o Mario está caindo ou pulando em cima dele (Pulo bem-sucedido)
-                    if (m->estado == ESTADO_MARIO_PULANDO || m->estado == ESTADO_MARIO_PULANDO_CORRENDO || m->estado == ESTADO_MARIO_CAINDO)
-                    {
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-                        if (koopared->estado == ESTADO_KOOPA_ANDANDO)
-                        {
-                            // Transforma o Koopa em casco parado
-                            koopared->estado = ESTADO_KOOPA_CASCO_PARADO;
-
-                            // Redimensiona o retângulo físico para o tamanho do casco de SNES (16x16)
-                            koopared->ret.width = 16;
-                            koopared->ret.height = 16;
-                            koopared->ret.y += 16; // Empurra 16 pixels para baixo para ele não ficar flutuando no ar
-
-                            m->vel.y = m->velPulo; // Mario quica para cima
-                            PlaySound(rm.somHitInimigo);
-
-                            int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
-                            p->score += tabelaComboAereo[idx];
-                            p->comboAereo++;
-                        }
-                        else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
-                        {
-                            // Se o casco estava parado e o Mario pulou em cima ou chutou pelo lado
-                            koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                            koopared->velAndando = 300; // Define a velocidade do chute
-                            m->vel.y = m->velPulo;      // Dá mais um quique
-                            PlaySound(rm.somHitInimigo);
-                        }
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+                if (m->estado == ESTADO_MARIO_PULANDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
+                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->vel.y = m->velPulo;
+                    rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
+                    PlaySound(rm.somHitInimigo);
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
+                } else if (!m->invulneravel) {
+                    if (m->grande) {
+                        // encolhe ao invés de perder vida
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->invulneravel = true;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel); // ou um som de encolher
+                    } else if (p->quantidadeAneis > 0) {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    } else {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
                     }
-                    else if (!m->invulneravel)
-                    {
-
-                        // Se o Mario trombar com o casco parado pelo lado, ele CHUTA o casco em vez de tomar dano
-                        if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
-                        {
-                            koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                            koopared->velAndando = 350;
-
-                            // Define a direção do casco baseado na posição do Mario
-                            if (retColCalculado.x < koopared->ret.x)
-                            {
-                                koopared->olhandoParaDireita = true;
-                            }
-                            else
-                            {
-                                koopared->olhandoParaDireita = false;
-                            }
-                            PlaySound(rm.somHitInimigo); // Ou som de chute, se tiver
-                        }
-                        else
-                        {
-                            // Se o Koopa estiver ANDANDO ou o casco estiver CORRENDO, o Mario toma dano
-                            if (p->quantidadeAneis > 0)
-                            {
-                                p->quantidadeAneis = 0;
-                                PlaySound(rm.somHitComAnel);
-                            }
-                            else
-                            {
-                                p->quantidadeVidas--;
-                                PlaySound(rm.somMorte);
-                            }
-                            m->invulneravel = true;
-                        }
-
-                        return; // um inimigo de cada vez!
-                    }
-                }
-                else if (inimigo->tipo == TIPO_INIMIGO_REX)
-                {
-
-                    InimigoRex *rex = (InimigoRex *)inimigo->objeto;
-
-                    if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO)
-                    {
-                        el = el->proximo;
-                        continue;
-                    }
-
-                    qaInimigo = getQuadroAnimacaoAtualInimigoRex(rex);
-                    olhandoParaDireita = &rex->olhandoParaDireita;
-                    ret = &rex->ret;
-
-                    float deslocamentoX = *olhandoParaDireita
-                                              ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
-                                              : qaInimigo->retColisao.x;
-                    float deslocamentoY = qaInimigo->retColisao.y;
-
-                    Rectangle retColInimigoCalculado = {
-                        ret->x + deslocamentoX,
-                        ret->y + deslocamentoY,
-                        qaInimigo->retColisao.width,
-                        qaInimigo->retColisao.height};
-
-                    if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-                    {
-
-                        if (m->estado == ESTADO_MARIO_PULANDO || m->estado == ESTADO_MARIO_PULANDO_CORRENDO || m->estado == ESTADO_MARIO_CAINDO)
-                        {
-                            m->vel.y = m->velPulo;
-                            rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
-                            PlaySound(rm.somHitInimigo);
-                            int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
-                            p->score += tabelaComboAereo[idx];
-                            p->comboAereo++;
-                        }
-                        else if (!m->invulneravel)
-                        {
-                            if (p->quantidadeAneis > 0)
-                            {
-                                p->quantidadeAneis = 0;
-                                PlaySound(rm.somHitComAnel);
-                            }
-                            else
-                            {
-                                p->quantidadeVidas--;
-                                PlaySound(rm.somMorte);
-                            }
-                            m->invulneravel = true;
-                        }
-
-                    }
+                    m->invulneravel = true;
                 }
             }
         }
+
         el = el->proximo;
     }
 }

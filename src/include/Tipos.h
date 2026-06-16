@@ -40,6 +40,8 @@ typedef enum EstadoMario
     ESTADO_MARIO_PULANDO_CORRENDO,
     ESTADO_MARIO_PULANDO_GIRANDO,
     ESTADO_MARIO_CAINDO,
+    ESTADO_MARIO_ABAIXADO,
+    ESTADO_MARIO_CRESCENDO,
 } EstadoMario;
 
 /**
@@ -76,8 +78,9 @@ typedef enum EstadoInimigoTonTon
 typedef enum EstadoInimigoKoopaRed
 {
     ESTADO_KOOPA_ANDANDO,
+    ESTADO_KOOPA_MORRENDO,
     ESTADO_KOOPA_CASCO_PARADO,
-    ESTADO_KOOPA_CASCO_CORRENDO
+    ESTADO_KOOPA_CASCO_CORRENDO,
 } EstadoInimigoKoopaRed;
 
 typedef enum EstadoInimigoRex
@@ -217,6 +220,7 @@ typedef struct Mario
 {
 
     Rectangle ret;
+    Rectangle retOriginal;
     Vector2 vel;
     Color cor;
 
@@ -242,11 +246,13 @@ typedef struct Mario
     float contadorTempoPiscaPisca;
 
     bool freando;
+    bool grande;
 
     EstadoMario estado;
     bool olhandoParaDireita;
 
     Animacao *animacoes[20];
+    Animacao *animacoesGrande[20];
     int quantidadeAnimacoes;
 
     Animacao animacaoParado;
@@ -255,6 +261,17 @@ typedef struct Mario
     Animacao animacaoPulando;
     Animacao animacaoPulandoCorrendo;
     Animacao animacaoCaindo;
+    Animacao animacaoAbaixado;
+    
+    Animacao animacaoCrescendo;
+
+    Animacao animacaoGrandeParado;
+    Animacao animacaoGrandeAndando;
+    Animacao animacaoGrandeCorrendo;
+    Animacao animacaoGrandePulando;
+    Animacao animacaoGrandePulandoCorrendo;
+    Animacao animacaoGrandeCaindo;
+    Animacao animacaoGrandeAbaixado;
 
 } Mario;
 

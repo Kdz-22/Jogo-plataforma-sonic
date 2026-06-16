@@ -261,12 +261,14 @@ static void inicializar(GameWorld *gw) {
     gw->personagem = criarMario(GetScreenWidth() / 2 + 144,
                                 calcularAlturaMapa(gw->mapa) - 400, 96, 96);
     // - 196
+    //gw->personagem = criarSonic(GetScreenWidth() / 2 + 144,
+    //                            calcularAlturaMapa(gw->mapa) - 400, 96, 96);
     gw->camera = (Camera2D){
         .offset = {0}, // deslocamento relativo da câmera em relação ao alvo
         .target = {0}, // o alvo da câmera, ou seja, a coordenada em que ela
                        // está centralizada
         .rotation = 0.0f, // rotação da câmera em graus. o pivô é o alvo.
-        .zoom = 1.0f      // zoom da câmera. 1.0f significa sem escala
+        .zoom = 0.9f      // zoom da câmera. 1.0f significa sem escala
     };
     
     gw->gravidade = 900;
