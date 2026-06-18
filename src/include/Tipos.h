@@ -261,8 +261,10 @@ typedef struct Mario
     Animacao animacaoCorrendo;
     Animacao animacaoPulando;
     Animacao animacaoPulandoCorrendo;
+    Animacao animacaoPulandoGirando;
     Animacao animacaoCaindo;
     Animacao animacaoAbaixado;
+    
 
     Animacao animacaoCrescendo;
 
@@ -271,6 +273,7 @@ typedef struct Mario
     Animacao animacaoGrandeCorrendo;
     Animacao animacaoGrandePulando;
     Animacao animacaoGrandePulandoCorrendo;
+    Animacao animacaoGrandePulandoGirando;
     Animacao animacaoGrandeCaindo;
     Animacao animacaoGrandeAbaixado;
 

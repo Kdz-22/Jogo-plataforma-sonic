@@ -15,9 +15,9 @@
 int main( void ) {
 
     GameWindow *gameWindow = createGameWindow(
-        800,             // width
-        450,             // height
-        "Jogo de Sonic", // title
+        1000,             // width
+        550,             // height
+        "Jogo que mario?", // title
         60,              // target FPS
         false,           // antialiasing
         false,           // resizable
