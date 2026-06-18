@@ -49,6 +49,7 @@ typedef enum EstadoMario
  */
 typedef enum EstadoJogo
 {
+    ESTADO_JOGO_SELECAO_PERSONAGEM,
     ESTADO_JOGO_JOGANDO,
     ESTADO_JOGO_GAMEOVER,
 } EstadoJogo;

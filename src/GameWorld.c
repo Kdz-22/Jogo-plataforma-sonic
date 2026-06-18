@@ -42,7 +42,9 @@ GameWorld *createGameWorld(void) {
     GameWorld *gw = (GameWorld *)malloc(sizeof(GameWorld));
     inicializar(gw);
 
-    gw->estado = ESTADO_JOGO_JOGANDO;
+    gw->personagemSelecionado = 0;
+
+    gw->estado = ESTADO_JOGO_SELECAO_PERSONAGEM;
 
     return gw;
 }
@@ -80,6 +82,18 @@ void updateGameWorld(GameWorld *gw, float delta) {
                 Clamp(rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f);
             SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
         }
+    }
+
+    if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM) {
+        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)) {
+            // alterna entre 0 e 1
+            gw->personagemSelecionado = !gw->personagemSelecionado;
+        }
+        if (IsKeyPressed(KEY_ENTER)) {
+            inicializar(gw);
+            gw->estado = ESTADO_JOGO_JOGANDO;
+        }
+        return; // não processa mais nada enquanto está na seleção
     }
 
     if (gw->estado == ESTADO_JOGO_JOGANDO) {
@@ -138,16 +152,15 @@ void drawGameWorld(GameWorld *gw) {
         gw->personagem->funcoes->desenhar(gw->personagem->dados);
         EndMode2D();
 
-        DrawText( "VOL", 640, 45, 25, WHITE );
-        DrawText( "AUMENTAR = +", 640, 75, 20, YELLOW );
-        DrawText( "DIMINUIR = -", 640, 105, 20, YELLOW );
-        desenharPontuacao(rm.texturaHUD,
-            (int)(rm.volumeMusicaFase01 * 100),
+        DrawText("VOL", 640, 45, 25, WHITE);
+        DrawText("AUMENTAR = +", 640, 75, 20, YELLOW);
+        DrawText("DIMINUIR = -", 640, 105, 20, YELLOW);
+        desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
                           (Vector2){700, 45});
-        //desenharTexto(rm.texturaHUD2,
-          //              "VOL",
-            //            (Vector2){660, 48}, 
-              //          2.0f);
+        // desenharTexto(rm.texturaHUD2,
+        //               "VOL",
+        //             (Vector2){660, 48},
+        //           2.0f);
 
         // Score
         DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
@@ -188,6 +201,51 @@ void drawGameWorld(GameWorld *gw) {
                           (Vector2){110, 75});
 
         // DrawFPS( 700, 15 );
+    } else if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM) {
+
+        ClearBackground(BLACK);
+
+        int larguraTela = GetScreenWidth();
+        int alturaTela = GetScreenHeight();
+
+        // título
+        int tamTitulo = MeasureText("SELECIONE O PERSONAGEM", 30);
+        DrawText("SELECIONE O PERSONAGEM", larguraTela / 2 - tamTitulo / 2, 50,
+                 30, WHITE);
+
+        // destaca o selecionado com um retângulo
+        int retX = gw->personagemSelecionado == 0 ? larguraTela / 4 - 60
+                                                  : larguraTela / 4 * 3 - 60;
+        Color corMario = gw->personagemSelecionado == 0 ? WHITE : (Color) {60, 60, 60, 200};
+        Color corSonic = gw->personagemSelecionado == 1 ? WHITE : (Color) {60, 60, 60, 200};
+
+        // Mario sempre na esquerda
+        DrawTexturePro(
+            rm.texturaMario, (Rectangle){8, 3453, 32, 32},
+            (Rectangle){larguraTela / 4 - 60, alturaTela / 2 - 60, 120, 120},
+            (Vector2){0, 0}, 0.0f, corMario);
+
+        // Sonic sempre na direita
+        DrawTexturePro(
+            rm.texturaJogador, (Rectangle){260, 2245, 80, 56},
+            (Rectangle){larguraTela / 4 * 3 - 60, alturaTela / 2 - 60, 120, 120},
+            (Vector2){0, 0}, 0.0f, corSonic);
+
+        DrawRectangleLines(retX, alturaTela / 2 - 60, 120, 120, YELLOW);
+
+        // nomes dos personagens
+        DrawText("MARIO", larguraTela / 4 - MeasureText("MARIO", 20) / 2,
+                 alturaTela / 2 + 80, 20,
+                 gw->personagemSelecionado == 0 ? YELLOW : GRAY);
+
+        DrawText("SONIC", larguraTela / 4 * 3 - MeasureText("SONIC", 20) / 2,
+                 alturaTela / 2 + 80, 20,
+                 gw->personagemSelecionado == 1 ? YELLOW : GRAY);
+
+        // instrução
+        int tamConfirmar = MeasureText("ENTER PARA CONFIRMAR", 20);
+        DrawText("ENTER PARA CONFIRMAR", larguraTela / 2 - tamConfirmar / 2,
+                 alturaTela - 60, 20, LIGHTGRAY);
     } else if (gw->estado == ESTADO_JOGO_GAMEOVER) {
 
         ClearBackground(BLACK);
@@ -256,21 +314,24 @@ static void atualizarCamera(GameWorld *gw) {
 static void inicializar(GameWorld *gw) {
 
     // gw->mapa = carregarMapa( "resources/mapas/mapaTeste.txt" );
-    //gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
+    // gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
     gw->mapa = carregarMapa("resources/mapas/yoshi-island-1.txt");
-    gw->personagem = criarMario(GetScreenWidth() / 2 + 144,
-                                calcularAlturaMapa(gw->mapa) - 400, 96, 96);
-    // - 196
-    //gw->personagem = criarSonic(GetScreenWidth() / 2 + 144,
-    //                            calcularAlturaMapa(gw->mapa) - 400, 96, 96);
+    if (gw->personagemSelecionado == 0) {
+        gw->personagem = criarMario(GetScreenWidth() / 2 + 144,
+                                    calcularAlturaMapa(gw->mapa) - 400, 96, 96);
+    } else {
+        gw->personagem = criarSonic(GetScreenWidth() / 2 + 144,
+                                    calcularAlturaMapa(gw->mapa) - 400, 96, 96);
+    }
+
     gw->camera = (Camera2D){
-        .offset = {0}, // deslocamento relativo da câmera em relação ao alvo
-        .target = {0}, // o alvo da câmera, ou seja, a coordenada em que ela
-                       // está centralizada
+        .offset = {0},    // deslocamento relativo da câmera em relação ao alvo
+        .target = {0},    // o alvo da câmera, ou seja, a coordenada em que ela
+                          // está centralizada
         .rotation = 0.0f, // rotação da câmera em graus. o pivô é o alvo.
         .zoom = 0.9f      // zoom da câmera. 1.0f significa sem escala
     };
-    
+
     gw->gravidade = 900;
 }
 
@@ -347,14 +408,15 @@ static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao) {
     }
 }
 
-static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao, float escala) {
+static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
+                          float escala) {
 
-    int charW      = 7;
-    int charH      = 11;
-    int inicioX    = 9;
-    int inicioY    = 82;
+    int charW = 7;
+    int charH = 11;
+    int inicioX = 9;
+    int inicioY = 82;
     int espacamento = 2;
-    int cursor     = 0; // <-- contador separado para posição X
+    int cursor = 0; // <-- contador separado para posição X
 
     for (int i = 0; texto[i] != '\0'; i++) {
 
@@ -368,21 +430,14 @@ static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao, flo
             continue;
         }
 
-        if (idx < 0) continue;
+        if (idx < 0)
+            continue;
 
-        Rectangle origem = {
-            inicioX + (idx * (charW + espacamento)),
-            inicioY,
-            charW,
-            charH
-        };
+        Rectangle origem = {inicioX + (idx * (charW + espacamento)), inicioY,
+                            charW, charH};
 
-        Rectangle dest = {
-            posicao.x + cursor * (charW * escala),
-            posicao.y,
-            charW * escala,
-            charH * escala
-        };
+        Rectangle dest = {posicao.x + cursor * (charW * escala), posicao.y,
+                          charW * escala, charH * escala};
 
         DrawTexturePro(hud, origem, dest, (Vector2){0, 0}, 0.0f, WHITE);
         cursor++;

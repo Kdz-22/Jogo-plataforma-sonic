@@ -490,7 +490,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
-                    PlaySound(rm.somFrenagem);
+                    //PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x > 0) {
@@ -508,7 +508,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
-                    PlaySound(rm.somFrenagem);
+                    //PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x > 0) {
@@ -529,7 +529,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
-                    PlaySound(rm.somFrenagem);
+                    //PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x < 0) {
@@ -547,7 +547,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
-                    PlaySound(rm.somFrenagem);
+                    //PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
 
