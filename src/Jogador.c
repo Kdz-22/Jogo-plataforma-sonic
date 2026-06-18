@@ -24,6 +24,8 @@
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
 #include "ItemCoguVerm.h"
+#include "ItemFlorPreta.h"
+
 #include "Macros.h"
 #include "Jogador.h"
 #include "ResourceManager.h"
@@ -709,6 +711,36 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p, Mapa *map
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
+            }
+        }
+        else if (item->tipo == TIPO_ITEM_FLOR_PRETA)
+        {
+            ItemFlorPreta *itemFlorPreta = (ItemFlorPreta *)item->objeto;
+
+            // Verifica se o item está ativo ou se já foi coletado
+            if (!itemFlorPreta->ativo || itemFlorPreta->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            // Obtém o quadro de animação atual para calcular a colisão precisa
+            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemFlorPreta(itemFlorPreta);
+
+            Rectangle retColItemCalculado = {
+                itemFlorPreta->ret.x + qaItem->retColisao.x,
+                itemFlorPreta->ret.y + qaItem->retColisao.y,
+                qaItem->retColisao.width,
+                qaItem->retColisao.height};
+
+            // Altere a lógica interna do IF se a Flor Preta der um poder/pontuação diferente
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
+                itemFlorPreta->estado = ESTADO_ITEM_FLOR_PRETA_COLETADA;
+                p->score += 200; // Exemplo: Flor preta dá 200 de score
+                // Se a flor der poder de fogo/tiro ao jogador (p), você pode ativar a flag aqui:
+                // p->podeAtirar = true;
+                PlaySound(rm.somAnel); // Substitua pelo som adequado se houver um som de power-up
             }
         }
 
