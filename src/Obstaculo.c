@@ -58,3 +58,21 @@ void desenharObstaculo( Obstaculo *o ) {
     );
 
 }
+
+void atualizarObstaculo( Obstaculo *o, float delta ) {
+
+    if ( o->quebrando && !o->quebrado ) {
+
+        const float duracaoQuadro = 0.08f; // 80ms por quadro
+        o->tempoQuadroQuebra += delta;
+
+        if ( o->tempoQuadroQuebra >= duracaoQuadro ) {
+            o->tempoQuadroQuebra = 0.0f;
+            o->quadroQuebra++;
+
+            if ( o->quadroQuebra >= 3 ) { // 3 frames após o "intacto" na sua spritesheet
+                o->quebrado = true;
+            }
+        }
+    }
+}

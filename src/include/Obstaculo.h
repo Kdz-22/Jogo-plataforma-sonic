@@ -25,3 +25,5 @@ void destruirObstaculo( Obstaculo *o );
  * @brief Desenha um obstáculo.
  */
 void desenharObstaculo( Obstaculo *o );
+
+void atualizarObstaculo( Obstaculo *o, float delta );

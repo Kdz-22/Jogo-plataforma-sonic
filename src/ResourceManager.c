@@ -89,6 +89,17 @@ void loadResourcesResourceManager( void ) {
         1
     );
 
+    rm.texturaItensAnimadosMario = carregarTexturaAlterandoCores( 
+        "resources/imagens/itens/itens-animados-mario",
+        (Color[]) {
+            { 248, 0, 248, 255 },
+        },
+        (Color[]) {
+            BLANK,
+        },
+        1
+    );
+
     rm.texturaTerreno = LoadTexture( "resources/imagens/tiles/terreno.png" );
     rm.texturaFundo = LoadTexture( "resources/imagens/fundo/fundo.png" );
     rm.texturaCanos = LoadTexture( "resources/imagens/tiles/canos.png" );
@@ -105,6 +116,7 @@ void loadResourcesResourceManager( void ) {
     SetTextureFilter( rm.texturaHUD, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaHUD2, TEXTURE_FILTER_POINT );
     SetTextureFilter( rm.texturaCanos, TEXTURE_FILTER_POINT );
+    SetTextureFilter( rm.texturaItensAnimadosMario, TEXTURE_FILTER_POINT );
 
     rm.somAnel = LoadSound( "resources/sons/efeitos/anel.wav" );
     rm.somFrenagem = LoadSound( "resources/sons/efeitos/frenagem.wav" );
@@ -129,6 +141,7 @@ void unloadResourcesResourceManager( void ) {
     UnloadTexture( rm.texturaHUD );
     UnloadTexture( rm.texturaHUD2 );
     UnloadTexture( rm.texturaCanos );
+    UnloadTexture( rm.texturaItensAnimadosMario );
 
     UnloadSound( rm.somAnel );
     UnloadSound( rm.somFrenagem );

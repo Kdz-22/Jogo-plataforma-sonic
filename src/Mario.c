@@ -73,6 +73,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
     m->quantidadeMaxPulos = 2;
 
     m->grande = false;
+    m->pulandoGirando = false;
     m->invulneravel = false;
     m->tempoInvulnerabilidade = 3.0f;
     m->contadorTempoInvulnerabilidade = 0.0f;
@@ -99,7 +100,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
     inicializarQuadrosAnimacao(
         m->animacaoParado.quadros, m->animacaoParado.quantidadeQuadros,
         1000,   // duração padrão para todos os quadros
-        8, 33, // início
+        8, 33,  // início
         48, 48, // dimensões
         4,      // separação
         true,   // de trás para frente
@@ -122,7 +123,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
         150,     // duração padrão para cada quadro
         216, 33, // início
         48, 48,  // dimensões
-        4,      // separação
+        4,       // separação
         false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
@@ -143,7 +144,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
         50,      // duração padrão para cada quadro
         372, 33, // início
         48, 48,  // dimensões
-        4,      // separação
+        4,       // separação
         false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
@@ -161,11 +162,11 @@ Personagem *criarMario(float x, float y, float w, float h) {
                          m->animacaoPulando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
         m->animacaoPulando.quadros, m->animacaoPulando.quantidadeQuadros,
-        40,      // duração padrão para cada quadro
-        60, 97,  // início
-        48, 48,  // dimensões
-        4,       // separação
-        false,   // de trás para frente
+        40,     // duração padrão para cada quadro
+        60, 97, // início
+        48, 48, // dimensões
+        4,      // separação
+        false,  // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             30, 35, 40, 50
@@ -183,11 +184,11 @@ Personagem *criarMario(float x, float y, float w, float h) {
     inicializarQuadrosAnimacao(
         m->animacaoPulandoCorrendo.quadros,
         m->animacaoPulandoCorrendo.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
+        15,      // duração padrão para cada quadro
         164, 97, // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        48, 48,  // dimensões
+        4,       // separação
+        false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             30, 35, 40, 50
@@ -205,11 +206,11 @@ Personagem *criarMario(float x, float y, float w, float h) {
     inicializarQuadrosAnimacao(
         m->animacaoPulandoGirando.quadros,
         m->animacaoPulandoGirando.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
+        15,      // duração padrão para cada quadro
         216, 97, // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        48, 48,  // dimensões
+        4,       // separação
+        false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             30, 35, 40, 50
@@ -226,11 +227,11 @@ Personagem *criarMario(float x, float y, float w, float h) {
                          m->animacaoCaindo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
         m->animacaoCaindo.quadros, m->animacaoCaindo.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
+        15,      // duração padrão para cada quadro
         112, 97, // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        48, 48,  // dimensões
+        4,       // separação
+        false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             30, 35, 40, 50
@@ -247,11 +248,11 @@ Personagem *criarMario(float x, float y, float w, float h) {
                          m->animacaoAbaixado.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
         m->animacaoAbaixado.quadros, m->animacaoAbaixado.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
+        15,      // duração padrão para cada quadro
         112, 33, // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        48, 48,  // dimensões
+        4,       // separação
+        false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             32, 46, 32, 32
@@ -288,12 +289,13 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandeParado,
                          m->animacaoGrandeParado.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandeParado.quadros, m->animacaoGrandeParado.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
+        m->animacaoGrandeParado.quadros,
+        m->animacaoGrandeParado.quantidadeQuadros,
+        15,     // duração padrão para cada quadro
         8, 576, // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        48, 48, // dimensões
+        4,      // separação
+        false,  // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             38, 23, 40, 71
@@ -308,7 +310,8 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandeAndando,
                          m->animacaoGrandeAndando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandeAndando.quadros, m->animacaoGrandeAndando.quantidadeQuadros,
+        m->animacaoGrandeAndando.quadros,
+        m->animacaoGrandeAndando.quantidadeQuadros,
         15,       // duração padrão para cada quadro
         164, 576, // início
         48, 48,   // dimensões
@@ -329,7 +332,8 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandeCorrendo,
                          m->animacaoGrandeCorrendo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandeCorrendo.quadros, m->animacaoGrandeCorrendo.quantidadeQuadros,
+        m->animacaoGrandeCorrendo.quadros,
+        m->animacaoGrandeCorrendo.quantidadeQuadros,
         15,       // duração padrão para cada quadro
         320, 576, // início
         48, 48,   // dimensões
@@ -349,12 +353,13 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandePulando,
                          m->animacaoGrandePulando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandePulando.quadros, m->animacaoGrandePulando.quantidadeQuadros,
-        15,       // duração padrão para cada quadro
-        60, 647,  // início
-        48, 48,   // dimensões
-        4,        // separação
-        false,    // de trás para frente
+        m->animacaoGrandePulando.quadros,
+        m->animacaoGrandePulando.quantidadeQuadros,
+        15,      // duração padrão para cada quadro
+        60, 647, // início
+        48, 48,  // dimensões
+        4,       // separação
+        false,   // de trás para frente
         (Rectangle){
             // retângulo de colisão padrão para cada quadro
             38, 23, 40, 71
@@ -367,12 +372,14 @@ Personagem *criarMario(float x, float y, float w, float h) {
     m->animacaoGrandePulandoCorrendo.pararNoUltimoQuadro = false;
     m->animacaoGrandePulandoCorrendo.executarUmaVez = false;
     m->animacaoGrandePulandoCorrendo.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoGrandePulandoCorrendo,
-                         m->animacaoGrandePulandoCorrendo.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(
+        &m->animacaoGrandePulandoCorrendo,
+        m->animacaoGrandePulandoCorrendo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandePulandoCorrendo.quadros, m->animacaoGrandePulandoCorrendo.quantidadeQuadros,
+        m->animacaoGrandePulandoCorrendo.quadros,
+        m->animacaoGrandePulandoCorrendo.quantidadeQuadros,
         15,       // duração padrão para cada quadro
-        164, 647,  // início
+        164, 647, // início
         48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
@@ -387,12 +394,14 @@ Personagem *criarMario(float x, float y, float w, float h) {
     m->animacaoGrandePulandoGirando.pararNoUltimoQuadro = false;
     m->animacaoGrandePulandoGirando.executarUmaVez = false;
     m->animacaoGrandePulandoGirando.finalizada = false;
-    criarQuadrosAnimacao(&m->animacaoGrandePulandoGirando,
-                         m->animacaoGrandePulandoGirando.quantidadeQuadros); // ok
+    criarQuadrosAnimacao(
+        &m->animacaoGrandePulandoGirando,
+        m->animacaoGrandePulandoGirando.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandePulandoGirando.quadros, m->animacaoGrandePulandoGirando.quantidadeQuadros,
+        m->animacaoGrandePulandoGirando.quadros,
+        m->animacaoGrandePulandoGirando.quantidadeQuadros,
         40,       // duração padrão para cada quadro
-        216, 647,  // início
+        216, 647, // início
         48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
@@ -411,9 +420,10 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandeCaindo,
                          m->animacaoGrandeCaindo.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandeCaindo.quadros, m->animacaoGrandeCaindo.quantidadeQuadros,
+        m->animacaoGrandeCaindo.quadros,
+        m->animacaoGrandeCaindo.quantidadeQuadros,
         15,       // duração padrão para cada quadro
-        112, 647,  // início
+        112, 647, // início
         48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
@@ -422,7 +432,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
             38, 28, 45, 78
             // 18, 36, 60, 60
         });
-    
+
     m->animacaoGrandeAbaixado.quantidadeQuadros = 1;
     m->animacaoGrandeAbaixado.quadroAtual = 0;
     m->animacaoGrandeAbaixado.contadorTempoQuadro = 0.0f;
@@ -432,9 +442,10 @@ Personagem *criarMario(float x, float y, float w, float h) {
     criarQuadrosAnimacao(&m->animacaoGrandeAbaixado,
                          m->animacaoGrandeAbaixado.quantidadeQuadros); // ok
     inicializarQuadrosAnimacao(
-        m->animacaoGrandeAbaixado.quadros, m->animacaoGrandeAbaixado.quantidadeQuadros,
+        m->animacaoGrandeAbaixado.quadros,
+        m->animacaoGrandeAbaixado.quantidadeQuadros,
         15,       // duração padrão para cada quadro
-        112, 576,  // início
+        112, 576, // início
         48, 48,   // dimensões
         4,        // separação
         false,    // de trás para frente
@@ -470,13 +481,15 @@ Personagem *criarMario(float x, float y, float w, float h) {
     quantidadeAnimacoes++;
     m->animacoesGrande[ESTADO_MARIO_PULANDO] = &m->animacaoGrandePulando;
     quantidadeAnimacoes++;
-    m->animacoesGrande[ESTADO_MARIO_PULANDO_CORRENDO] = &m->animacaoGrandePulandoCorrendo;
+    m->animacoesGrande[ESTADO_MARIO_PULANDO_CORRENDO] =
+        &m->animacaoGrandePulandoCorrendo;
     quantidadeAnimacoes++;
     m->animacoesGrande[ESTADO_MARIO_CAINDO] = &m->animacaoGrandeCaindo;
     quantidadeAnimacoes++;
     m->animacoesGrande[ESTADO_MARIO_ABAIXADO] = &m->animacaoGrandeAbaixado;
     quantidadeAnimacoes++;
-    m->animacoesGrande[ESTADO_MARIO_PULANDO_GIRANDO] = &m->animacaoGrandePulandoGirando;
+    m->animacoesGrande[ESTADO_MARIO_PULANDO_GIRANDO] =
+        &m->animacaoGrandePulandoGirando;
     quantidadeAnimacoes++;
 
     m->quantidadeAnimacoes = quantidadeAnimacoes;
@@ -519,9 +532,10 @@ void entradaMario(void *dados, Personagem *p, float delta) {
     bool esquerdaDown = IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A) ||
                         (IsGamepadAvailable(0) &&
                          IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT));
-    bool cimaDown = IsKeyDown(KEY_UP) || IsKeyDown(KEY_W) ||
-                    (IsGamepadAvailable(0) &&
-                     IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP));
+    bool pulandoGirandoPressed =
+        IsKeyDown(KEY_UP) || IsKeyDown(KEY_W) ||
+        (IsGamepadAvailable(0) &&
+         IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP));
     bool baixoDown = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S) ||
                      (IsGamepadAvailable(0) &&
                       IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN));
@@ -536,7 +550,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
-                    //PlaySound(rm.somFrenagem);
+                    // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x > 0) {
@@ -554,7 +568,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
-                    //PlaySound(rm.somFrenagem);
+                    // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x > 0) {
@@ -575,7 +589,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
-                    //PlaySound(rm.somFrenagem);
+                    // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
                 if (m->vel.x < 0) {
@@ -593,7 +607,7 @@ void entradaMario(void *dados, Personagem *p, float delta) {
             if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
                 if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
-                    //PlaySound(rm.somFrenagem);
+                    // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
 
@@ -625,7 +639,9 @@ void entradaMario(void *dados, Personagem *p, float delta) {
 
     float absVelX = fabsf(m->vel.x);
     if (m->quantidadePulos > 0) {
-        if (m->vel.y < 0) {
+        if (m->pulandoGirando) {
+            m->estado = ESTADO_MARIO_PULANDO_GIRANDO;
+        } else if (m->vel.y < 0) {
             if (absVelX <= m->velAndando) {
                 m->estado = ESTADO_MARIO_PULANDO;
             } else {
@@ -645,9 +661,11 @@ void entradaMario(void *dados, Personagem *p, float delta) {
         m->estado = ESTADO_MARIO_CORRENDO;
     }
 
-    if (puloPressed && m->quantidadePulos < m->quantidadeMaxPulos) {
+    if ((puloPressed || pulandoGirandoPressed) &&
+        m->quantidadePulos < m->quantidadeMaxPulos) {
         m->vel.y = m->velPulo;
         m->quantidadePulos++;
+        m->pulandoGirando = pulandoGirandoPressed;
         // PlaySound( rm.somPulo );
     }
 
@@ -735,6 +753,7 @@ void resetarMario(void *dados) {
     m->contadorTempoInvulnerabilidade = 0.0f;
     m->contadorTempoPiscaPisca = 0.0f;
     m->piscaPisca = false;
+    m->pulandoGirando = false;
     m->estado = ESTADO_MARIO_PARADO;
 
     if (m->grande) {
@@ -860,10 +879,29 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
             continue;
         }
         if (CheckCollisionRecs(retColCalculado, o->ret)) {
+
+            bool vindoDeBaixo =
+                retColCalculado.y + retColCalculado.height / 2 >=
+                o->ret.y + o->ret.height / 2;
+
+            if (o->eBlocoGiratorio && vindoDeBaixo &&
+                m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando) {
+
+                o->quebrando = true;
+                o->solido = false; // remove a colisão na hora, Mario atravessa
+                o->quadroQuebra = 0;
+                o->tempoQuadroQuebra = 0.0f;
+                //PlaySound(rm.somHitInimigo); // troque por um som de quebra se tiver
+
+                el = el->proximo;
+                continue; // não aplica a correção normal de posição
+            }
+
             if (retColCalculado.y + retColCalculado.height / 2 <
                 o->ret.y + o->ret.height / 2) {
                 m->ret.y = o->ret.y - qa->retColisao.height - deslocamentoY;
                 m->quantidadePulos = 0;
+                m->pulandoGirando = false;
             } else {
                 m->ret.y = o->ret.y + o->ret.height - deslocamentoY;
             }
@@ -962,7 +1000,8 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa) {
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
             if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
-                itemCogumeloVermelho->estado = ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
+                itemCogumeloVermelho->estado =
+                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);

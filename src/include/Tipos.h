@@ -237,6 +237,7 @@ typedef struct Mario {
 
     bool freando;
     bool grande;
+    bool pulandoGirando;
 
     EstadoMario estado;
     bool olhandoParaDireita;
@@ -492,9 +493,16 @@ typedef struct Obstaculo {
     Rectangle fonte;
     Rectangle fonteUsado;
     Texture2D *textura;
+    
 
     bool solido;
     bool eBlocoInterrogacao;
+
+    bool eBlocoGiratorio;
+    bool quebrando;
+    bool quebrado;
+    int quadroQuebra;
+    float tempoQuadroQuebra;
 } Obstaculo;
 
 /**
