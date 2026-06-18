@@ -79,11 +79,11 @@ InimigoNegoPreto *criarInimigoNegoPreto(Rectangle ret, Color cor)
         novoInimigo->animacaoVoando.quadros,
         novoInimigo->animacaoVoando.quantidadeQuadros,
         100,    
-        0, 0,   
-        32, 32, 
+        1, 180,   
+        128, 128, 
         0,      
         false,
-        (Rectangle){0, 0, 32, 32} 
+        (Rectangle){1, 128, 128, 128} 
     );
 
     novoInimigo->animacoes[ESTADO_INIMIGO_NEGOPRETO_VOANDO] = &novoInimigo->animacaoVoando;

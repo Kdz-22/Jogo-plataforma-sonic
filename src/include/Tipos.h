@@ -84,7 +84,6 @@ typedef enum EstadoInimigoRex {
 
 typedef enum EstadoInimigoNegoPreto
 {
-    ESTADO_INIMIGO_NEGOPRETO_INATIVO,
     ESTADO_INIMIGO_NEGOPRETO_VOANDO,
 } EstadoInimigoNegoPreto;
 
