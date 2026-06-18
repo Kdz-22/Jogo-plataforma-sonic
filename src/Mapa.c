@@ -196,8 +196,8 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     obs->eBlocoGiratorio = true;
                     obs->quebrando = false;
                     obs->quebrado = false;
-                    obs->quadroQuebra = 0;
-                    obs->tempoQuadroQuebra = 0.0f;
+                    obs->quadroQuebra = 4; // começa no frame "intacto"
+                    obs->tempoQuadroQuebra = 1.0f;
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
