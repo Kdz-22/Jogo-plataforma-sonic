@@ -18,6 +18,8 @@
 #include "InimigoTonTon.h"
 #include "InimigoKoopaRed.h"
 #include "InimigoRex.h"
+#include "InimigoNegoPreto.h"
+
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
@@ -26,17 +28,18 @@
 #include "Tipos.h"
 #include "ResourceManager.h"
 
-static void inserirObstaculo( Mapa *mapa, ElementoMapa *obstaculo );
-static void inserirItem( Mapa *mapa, ElementoMapa *item );
-static void inserirInimigo( Mapa *mapa, ElementoMapa *inimigo );
+static void inserirObstaculo(Mapa *mapa, ElementoMapa *obstaculo);
+static void inserirItem(Mapa *mapa, ElementoMapa *item);
+static void inserirInimigo(Mapa *mapa, ElementoMapa *inimigo);
 
 /**
  * @brief Carrega um mapa a partir de uma arquivo.
  */
-Mapa *carregarMapa( const char *caminhoArquivo ) {
+Mapa *carregarMapa(const char *caminhoArquivo)
+{
 
     // aloca um novo mapa
-    Mapa *novoMapa = (Mapa*) malloc( sizeof( Mapa ) );
+    Mapa *novoMapa = (Mapa *)malloc(sizeof(Mapa));
 
     novoMapa->obstaculos = NULL;
     novoMapa->quantidadeObstaculos = 0;
@@ -50,9 +53,9 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
     novoMapa->dimensaoPadraoElementos = 48;
     novoMapa->linhas = 0;
     novoMapa->colunas = 0;
-    
+
     // carrega dados do arquivo de texto
-    char *dadosMapa = LoadFileText( caminhoArquivo );
+    char *dadosMapa = LoadFileText(caminhoArquivo);
 
     // marcadores para processamento do mapa
     char *caractereAtual = dadosMapa;
@@ -60,439 +63,478 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
     int colunaAtual = 0;
 
     // caractere atual marca inicialmente a primeira posição de dadosMapa
-    // C-strings terminam em '\0', sendo assim, caminhamos caractere por 
+    // C-strings terminam em '\0', sendo assim, caminhamos caractere por
     // caractere até o fim
-    while ( *caractereAtual != '\0' ) {
+    while (*caractereAtual != '\0')
+    {
 
         char c = *caractereAtual;
 
         // fim de linha?
-        if ( c == '\n' ) {
+        if (c == '\n')
+        {
 
             linhaAtual++;
             colunaAtual = 0;
 
             novoMapa->linhas = linhaAtual;
+        }
+        else
+        {
 
-        } else {
+            if (c != ' ')
+            {
 
-            if ( c != ' ' ) {
-
-                ElementoMapa *el = (ElementoMapa*) malloc( sizeof( ElementoMapa ) );
+                ElementoMapa *el = (ElementoMapa *)malloc(sizeof(ElementoMapa));
                 el->proximo = NULL;
 
-                if ( c >= 'A' && c <= 'Z' ) {
+                if (c >= 'A' && c <= 'Z')
+                {
                     bool solido = true;
                     int deslocamento = c - 'A';
 
-                    if ( c == 'A' || c == 'R' || c == 'S' || c == 'U' || c == 'Q' || c == 'P' || c == 'M' ||
-                        c == 'F' || c == 'G'  ) {
+                    if (c == 'A' || c == 'R' || c == 'S' || c == 'U' || c == 'Q' || c == 'P' || c == 'M' ||
+                        c == 'F' || c == 'G')
+                    {
                         solido = false;
                     }
 
-                    el->objeto = criarObstaculo( 
-                        (Rectangle) { 
-                            .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
-                            .y = novoMapa->dimensaoPadraoElementos * linhaAtual, 
-                            .width = novoMapa->dimensaoPadraoElementos, 
-                            .height = novoMapa->dimensaoPadraoElementos
-                        },
+                    el->objeto = criarObstaculo(
+                        (Rectangle){
+                            .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                            .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
+                            .width = novoMapa->dimensaoPadraoElementos,
+                            .height = novoMapa->dimensaoPadraoElementos},
                         GRAY,
-                        (Rectangle) { 
-                            1 + ( novoMapa->dimensaoPadraoElementos + 1 ) * deslocamento, 
-                            1, 
+                        (Rectangle){
+                            1 + (novoMapa->dimensaoPadraoElementos + 1) * deslocamento,
+                            1,
                             novoMapa->dimensaoPadraoElementos,
-                            novoMapa->dimensaoPadraoElementos
-                        },
+                            novoMapa->dimensaoPadraoElementos},
                         &rm.texturaTerreno,
-                        solido
-                    );
+                        solido);
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
 
-                    inserirObstaculo( novoMapa, el );
-
-                } else if (c == '!' || c == '@' || c == '#' || c == '$' ||
-                           c == '%' || c == '&' || c == '*' || c == '(' ||
-                           c == ')' || c == '[' || c == ']' || c == '{' ||
-                           c == '}' || c == '?' || c == ';' || c == ':' ||
-                           c == ',' || c == '.' || c == '<' || c == '>' ) {
+                    inserirObstaculo(novoMapa, el);
+                }
+                else if (c == '!' || c == '@' || c == '#' || c == '$' ||
+                         c == '%' || c == '&' || c == '*' || c == '(' ||
+                         c == ')' || c == '[' || c == ']' || c == '{' ||
+                         c == '}' || c == '?' || c == ';' || c == ':' ||
+                         c == ',' || c == '.' || c == '<' || c == '>')
+                {
                     // mapeia cada caractere para um tile do cano
                     int deslocamento = 0;
-                    if      ( c == '!' ) deslocamento = 0; // topo esquerdo do cano
-                    else if ( c == '@' ) deslocamento = 1; // topo direito
-                    else if ( c == '#' ) deslocamento = 2; // corpo esquerdo
-                    else if ( c == '$' ) deslocamento = 3; // corpo direito
-                    else if ( c == '%' ) deslocamento = 4; // corpo direito
-                    else if ( c == '&' ) deslocamento = 5; // corpo direito
-                    else if ( c == '*' ) deslocamento = 6; // corpo direito
-                    else if ( c == '(' ) deslocamento = 7; // corpo direito
-                    else if ( c == ')' ) deslocamento = 8; // corpo direito
-                    else if ( c == '[' ) deslocamento = 9; // corpo direito
-                    else if ( c == ']' ) deslocamento = 10; // corpo direito
-                    else if ( c == '{' ) deslocamento = 11; // corpo direito
-                    else if ( c == '}' ) deslocamento = 12; // corpo direito
-                    else if ( c == '?' ) deslocamento = 13; // corpo direito
-                    else if ( c == ';' ) deslocamento = 14; // corpo direito
-                    else if ( c == ':' ) deslocamento = 15; // corpo direito
-                    else if ( c == ',' ) deslocamento = 16; // corpo direito
-                    else if ( c == '.' ) deslocamento = 17; // corpo direito
-                    else if ( c == '<' ) deslocamento = 18; // corpo direito
-                    else if ( c == '>' ) deslocamento = 19; // corpo direito
+                    if (c == '!')
+                        deslocamento = 0; // topo esquerdo do cano
+                    else if (c == '@')
+                        deslocamento = 1; // topo direito
+                    else if (c == '#')
+                        deslocamento = 2; // corpo esquerdo
+                    else if (c == '$')
+                        deslocamento = 3; // corpo direito
+                    else if (c == '%')
+                        deslocamento = 4; // corpo direito
+                    else if (c == '&')
+                        deslocamento = 5; // corpo direito
+                    else if (c == '*')
+                        deslocamento = 6; // corpo direito
+                    else if (c == '(')
+                        deslocamento = 7; // corpo direito
+                    else if (c == ')')
+                        deslocamento = 8; // corpo direito
+                    else if (c == '[')
+                        deslocamento = 9; // corpo direito
+                    else if (c == ']')
+                        deslocamento = 10; // corpo direito
+                    else if (c == '{')
+                        deslocamento = 11; // corpo direito
+                    else if (c == '}')
+                        deslocamento = 12; // corpo direito
+                    else if (c == '?')
+                        deslocamento = 13; // corpo direito
+                    else if (c == ';')
+                        deslocamento = 14; // corpo direito
+                    else if (c == ':')
+                        deslocamento = 15; // corpo direito
+                    else if (c == ',')
+                        deslocamento = 16; // corpo direito
+                    else if (c == '.')
+                        deslocamento = 17; // corpo direito
+                    else if (c == '<')
+                        deslocamento = 18; // corpo direito
+                    else if (c == '>')
+                        deslocamento = 19; // corpo direito
 
                     bool solido = true;
                     el->objeto = criarObstaculo(
-                        (Rectangle) {
+                        (Rectangle){
                             .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
                             .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
                             .width = novoMapa->dimensaoPadraoElementos,
-                            .height = novoMapa->dimensaoPadraoElementos
-                        },
+                            .height = novoMapa->dimensaoPadraoElementos},
                         GRAY,
-                        (Rectangle) {
-                            1 + ( novoMapa->dimensaoPadraoElementos + 1 ) * deslocamento,
+                        (Rectangle){
+                            1 + (novoMapa->dimensaoPadraoElementos + 1) * deslocamento,
                             1,
                             novoMapa->dimensaoPadraoElementos,
-                            novoMapa->dimensaoPadraoElementos
-                        },
+                            novoMapa->dimensaoPadraoElementos},
                         &rm.texturaCanos,
-                        solido
-                    );
-                
-                    el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
-                    inserirObstaculo( novoMapa, el );
+                        solido);
 
-                } else if ( c == 'd' ) {
+                    el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
+                    inserirObstaculo(novoMapa, el);
+                }
+                else if (c == 'd')
+                {
                     // Bloco de interrogação
                     el->objeto = criarObstaculo(
-                        (Rectangle) {
+                        (Rectangle){
                             .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
                             .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
                             .width = novoMapa->dimensaoPadraoElementos,
-                            .height = novoMapa->dimensaoPadraoElementos
-                        },
+                            .height = novoMapa->dimensaoPadraoElementos},
                         GRAY,
-                        (Rectangle) {
-                            1 + ( novoMapa->dimensaoPadraoElementos + 1 ) * 26,
+                        (Rectangle){
+                            1 + (novoMapa->dimensaoPadraoElementos + 1) * 26,
                             1,
                             novoMapa->dimensaoPadraoElementos,
-                            novoMapa->dimensaoPadraoElementos
-                        },
+                            novoMapa->dimensaoPadraoElementos},
                         &rm.texturaTerreno,
-                        true
-                    );
+                        true);
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
-                    inserirObstaculo( novoMapa, el );
-
-                } else if (c >= 'a' && c <= 'z') {
+                    inserirObstaculo(novoMapa, el);
+                }
+                else if (c >= 'a' && c <= 'z')
+                {
 
                     Item *item = NULL;
 
-                    switch ( c ) {
+                    switch (c)
+                    {
 
-                        case 'a':
+                    case 'a':
 
-                            item = criarItem( TIPO_ITEM_ANEL );
+                        item = criarItem(TIPO_ITEM_ANEL);
 
-                            item->objeto = criarItemAnel( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5, 
-                                    .width = 32, 
-                                    .height = 32
-                                },
-                                YELLOW
-                            );
+                        item->objeto = criarItemAnel(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5,
+                                .width = 32,
+                                .height = 32},
+                            YELLOW);
 
-                            el->objeto = item;
-                            el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
+                        el->objeto = item;
+                        el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
 
-                            break;
+                        break;
 
-                        case 'b':
+                    case 'b':
 
-                            item = criarItem( TIPO_ITEM_ANEL_AZUL );
+                        item = criarItem(TIPO_ITEM_ANEL_AZUL);
 
-                            item->objeto = criarItemAnelAzul( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5, 
-                                    .width = 32, 
-                                    .height = 32
-                                },
-                                YELLOW
-                            );
+                        item->objeto = criarItemAnelAzul(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5,
+                                .width = 32,
+                                .height = 32},
+                            YELLOW);
 
-                            el->objeto = item;
-                            el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
+                        el->objeto = item;
+                        el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
 
-                            break;
+                        break;
 
-                        case 'c':
+                    case 'c':
 
-                            item = criarItem( TIPO_ITEM_COGUMELO_VERMELHO );
+                        item = criarItem(TIPO_ITEM_COGUMELO_VERMELHO);
 
-                            item->objeto = criarItemCogumeloVermelho( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5, 
-                                    .width = 32, 
-                                    .height = 32
-                                },
-                                YELLOW
-                            );
+                        item->objeto = criarItemCogumeloVermelho(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 8,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual + 5,
+                                .width = 32,
+                                .height = 32},
+                            YELLOW);
 
-                            el->objeto = item;
-                            el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
+                        el->objeto = item;
+                        el->tipo = TIPO_ELEMENTO_MAPA_ITEM;
 
-                            break;
+                        break;
 
-                        default:
-                            TraceLog( LOG_ERROR, "Tipo de item desconhecido." );
-                            abort();
-                            break;
+                    default:
+                        TraceLog(LOG_ERROR, "Tipo de item desconhecido.");
+                        abort();
+                        break;
                     }
 
-                    inserirItem( novoMapa, el );
-
-                } else if (c >= '0' && c <= '9') {
+                    inserirItem(novoMapa, el);
+                }
+                else if (c >= '0' && c <= '9')
+                {
 
                     Inimigo *inimigo = NULL;
 
-                    switch ( c ) {
+                    switch (c)
+                    {
 
-                        case '0':
+                    case '0':
 
-                            inimigo = criarInimigo( TIPO_INIMIGO_MOTOBUG );
+                        inimigo = criarInimigo(TIPO_INIMIGO_MOTOBUG);
 
-                            inimigo->objeto = criarInimigoMotobug( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 12, 
-                                    .width = 80, 
-                                    .height = 60
-                                },
-                                YELLOW
-                            );
+                        inimigo->objeto = criarInimigoMotobug(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 12,
+                                .width = 80,
+                                .height = 60},
+                            YELLOW);
 
-                            el->objeto = inimigo;
-                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
-                            break;
+                        break;
 
-                        case '1':
+                    case '1':
 
-                            inimigo = criarInimigo( TIPO_INIMIGO_SPIKES );
+                        inimigo = criarInimigo(TIPO_INIMIGO_SPIKES);
 
-                            inimigo->objeto = criarInimigoSpikes( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21, 
-                                    .width = 80, 
-                                    .height = 60
-                                },
-                                BLUE
-                            );
+                        inimigo->objeto = criarInimigoSpikes(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                .width = 80,
+                                .height = 60},
+                            BLUE);
 
-                            el->objeto = inimigo;
-                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
-                            break;
-                        case '2':
+                        break;
+                    case '2':
 
-                            inimigo = criarInimigo( TIPO_INIMIGO_TONTON );
+                        inimigo = criarInimigo(TIPO_INIMIGO_TONTON);
 
-                            inimigo->objeto = criarInimigoTonTon( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21, 
-                                    .width = 80, 
-                                    .height = 60
-                                },
-                                BLUE
-                            );
+                        inimigo->objeto = criarInimigoTonTon(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                .width = 80,
+                                .height = 60},
+                            BLUE);
 
-                            el->objeto = inimigo;
-                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
-                            break;
-                        case '3':
+                        break;
+                    case '3':
 
-                            inimigo = criarInimigo( TIPO_INIMIGO_KOOPARED );
+                        inimigo = criarInimigo(TIPO_INIMIGO_KOOPARED);
 
-                            inimigo->objeto = criarInimigoKoopaRed( 
-                                (Rectangle) { 
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual, 
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21, 
-                                    .width = 80, 
-                                    .height = 60
-                                },
-                                BLUE
-                            );
+                        inimigo->objeto = criarInimigoKoopaRed(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                .width = 80,
+                                .height = 60},
+                            BLUE);
 
-                            el->objeto = inimigo;
-                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
-                            break;
-                        case '4':
+                        break;
+                    case '4':
 
-                            inimigo = criarInimigo(TIPO_INIMIGO_REX);
+                        inimigo = criarInimigo(TIPO_INIMIGO_REX);
 
-                            inimigo->objeto = criarInimigoRex(
-                                (Rectangle){
-                                    .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
-                                    .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
-                                    .width = 80,
-                                    .height = 60},
-                                BLUE);
+                        inimigo->objeto = criarInimigoRex(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                .width = 80,
+                                .height = 60},
+                            BLUE);
 
-                            el->objeto = inimigo;
-                            el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
-                            break;
+                        break;
+                        
+                    case '5':
 
-                        default:
-                            TraceLog( LOG_ERROR, "Tipo de inimigo desconhecido." );
-                            abort();
-                            break;
+                        inimigo = criarInimigo(TIPO_INIMIGO_NEGOPRETO);
+
+                        inimigo->objeto = criarInimigoNegoPreto(
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                                .y = novoMapa->dimensaoPadraoElementos * linhaAtual - 21,
+                                .width = 80,
+                                .height = 60},
+                            BLUE);
+
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+
+                        break;
+
+                    default:
+                        TraceLog(LOG_ERROR, "Tipo de inimigo desconhecido.");
+                        abort();
+                        break;
                     }
 
-                    inserirInimigo( novoMapa, el );
-
-                } else {
-                    TraceLog( LOG_ERROR, "Entidade inválida no mapa." );
+                    inserirInimigo(novoMapa, el);
+                }
+                else
+                {
+                    TraceLog(LOG_ERROR, "Entidade inválida no mapa.");
                     abort();
                 }
             }
 
             colunaAtual++;
 
-            if ( novoMapa->colunas < colunaAtual ) {
+            if (novoMapa->colunas < colunaAtual)
+            {
                 novoMapa->colunas = colunaAtual;
             }
-
         }
 
         caractereAtual++;
-
     }
 
     novoMapa->linhas++;
-    
+
     // descarrega os dados
-    UnloadFileText( dadosMapa );
+    UnloadFileText(dadosMapa);
 
     return novoMapa;
-
 }
 
 /**
  * @brief Destroi um mapa.
  */
-void destruirMapa( Mapa *m ) {
+void destruirMapa(Mapa *m)
+{
 
-    if ( m != NULL ) {
-        
+    if (m != NULL)
+    {
+
         ElementoMapa *el = NULL;
-        
+
         el = m->obstaculos;
-        while ( el != NULL ) {
-            destruirObstaculo( (Obstaculo*) el->objeto );
+        while (el != NULL)
+        {
+            destruirObstaculo((Obstaculo *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
-            free( t );
+            free(t);
         }
 
         el = m->itens;
-        while ( el != NULL ) {
-            destruirItem( (Item*) el->objeto );
+        while (el != NULL)
+        {
+            destruirItem((Item *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
-            free( t );
+            free(t);
         }
 
         el = m->inimigos;
-        while ( el != NULL ) {
-            destruirInimigo( (Inimigo*) el->objeto );
+        while (el != NULL)
+        {
+            destruirInimigo((Inimigo *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
-            free( t );
+            free(t);
         }
-
     }
-
 }
 
 /**
  * @brief Atualiza um mapa.
  */
-void atualizarMapa( Mapa *m, GameWorld *gw, float delta ) {
+void atualizarMapa(Mapa *m, GameWorld *gw, float delta)
+{
 
     ElementoMapa *el = NULL;
 
     el = m->itens;
-    while ( el != NULL ) {
-        atualizarItem( (Item*) el->objeto, delta );
+    while (el != NULL)
+    {
+        atualizarItem((Item *)el->objeto, delta);
         el = el->proximo;
     }
 
     el = m->inimigos;
-    while ( el != NULL ) {
-        atualizarInimigo( (Inimigo*) el->objeto, gw, delta );
+    while (el != NULL)
+    {
+        atualizarInimigo((Inimigo *)el->objeto, gw, delta);
         el = el->proximo;
     }
-
 }
 
 /**
  * @brief Desenha um mapa.
  */
-void desenharMapa( Mapa *m ) {
+void desenharMapa(Mapa *m)
+{
 
     ElementoMapa *el = NULL;
 
     el = m->obstaculos;
-    while ( el != NULL ) {
-        desenharObstaculo( (Obstaculo*) el->objeto );
+    while (el != NULL)
+    {
+        desenharObstaculo((Obstaculo *)el->objeto);
         el = el->proximo;
     }
 
     el = m->itens;
-    while ( el != NULL ) {
-        desenharItem( (Item*) el->objeto );
+    while (el != NULL)
+    {
+        desenharItem((Item *)el->objeto);
         el = el->proximo;
     }
 
     el = m->inimigos;
-    while ( el != NULL ) {
-        desenharInimigo( (Inimigo*) el->objeto );
+    while (el != NULL)
+    {
+        desenharInimigo((Inimigo *)el->objeto);
         el = el->proximo;
     }
-
 }
 
 /**
  * @brief Calcula a largura do mapa.
  */
-int calcularLarguraMapa( Mapa *m ) {
-    return (int) ( m->dimensaoPadraoElementos * m->colunas );
+int calcularLarguraMapa(Mapa *m)
+{
+    return (int)(m->dimensaoPadraoElementos * m->colunas);
 }
 
 /**
  * @brief Calcula a altura do mapa.
  */
-int calcularAlturaMapa( Mapa *m ) {
-    return (int) ( m->dimensaoPadraoElementos * m->linhas );
+int calcularAlturaMapa(Mapa *m)
+{
+    return (int)(m->dimensaoPadraoElementos * m->linhas);
 }
 
 /**
  * @brief Insere um obstáculo na lista de obstáculos.
  */
-static void inserirObstaculo( Mapa *mapa, ElementoMapa *obstaculo ) {
-    if ( mapa->obstaculos == NULL ) {
+static void inserirObstaculo(Mapa *mapa, ElementoMapa *obstaculo)
+{
+    if (mapa->obstaculos == NULL)
+    {
         mapa->obstaculos = obstaculo;
-    } else {
+    }
+    else
+    {
         obstaculo->proximo = mapa->obstaculos;
         mapa->obstaculos = obstaculo;
     }
@@ -502,10 +544,14 @@ static void inserirObstaculo( Mapa *mapa, ElementoMapa *obstaculo ) {
 /**
  * @brief Insere um item na lista de itens.
  */
-static void inserirItem( Mapa *mapa, ElementoMapa *item ) {
-    if ( mapa->itens == NULL ) {
+static void inserirItem(Mapa *mapa, ElementoMapa *item)
+{
+    if (mapa->itens == NULL)
+    {
         mapa->itens = item;
-    } else {
+    }
+    else
+    {
         item->proximo = mapa->itens;
         mapa->itens = item;
     }
@@ -515,10 +561,14 @@ static void inserirItem( Mapa *mapa, ElementoMapa *item ) {
 /**
  * @brief Insere um inimigo na lista de inimigos.
  */
-static void inserirInimigo( Mapa *mapa, ElementoMapa *inimigo ) {
-    if ( mapa->inimigos == NULL ) {
+static void inserirInimigo(Mapa *mapa, ElementoMapa *inimigo)
+{
+    if (mapa->inimigos == NULL)
+    {
         mapa->inimigos = inimigo;
-    } else {
+    }
+    else
+    {
         inimigo->proximo = mapa->inimigos;
         mapa->inimigos = inimigo;
     }

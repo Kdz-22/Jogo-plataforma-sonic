@@ -16,6 +16,7 @@
 #include "InimigoTonTon.h"
 #include "InimigoKoopaRed.h"
 #include "InimigoRex.h"
+#include "InimigoNegoPreto.h"
 #include "Tipos.h"
 
 /**
@@ -113,6 +114,9 @@ void desenharInimigo(Inimigo *inimigo)
     case TIPO_INIMIGO_REX:
         desenharInimigoRex((InimigoRex *)inimigo->objeto);
         break;
+    case TIPO_INIMIGO_NEGOPRETO:
+        desenharInimigoNegoPreto((InimigoNegoPreto *)inimigo->objeto);
+        break;
     default:
         return;
     }
@@ -168,6 +172,13 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa)
             qa = getQuadroAnimacaoAtualInimigoRex(rex);
             olhandoParaDireita = &rex->olhandoParaDireita;
             ret = &rex->ret;
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
+        {
+            InimigoNegoPreto *negopreto = (InimigoNegoPreto *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoNegoPreto(negopreto);
+            olhandoParaDireita = &negopreto->olhandoParaDireita;
+            ret = &negopreto->ret;
         }
         else
         {
@@ -263,6 +274,14 @@ void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa)
             olhandoParaDireita = &rex->olhandoParaDireita;
             ret = &rex->ret;
             vel = &rex->vel;
+        }        
+        else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
+        {
+            InimigoNegoPreto *negopreto = (InimigoNegoPreto *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoNegoPreto(negopreto);
+            olhandoParaDireita = &negopreto->olhandoParaDireita;
+            ret = &negopreto->ret;
+            vel = &negopreto->vel;
         }
         else
         {

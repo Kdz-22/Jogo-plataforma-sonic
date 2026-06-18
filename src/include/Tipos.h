@@ -90,6 +90,12 @@ typedef enum EstadoInimigoRex
     ESTADO_INIMIGO_REX_MORRENDO,
 } EstadoInimigoRex;
 
+typedef enum EstadoInimigoNegoPreto
+{
+    ESTADO_INIMIGO_NEGOPRETO_INATIVO,
+    ESTADO_INIMIGO_NEGOPRETO_VOANDO,
+} EstadoInimigoNegoPreto;
+
 /**
  * @brief Representa o tipo de um inimigo.
  */
@@ -100,6 +106,7 @@ typedef enum TipoInimigo
     TIPO_INIMIGO_TONTON,
     TIPO_INIMIGO_KOOPARED,
     TIPO_INIMIGO_REX,
+    TIPO_INIMIGO_NEGOPRETO,
 } TipoInimigo;
 
 /**
@@ -407,6 +414,26 @@ typedef struct InimigoRex
     Animacao animacaoMorrendo;
 
 } InimigoRex;
+
+typedef struct InimigoNegoPreto
+{
+
+    Rectangle ret;
+    Vector2 vel;
+    Color cor;
+
+    float velVoo;
+
+    EstadoInimigoNegoPreto estado;
+    bool ativo;
+    bool olhandoParaDireita;
+
+    Animacao *animacoes[1];
+    int quantidadeAnimacoes;
+
+    Animacao animacaoVoando;
+
+} InimigoNegoPreto;
 
 /**
  * @brief Representa um inimigo.
