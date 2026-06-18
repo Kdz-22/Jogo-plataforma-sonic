@@ -497,7 +497,7 @@ typedef struct ItemFlorPreta {
     Animacao animacaoColetando;
 
 
-} ItemCogumeloVeItemFlorPretarmelho;
+} ItemFlorPreta;
 
 /**
  * @brief Representa um item estático do mapa.

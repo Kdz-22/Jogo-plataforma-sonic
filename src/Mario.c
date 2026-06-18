@@ -24,6 +24,8 @@
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
 #include "ItemCoguVerm.h"
+#include "ItemFlorPreta.h"
+
 #include "Jogador.h"
 #include "Macros.h"
 #include "Mario.h"
@@ -1129,6 +1131,54 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                     m->ret.y -= m->ret.height; // sobe para não entrar no chão
                     m->ret.height *= 1.2;
                     m->ret.width *= 1.2;
+                }
+            }
+        }
+        else if (item->tipo == TIPO_ITEM_FLOR_PRETA)
+        {
+            ItemFlorPreta *florPreta = (ItemFlorPreta *)item->objeto;
+
+            if (!florPreta->ativo ||
+                florPreta->estado == ESTADO_ITEM_FLOR_PRETA_PARADA)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            QuadroAnimacao *qaItem = getQuadroAnimacaoAtualItemFlorPreta(florPreta);
+
+            Rectangle retColItemCalculado = {
+                florPreta->ret.x + qaItem->retColisao.x,
+                florPreta->ret.y + qaItem->retColisao.y,
+                qaItem->retColisao.width, qaItem->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
+                // Flor Preta só faz dano quando está ATACANDO (COLETADA)
+                if (florPreta->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA &&
+                    !m->invulneravel)
+                {
+                    if (m->grande)
+                    {
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->invulneravel = true;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else if (p->quantidadeAneis > 0)
+                    {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+                    m->invulneravel = true;
+                    return;
                 }
             }
         }
