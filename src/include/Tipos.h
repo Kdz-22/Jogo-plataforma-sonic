@@ -262,7 +262,7 @@ typedef struct Mario
     Animacao animacaoPulandoCorrendo;
     Animacao animacaoCaindo;
     Animacao animacaoAbaixado;
-    
+
     Animacao animacaoCrescendo;
 
     Animacao animacaoGrandeParado;
@@ -382,7 +382,8 @@ typedef struct InimigoKoopaRed
 
 } InimigoKoopaRed;
 
-typedef struct InimigoRex {
+typedef struct InimigoRex
+{
 
     Rectangle ret;
     Vector2 vel;
@@ -488,8 +489,12 @@ typedef struct Obstaculo
     Rectangle ret;
     Color cor;
     Rectangle fonte;
+    Rectangle fonteUsado;
     Texture2D *textura;
+
     bool solido;
+    bool eBlocoInterrogacao;
+    bool ativado;
 } Obstaculo;
 
 /**

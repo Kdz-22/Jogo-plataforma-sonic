@@ -162,6 +162,29 @@ Mapa *carregarMapa( const char *caminhoArquivo ) {
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo( novoMapa, el );
 
+                } else if ( c == 'd' ) {
+                    // Bloco de interrogação
+                    el->objeto = criarObstaculo(
+                        (Rectangle) {
+                            .x = novoMapa->dimensaoPadraoElementos * colunaAtual,
+                            .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
+                            .width = novoMapa->dimensaoPadraoElementos,
+                            .height = novoMapa->dimensaoPadraoElementos
+                        },
+                        GRAY,
+                        (Rectangle) {
+                            1 + ( novoMapa->dimensaoPadraoElementos + 1 ) * 26,
+                            1,
+                            novoMapa->dimensaoPadraoElementos,
+                            novoMapa->dimensaoPadraoElementos
+                        },
+                        &rm.texturaTerreno,
+                        true
+                    );
+
+                    el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
+                    inserirObstaculo( novoMapa, el );
+
                 } else if (c >= 'a' && c <= 'z') {
 
                     Item *item = NULL;
