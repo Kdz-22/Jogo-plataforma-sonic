@@ -1,7 +1,7 @@
 /**
  * @file InimigoNegoPreto.c
- * @author Prof. Dr. David Buzatto (Adaptado para NegoPreto)
- * @brief Implementação do Inimigo (NegoPreto) com mecânica de casco.
+ * @author Prof. Dr. David Buzatto
+ * @brief Implementação do Inimigo (NegoPreto) 
  *
  * @copyright Copyright (c) 2026
  */
@@ -17,7 +17,7 @@
 #include "ResourceManager.h"
 #include "Tipos.h"
 
-static const bool MOSTRAR_RETANGULOS = false;
+static const bool MOSTRAR_RETANGULOS = true;
 
 static Animacao *getAnimacaoAtualInimigoNegoPreto(InimigoNegoPreto *inimigo)
 {
@@ -79,11 +79,11 @@ InimigoNegoPreto *criarInimigoNegoPreto(Rectangle ret, Color cor)
         novoInimigo->animacaoVoando.quadros,
         novoInimigo->animacaoVoando.quantidadeQuadros,
         100,    
-        0, 0,   
-        32, 32, 
+        1, 180,   
+        128, 128, 
         0,      
         false,
-        (Rectangle){0, 0, 32, 32} 
+        (Rectangle){20, 64, 88, 64} 
     );
 
     novoInimigo->animacoes[ESTADO_INIMIGO_NEGOPRETO_VOANDO] = &novoInimigo->animacaoVoando;

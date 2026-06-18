@@ -17,6 +17,8 @@
 #include "InimigoRex.h"
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
+#include "InimigoNegoPreto.h"
+
 #include "Macros.h"
 #include "Mapa.h"
 
@@ -413,8 +415,8 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                                         .y = novoMapa->dimensaoPadraoElementos *
                                                  linhaAtual -
                                              21,
-                                        .width = 80,
-                                        .height = 60},
+                                        .width = 128,
+                                        .height = 128},
                             BLUE);
 
                         el->objeto = inimigo;

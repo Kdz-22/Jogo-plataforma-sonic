@@ -18,6 +18,8 @@
 #include "InimigoTonTon.h"
 #include "InimigoKoopaRed.h"
 #include "InimigoRex.h"
+#include "InimigoNegoPreto.h"
+
 #include "Item.h"
 #include "ItemAnel.h"
 #include "ItemAnelAzul.h"
@@ -681,7 +683,9 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p, Mapa *map
                 p->score += 100;
                 PlaySound(rm.somAnel);
             }
-        } else if ( item->tipo == TIPO_ITEM_COGUMELO_VERMELHO ) {
+        }
+        else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO)
+        {
 
             ItemCogumeloVermelho *itemCogumeloVermelho = (ItemCogumeloVermelho *)item->objeto;
 
@@ -1014,7 +1018,58 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
 
                 return; // um inimigo de cada vez!
             }
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
+        {
 
+            InimigoNegoPreto *negoPreto =
+                (InimigoNegoPreto *)inimigo->objeto;
+
+            if (!negoPreto->ativo)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            qaInimigo = getQuadroAnimacaoAtualInimigoNegoPreto(negoPreto);
+            olhandoParaDireita = &negoPreto->olhandoParaDireita;
+            ret = &negoPreto->ret;
+
+            float deslocamentoX =
+                *olhandoParaDireita
+                    ? ret->width - qaInimigo->retColisao.x -
+                          qaInimigo->retColisao.width
+                    : qaInimigo->retColisao.x;
+
+            float deslocamentoY = qaInimigo->retColisao.y;
+
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX,
+                ret->y + deslocamentoY,
+                qaInimigo->retColisao.width,
+                qaInimigo->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
+
+                if (!j->invulneravel)
+                {
+                    if (p->quantidadeAneis > 0)
+                    {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+
+                    j->invulneravel = true;
+                }
+
+                return;
+            }
         }
         el = el->proximo;
     }

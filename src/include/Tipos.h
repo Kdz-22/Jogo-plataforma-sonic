@@ -85,7 +85,6 @@ typedef enum EstadoInimigoRex {
 
 typedef enum EstadoInimigoNegoPreto
 {
-    ESTADO_INIMIGO_NEGOPRETO_INATIVO,
     ESTADO_INIMIGO_NEGOPRETO_VOANDO,
 } EstadoInimigoNegoPreto;
 
@@ -119,13 +118,20 @@ typedef enum EstadoItemCogumeloVermelho {
     ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO,
 } EstadoItemCogumeloVermelho;
 
+typedef enum EstadoItemFlorPreta {
+    ESTADO_ITEM_FLOR_PRETA_PARADA,
+    ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO,
+    ESTADO_ITEM_FLOR_PRETA_COLETADA
+} EstadoItemFlorPreta;
+
 /**
  * @brief Representa o tipo de um item.
  */
 typedef enum TipoItem {
     TIPO_ITEM_ANEL,
     TIPO_ITEM_ANEL_AZUL,
-    TIPO_ITEM_COGUMELO_VERMELHO
+    TIPO_ITEM_COGUMELO_VERMELHO,
+    TIPO_ITEM_FLOR_PRETA,
 } TipoItem;
 
 /**
@@ -475,6 +481,24 @@ typedef struct ItemCogumeloVermelho {
     Animacao animacaoColetando;
 
 } ItemCogumeloVermelho;
+
+typedef struct ItemFlorPreta {
+
+    Rectangle ret;
+    Color cor;
+
+    EstadoItemFlorPreta estado;
+    bool ativo;
+
+    Animacao *animacoes[3];
+    int quantidadeAnimacoes;
+
+    Animacao animacaoParado;
+    Animacao animacaoSaindoDoBloco;
+    Animacao animacaoColetando;
+
+
+} ItemCogumeloVeItemFlorPretarmelho;
 
 /**
  * @brief Representa um item estático do mapa.
