@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "raylib/raylib.h"
 
@@ -38,6 +39,7 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa);
 static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa);
 static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                                              Mapa *mapa);
+static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw);
 
 static const bool MOSTRAR_RETANGULOS = true;
 static PersonagemFuncoes marioFuncoes;
@@ -725,6 +727,7 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta) {
 
     resolverColisaoMarioItensMapa(m, p, gw->mapa);
     resolverColisaoMarioInimigosMapa(m, p, gw->mapa);
+    resolverEntradaCanoMapa(m, p, gw);
 }
 
 /**
@@ -756,17 +759,28 @@ void resetarMario(void *dados) {
     m->pulandoGirando = false;
     m->estado = ESTADO_MARIO_PARADO;
 
-    if (m->grande) {
-        m->grande = false;
-        m->ret.width /= 2;
-        m->ret.height /= 2;
+    // reseta animações pequenas
+    for (int i = 0; i < ESTADO_MARIO_CRESCENDO + 1; i++) {
+        if (m->animacoes[i] != NULL) {
+            m->animacoes[i]->quadroAtual = 0;
+            m->animacoes[i]->contadorTempoQuadro = 0.0f;
+            m->animacoes[i]->finalizada = false;
+        }
     }
-    // animações
-    for (int i = 0; i < m->quantidadeAnimacoes; i++) {
-        m->animacoes[i]->quadroAtual = 0;
-        m->animacoes[i]->contadorTempoQuadro = 0.0f;
-        m->animacoes[i]->finalizada = false;
+
+    // reseta animações grandes
+    for (int i = 0; i < ESTADO_MARIO_ABAIXADO + 1; i++) {
+        if (m->animacoesGrande[i] != NULL) {
+            m->animacoesGrande[i]->quadroAtual = 0;
+            m->animacoesGrande[i]->contadorTempoQuadro = 0.0f;
+            m->animacoesGrande[i]->finalizada = false;
+        }
     }
+
+    // reseta animação de crescendo separadamente
+    m->animacaoCrescendo.quadroAtual = 0;
+    m->animacaoCrescendo.contadorTempoQuadro = 0.0f;
+    m->animacaoCrescendo.finalizada = false;
 }
 
 static PersonagemFuncoes marioFuncoes = {
@@ -884,14 +898,20 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
                 retColCalculado.y + retColCalculado.height / 2 >=
                 o->ret.y + o->ret.height / 2;
 
-            if (o->eBlocoGiratorio && vindoDeBaixo &&
-                m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando) {
+            bool vindoDeCima = retColCalculado.y + retColCalculado.height / 2 <=
+                               o->ret.y + o->ret.height / 2;
+
+            if ((o->eBlocoGiratorio && vindoDeBaixo &&
+                 m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando) ||
+                (o->eBlocoGiratorio && vindoDeCima &&
+                 m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando)) {
 
                 o->quebrando = true;
                 o->solido = false; // remove a colisão na hora, Mario atravessa
                 o->quadroQuebra = 0;
                 o->tempoQuadroQuebra = 0.0f;
-                //PlaySound(rm.somHitInimigo); // troque por um som de quebra se tiver
+                // PlaySound(rm.somHitInimigo); // troque por um som de quebra
+                // se tiver
 
                 el = el->proximo;
                 continue; // não aplica a correção normal de posição
@@ -1074,7 +1094,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
-                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->estado == ESTADO_MARIO_CAINDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1129,7 +1150,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
-                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->estado == ESTADO_MARIO_CAINDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1181,7 +1203,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
-                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->estado == ESTADO_MARIO_CAINDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     koopared->estado = ESTADO_KOOPA_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1233,7 +1256,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
-                    m->estado == ESTADO_MARIO_CAINDO) {
+                    m->estado == ESTADO_MARIO_CAINDO ||
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1258,6 +1282,45 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     }
                     m->invulneravel = true;
                 }
+            }
+        }
+
+        el = el->proximo;
+    }
+}
+
+static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw) {
+
+    if (!IsKeyPressed(KEY_DOWN) && !IsKeyPressed(KEY_S)) {
+        return;
+    }
+
+    ElementoMapa *el = gw->mapa->obstaculos;
+
+    while (el != NULL) {
+        Obstaculo *o = (Obstaculo *)el->objeto;
+
+        if (o->eCanoSaida) {
+            QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
+
+            float deslocamentoX =
+                m->olhandoParaDireita
+                    ? qa->retColisao.x
+                    : m->ret.width - qa->retColisao.x - qa->retColisao.width;
+            float deslocamentoY = qa->retColisao.y;
+
+            Rectangle retColCalculado = {
+                m->ret.x + deslocamentoX, m->ret.y + deslocamentoY,
+                qa->retColisao.width, qa->retColisao.height};
+
+            // checa se o mario está em pé em cima do cano
+            Rectangle retTopoSaida = {o->ret.x, o->ret.y - 4, o->ret.width, 8};
+
+            if (CheckCollisionRecs(retColCalculado, retTopoSaida)) {
+                strncpy(gw->proximaFase, o->proximaFase, 255);
+                gw->proximaFase[255] = '\0';
+                gw->estado = ESTADO_JOGO_PROXIMA_FASE;
+                return;
             }
         }
 

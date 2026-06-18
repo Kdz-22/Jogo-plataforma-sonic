@@ -49,6 +49,7 @@ typedef enum EstadoJogo {
     ESTADO_JOGO_SELECAO_PERSONAGEM,
     ESTADO_JOGO_JOGANDO,
     ESTADO_JOGO_GAMEOVER,
+    ESTADO_JOGO_PROXIMA_FASE,
 } EstadoJogo;
 
 /**
@@ -364,7 +365,7 @@ typedef struct InimigoKoopaRed {
     bool ativo;
     bool olhandoParaDireita;
 
-    Animacao *animacoes[2];
+    Animacao *animacoes[20];
     int quantidadeAnimacoes;
     Animacao animacaoAndando;
     Animacao animacaoCasco;
@@ -503,6 +504,9 @@ typedef struct Obstaculo {
     bool quebrado;
     int quadroQuebra;
     float tempoQuadroQuebra;
+
+    bool eCanoSaida;
+    const char *proximaFase;
 } Obstaculo;
 
 /**
@@ -572,4 +576,6 @@ struct GameWorld {
     EstadoJogo estado;
 
     int personagemSelecionado;
+
+    char proximaFase[256];
 };

@@ -90,7 +90,7 @@ void loadResourcesResourceManager( void ) {
     );
 
     rm.texturaItensAnimadosMario = carregarTexturaAlterandoCores( 
-        "resources/imagens/itens/itens-animados-mario",
+        "resources/imagens/itens/itens-animados-mario.png",
         (Color[]) {
             { 248, 0, 248, 255 },
         },

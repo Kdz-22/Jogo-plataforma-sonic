@@ -110,8 +110,9 @@ void updateGameWorld(GameWorld *gw, float delta) {
 
         gw->personagem->time += delta;
 
-        atualizarCamera(gw);
-
+        if (gw->estado == ESTADO_JOGO_JOGANDO) {
+            atualizarCamera(gw);
+        }
         // GAMEOVER
         if (gw->personagem->quantidadeVidas < 0) {
             gw->estado = ESTADO_JOGO_GAMEOVER;
@@ -133,6 +134,22 @@ void updateGameWorld(GameWorld *gw, float delta) {
 
             gw->estado = ESTADO_JOGO_JOGANDO;
         }
+    } else if (gw->estado == ESTADO_JOGO_PROXIMA_FASE) {
+        printf("proximaFase = %s\n", gw->proximaFase);
+        printf("destruindo mapa...\n");
+        destruirMapa(gw->mapa);
+        gw->mapa = NULL; // evita double free
+        printf("carregando novo mapa...\n");
+        gw->mapa = carregarMapa(gw->proximaFase);
+        printf("resetando personagem...\n");
+        gw->personagem->funcoes->resetar(gw->personagem->dados);
+        printf("reposicionando mario...\n");
+        Mario *m = (Mario *)gw->personagem->dados;
+        m->ret.x = GetScreenWidth() / 2 + 144;
+        m->ret.y = calcularAlturaMapa(gw->mapa) - 400;
+        printf("trocando estado...\n");
+        gw->estado = ESTADO_JOGO_JOGANDO;
+        printf("feito!\n");
     }
 }
 
@@ -216,8 +233,10 @@ void drawGameWorld(GameWorld *gw) {
         // destaca o selecionado com um retângulo
         int retX = gw->personagemSelecionado == 0 ? larguraTela / 4 - 60
                                                   : larguraTela / 4 * 3 - 60;
-        Color corMario = gw->personagemSelecionado == 0 ? WHITE : (Color) {60, 60, 60, 200};
-        Color corSonic = gw->personagemSelecionado == 1 ? WHITE : (Color) {60, 60, 60, 200};
+        Color corMario =
+            gw->personagemSelecionado == 0 ? WHITE : (Color){60, 60, 60, 200};
+        Color corSonic =
+            gw->personagemSelecionado == 1 ? WHITE : (Color){60, 60, 60, 200};
 
         // Mario sempre na esquerda
         DrawTexturePro(
@@ -226,10 +245,10 @@ void drawGameWorld(GameWorld *gw) {
             (Vector2){0, 0}, 0.0f, corMario);
 
         // Sonic sempre na direita
-        DrawTexturePro(
-            rm.texturaJogador, (Rectangle){260, 2245, 80, 56},
-            (Rectangle){larguraTela / 4 * 3 - 60, alturaTela / 2 - 60, 120, 120},
-            (Vector2){0, 0}, 0.0f, corSonic);
+        DrawTexturePro(rm.texturaJogador, (Rectangle){260, 2245, 80, 56},
+                       (Rectangle){larguraTela / 4 * 3 - 60,
+                                   alturaTela / 2 - 60, 120, 120},
+                       (Vector2){0, 0}, 0.0f, corSonic);
 
         DrawRectangleLines(retX, alturaTela / 2 - 60, 120, 120, YELLOW);
 
@@ -283,18 +302,23 @@ static void desenharFundo(GameWorld *gw) {
 
 static void atualizarCamera(GameWorld *gw) {
 
-    Jogador *j = (Jogador *)gw->personagem->dados;
+    Rectangle ret;
+
+    if (gw->personagemSelecionado == 0) {
+        Mario *m = (Mario *)gw->personagem->dados;
+        ret = m->ret;
+    } else {
+        Jogador *j = (Jogador *)gw->personagem->dados;
+        ret = j->ret;
+    }
+
     Camera2D *c = &gw->camera;
 
     c->offset.x = GetScreenWidth() / 2;
     c->offset.y = GetScreenHeight() / 2;
 
-    // O target é arredondado para o inteiro mais próximo para garantir que a
-    // translação da câmera ocorra sempre em posições inteiras de pixel. Sem
-    // esse arredondamento, o valor float contínuo de ret.x faz os tiles serem
-    // renderizados em posições subpixel, causando frestas visíveis entre eles.
-    c->target.x = roundf(j->ret.x + j->ret.width / 2.0f);
-    c->target.y = roundf(j->ret.y + j->ret.height / 2.0f);
+    c->target.x = roundf(ret.x + ret.width / 2.0f);
+    c->target.y = roundf(ret.y + ret.height / 2.0f);
 
     int minX = GetScreenWidth() / 2;
     int maxX = calcularLarguraMapa(gw->mapa) - GetScreenWidth() / 2;

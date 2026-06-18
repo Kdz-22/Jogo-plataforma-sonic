@@ -155,8 +155,9 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                         deslocamento = 17; // corpo direito
                     else if (c == '<')
                         deslocamento = 18; // corpo direito
-                    else if (c == '>')
+                    else if (c == '>') {
                         deslocamento = 19; // corpo direito
+                    }
 
                     bool solido = true;
                     el->objeto = criarObstaculo(
@@ -177,6 +178,36 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
 
+                } else if (c == '+') {
+                    // pega o deslocamento do tile do cano na spritesheet
+                    // use o mesmo deslocamento do topo do cano normal que já
+                    // existe
+                    int deslocamento =
+                        12; // ajusta conforme o tile correto na texturaCanos
+
+                    el->objeto = criarObstaculo(
+                        (Rectangle){
+                            .x =
+                                novoMapa->dimensaoPadraoElementos * colunaAtual,
+                            .y = novoMapa->dimensaoPadraoElementos * linhaAtual,
+                            .width = novoMapa->dimensaoPadraoElementos,
+                            .height = novoMapa->dimensaoPadraoElementos},
+                        GRAY,
+                        (Rectangle){
+                            1 + (novoMapa->dimensaoPadraoElementos + 1) *
+                                    deslocamento,
+                            1, novoMapa->dimensaoPadraoElementos,
+                            novoMapa->dimensaoPadraoElementos},
+                        &rm.texturaCanos, true);
+
+                    Obstaculo *obs = (Obstaculo *)el->objeto;
+                    obs->eCanoSaida = true;
+                    obs->proximaFase =
+                        "resources\\mapas\\mapa01.txt"; // troca pelo arquivo da
+                                                        // fase destino
+
+                    el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
+                    inserirObstaculo(novoMapa, el);
                 } else if (c == '-') {
                     el->objeto = criarObstaculo(
                         (Rectangle){
@@ -196,7 +227,7 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     obs->eBlocoGiratorio = true;
                     obs->quebrando = false;
                     obs->quebrado = false;
-                    obs->quadroQuebra = 4; // começa no frame "intacto"
+                    obs->quadroQuebra = 0;
                     obs->tempoQuadroQuebra = 1.0f;
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
@@ -430,14 +461,18 @@ void destruirMapa(Mapa *m) {
     if (m != NULL) {
 
         ElementoMapa *el = NULL;
+        printf("destruindo obstaculos...\n");
 
         el = m->obstaculos;
         while (el != NULL) {
+            printf("  destruindo obstaculo %p\n", (void *)el);
+
             destruirObstaculo((Obstaculo *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
             free(t);
         }
+        printf("destruindo itens...\n");
 
         el = m->itens;
         while (el != NULL) {
@@ -446,6 +481,7 @@ void destruirMapa(Mapa *m) {
             el = el->proximo;
             free(t);
         }
+        printf("destruindo inimigos...\n");
 
         el = m->inimigos;
         while (el != NULL) {
@@ -454,6 +490,9 @@ void destruirMapa(Mapa *m) {
             el = el->proximo;
             free(t);
         }
+        printf("liberando mapa...\n");
+
+        free(m);
     }
 }
 
@@ -475,7 +514,7 @@ void atualizarMapa(Mapa *m, GameWorld *gw, float delta) {
         atualizarInimigo((Inimigo *)el->objeto, gw, delta);
         el = el->proximo;
     }
-    
+
     el = m->obstaculos;
     while (el != NULL) {
         atualizarObstaculo((Obstaculo *)el->objeto, delta);

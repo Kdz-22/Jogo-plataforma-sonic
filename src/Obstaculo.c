@@ -26,6 +26,15 @@ Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D 
     novoObstaculo->textura = textura;
     novoObstaculo->solido = solido;
 
+    novoObstaculo->eBlocoGiratorio = false;
+    novoObstaculo->quebrando = false;
+    novoObstaculo->quebrado = false;
+    novoObstaculo->quadroQuebra = 0;
+    novoObstaculo->tempoQuadroQuebra = 0.0f;
+
+    novoObstaculo->eCanoSaida = false;
+    novoObstaculo->proximaFase = NULL;
+
     return novoObstaculo;
 
 }
@@ -40,25 +49,36 @@ void destruirObstaculo( Obstaculo *o ) {
 /**
  * @brief Desenha um obstáculo.
  */
-void desenharObstaculo( Obstaculo *o ) {
+void desenharObstaculo(Obstaculo *o) {
 
-    if ( o->textura == NULL ) {
-        DrawRectangleRec( o->ret, o->cor );
-        DrawRectangleLines( o->ret.x, o->ret.y, o->ret.width, o->ret.height, BLACK );
+    if (o->quebrado) {
+        return; // não desenha nada
+    }
+
+    if (o->textura == NULL) {
+        DrawRectangleRec(o->ret, o->cor);
+        DrawRectangleLines(o->ret.x, o->ret.y, o->ret.width, o->ret.height, BLACK);
         return;
     }
 
-    DrawTexturePro(
-        *o->textura, 
-        o->fonte,
-        o->ret,
-        (Vector2) { 0 },
-        0.0f,
-        WHITE
-    );
+    Rectangle fonteAtual = o->fonte;
 
+    if (o->quebrando && o->eBlocoGiratorio) {
+        // cada quadro de quebra está ao lado do frame original na spritesheet
+        // ajusta o x conforme o quadro atual da animação
+        fonteAtual.x = o->fonte.x + (o->quadroQuebra * (o->fonte.width + 8));
+    }
+
+    DrawTexturePro(
+        *o->textura,
+        fonteAtual,
+        o->ret,
+        (Vector2){0},
+        0.0f,
+        WHITE);
 }
 
+// Obstaculo.c
 void atualizarObstaculo( Obstaculo *o, float delta ) {
 
     if ( o->quebrando && !o->quebrado ) {
