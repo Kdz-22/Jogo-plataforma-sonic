@@ -17,7 +17,7 @@
 #include "ResourceManager.h"
 #include "Tipos.h"
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 
 static Animacao *getAnimacaoAtualInimigoNegoPreto(InimigoNegoPreto *inimigo)
 {
