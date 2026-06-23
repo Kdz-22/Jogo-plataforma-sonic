@@ -46,7 +46,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                                              Mapa *mapa);
 static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw);
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 static PersonagemFuncoes marioFuncoes;
 
 Personagem *criarMario(float x, float y, float w, float h)
