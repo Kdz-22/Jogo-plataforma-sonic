@@ -925,11 +925,9 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
                     {
                         // Transforma o Koopa em casco parado
                         koopared->estado = ESTADO_KOOPA_CASCO_PARADO;
-
-                        // Redimensiona o retângulo do Koopa para o formato quadrado do casco (16x16)
-                        koopared->ret.width = 16;
-                        koopared->ret.height = 16;
-                        koopared->ret.y += 16; // Compensa a altura (de 32 para 16) para ele não flutuar
+                        koopared->ret.width = 32;
+                        koopared->ret.height = 34;
+                        koopared->ret.y -= 6;
 
                         j->vel.y = j->velPulo; // Sonic quica para cima
                         PlaySound(rm.somHitInimigo);

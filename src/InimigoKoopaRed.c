@@ -27,7 +27,8 @@ static const bool MOSTRAR_RETANGULOS = false;
 /**
  * @brief Cria um novo Inimigo (koopared).
  */
-InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor) {
+InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor)
+{
 
     InimigoKoopaRed *novoInimigo =
         (InimigoKoopaRed *)malloc(sizeof(InimigoKoopaRed));
@@ -58,15 +59,14 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor) {
     inicializarQuadrosAnimacao(
         novoInimigo->animacaoAndando.quadros,
         novoInimigo->animacaoAndando.quantidadeQuadros,
-        250,    // duração de cada frame (ms)
-        1, 115, // Início X, Y na Texture
-        16, 30, // Dimensões do sprite (Largura, Altura de SNES)
-        1,      // Separação de pixels entre frames
+        250,                             // duração de cada frame (ms)
+        1, 115,                          // Início X, Y na Texture
+        16, 28,                          // Dimensões do sprite (Largura, Altura de SNES)
+        1,                               // Separação de pixels entre frames
         false, (Rectangle){2, 2, 68, 58} // Hitbox interna relativa ao sprite
     );
 
-    // CONFIGURAÇÃO DO CASCO PARADO
-    novoInimigo->animacaoCasco.quantidadeQuadros = 1; // Apenas 1 frame estático
+    novoInimigo->animacaoCasco.quantidadeQuadros = 1;
     novoInimigo->animacaoCasco.quadroAtual = 0;
     novoInimigo->animacaoCasco.contadorTempoQuadro = 0.0f;
     novoInimigo->animacaoCasco.pararNoUltimoQuadro = true;
@@ -78,28 +78,29 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor) {
 
     inicializarQuadrosAnimacao(
         novoInimigo->animacaoCasco.quadros,
-        novoInimigo->animacaoCasco.quantidadeQuadros, 1000, 35,
-        113, // MUDAR AQUI: Coloque a posição X, Y exata daquele casco circulado
-        16, 16, // O casco sozinho mede 16x16
-        0, false, (Rectangle){0, 0, 16, 16});
+        novoInimigo->animacaoCasco.quantidadeQuadros,
+        1000,                     // duração padrão para o quadro estático (1 segundo)
+        35, 113,                  // início (coordenadas X, Y do editor)
+        32, 34,                   // dimensões reais do novo casco (Largura, Altura)
+        0,                        // separação (não há outros frames colados)
+        false,                    // de trás para frente
+        (Rectangle){2, 2, 32, 34} // retângulo de colisão cobrindo o casco inteiro
+    );
 
-    // Mapeando os estados para o array de ponteiros de animação
     novoInimigo->animacoes[ESTADO_KOOPA_ANDANDO] =
         &novoInimigo->animacaoAndando;
-    quantidadeAnimacoes++;
+
     novoInimigo->animacoes[ESTADO_KOOPA_CASCO_PARADO] =
         &novoInimigo->animacaoCasco;
-    quantidadeAnimacoes++;
-    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_CORRENDO] = NULL;
-    quantidadeAnimacoes++;
-    novoInimigo->animacoes[ESTADO_KOOPA_MORRENDO] = NULL;
-    quantidadeAnimacoes++;
-    // Reaproveitando o mesmo casco para o estado morrendo
-    // Se no futuro você fizer o casco correndo/girando, mapeie aqui:
-    // novoInimigo->animacoes[ESTADO_KOOPA_CASCO_CORRENDO] =
-    // &novoInimigo->animacaoCascoGirando; quantidadeAnimacoes++;
 
-    novoInimigo->quantidadeAnimacoes = quantidadeAnimacoes;
+    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_CORRENDO] =
+        &novoInimigo->animacaoCasco; // Usa o mesmo casco para correr por enquanto
+
+    novoInimigo->animacoes[ESTADO_KOOPA_MORRENDO] =
+        &novoInimigo->animacaoCasco;
+    // Usa o mesmo casco para o estado morrendo
+    // Atualiza a quantidade total de animações mapeadas no array
+    novoInimigo->quantidadeAnimacoes = 4;
 
     return novoInimigo;
 }
@@ -107,18 +108,17 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor) {
 /**
  * @brief Destroi um inimigo (koopared).
  */
-void destruirInimigoKoopaRed(InimigoKoopaRed *inimigo) {
-    if (inimigo != NULL) {
-        printf("    quantidadeAnimacoes = %d\n", inimigo->quantidadeAnimacoes);
+void destruirInimigoKoopaRed(InimigoKoopaRed *inimigo)
+{
+    if (inimigo != NULL)
+    {
+        printf("    Destruindo structs reais de animacao...\n");
 
-        for (int i = 0; i < inimigo->quantidadeAnimacoes; i++) {
-            printf("    destruindo animacao %d ponteiro %p\n", i,
-                   (void *)inimigo->animacoes[i]);
+        // Libera apenas as duas estruturas reais de memória criadas
+        destruirQuadrosAnimacao(&inimigo->animacaoAndando);
+        destruirQuadrosAnimacao(&inimigo->animacaoCasco);
 
-            destruirQuadrosAnimacao(inimigo->animacoes[i]);
-        }
         printf("    liberando inimigo...\n");
-
         free(inimigo);
         printf("    liberado!\n");
     }
@@ -128,30 +128,47 @@ void destruirInimigoKoopaRed(InimigoKoopaRed *inimigo) {
  * @brief Atualiza um inimigo (koopared).
  */
 void atualizarInimigoKoopaRed(InimigoKoopaRed *inimigo, GameWorld *gw,
-                              float delta) {
+                              float delta)
+{
 
-    if (inimigo->ativo) {
+    if (inimigo->ativo)
+    {
 
         Animacao *animacaoAtual = getAnimacaoAtualInimigoKoopaRed(inimigo);
         atualizarAnimacao(animacaoAtual, delta);
 
-        if (inimigo->estado == ESTADO_KOOPA_ANDANDO) {
+        if (inimigo->estado == ESTADO_KOOPA_ANDANDO)
+        {
             // Anda normal para o lado que está olhando
-            if (inimigo->olhandoParaDireita) {
+            if (inimigo->olhandoParaDireita)
+            {
                 inimigo->vel.x = inimigo->velAndando;
-            } else {
+            }
+            else
+            {
                 inimigo->vel.x = -inimigo->velAndando;
             }
-        } else if (inimigo->estado == ESTADO_KOOPA_CASCO_PARADO) {
+        }
+        else if (inimigo->estado == ESTADO_KOOPA_CASCO_PARADO)
+        {
             // Fica completamente parado no chão
             inimigo->vel.x = 0;
-        } else if (inimigo->estado == ESTADO_KOOPA_CASCO_CORRENDO) {
-            // Se foi chutado, a velocidade X deve ser alta (definida na colisão
-            // com o Mario)
+        }
+        else if (inimigo->estado == ESTADO_KOOPA_CASCO_CORRENDO)
+        {
+            if (inimigo->olhandoParaDireita)
+            {
+                inimigo->vel.x = inimigo->velAndando; // velAndando aqui será o valor alto (300/350) definido no chute
+            }
+            else
+            {
+                inimigo->vel.x = -inimigo->velAndando;
+            }
         }
 
         inimigo->vel.y += gw->gravidade * delta;
-        if (inimigo->vel.y > inimigo->velMaxQueda) {
+        if (inimigo->vel.y > inimigo->velMaxQueda)
+        {
             inimigo->vel.y = inimigo->velMaxQueda;
         }
 
@@ -165,20 +182,30 @@ void atualizarInimigoKoopaRed(InimigoKoopaRed *inimigo, GameWorld *gw,
         // Aplica o movimento e resolve colisão no eixo Y
         inimigo->ret.y += inimigo->vel.y * delta;
         resolverColisaoInimigoObstaculosMapaY(&ini, gw->mapa);
+
+        if (inimigo->estado == ESTADO_KOOPA_MORRENDO)
+        {
+            inimigo->ativo = false;
+            // O gerenciador de listas do jogo agora sabe que pode chamar o
+            // destruirInimigoKoopaRed de forma totalmente segura fora dos loops!
+        }
     }
 }
 
 /**
  * @brief Desenha um inimigo (koopared).
  */
-void desenharInimigoKoopaRed(InimigoKoopaRed *inimigo) {
+void desenharInimigoKoopaRed(InimigoKoopaRed *inimigo)
+{
 
-    if (inimigo->ativo) {
+    if (inimigo->ativo)
+    {
         // Pega o quadro da animação baseado no estado atual (Andando ou Casco)
         QuadroAnimacao *qa = getQuadroAnimacaoAtualInimigoKoopaRed(inimigo);
         desenharQuadroAnimacaoInimigoKoopaRed(inimigo, qa, WHITE);
 
-        if (MOSTRAR_RETANGULOS) {
+        if (MOSTRAR_RETANGULOS)
+        {
             DrawRectangleRec(inimigo->ret, Fade(inimigo->cor, 0.5f));
             DrawRectangleLines(inimigo->ret.x, inimigo->ret.y,
                                inimigo->ret.width, inimigo->ret.height, BLACK);
@@ -190,15 +217,18 @@ void desenharInimigoKoopaRed(InimigoKoopaRed *inimigo) {
  * @brief Obtém o quadro de animação atual de um inimigo (koopared).
  */
 QuadroAnimacao *
-getQuadroAnimacaoAtualInimigoKoopaRed(InimigoKoopaRed *inimigo) {
+getQuadroAnimacaoAtualInimigoKoopaRed(InimigoKoopaRed *inimigo)
+{
     return getQuadroAtualAnimacao(getAnimacaoAtualInimigoKoopaRed(inimigo));
 }
 
 static void desenharQuadroAnimacaoInimigoKoopaRed(InimigoKoopaRed *inimigo,
                                                   QuadroAnimacao *qa,
-                                                  Color tonalidade) {
+                                                  Color tonalidade)
+{
 
-    if (qa != NULL) {
+    if (qa != NULL)
+    {
 
         DrawTexturePro(rm.texturaBadniks,
                        (Rectangle){qa->fonte.x, qa->fonte.y,
@@ -208,7 +238,8 @@ static void desenharQuadroAnimacaoInimigoKoopaRed(InimigoKoopaRed *inimigo,
                                    qa->fonte.height},
                        inimigo->ret, (Vector2){0}, 0.0f, tonalidade);
 
-        if (MOSTRAR_RETANGULOS) {
+        if (MOSTRAR_RETANGULOS)
+        {
             float xDesenho = inimigo->olhandoParaDireita
                                  ? inimigo->ret.x + inimigo->ret.width -
                                        qa->retColisao.x - qa->retColisao.width
@@ -220,6 +251,7 @@ static void desenharQuadroAnimacaoInimigoKoopaRed(InimigoKoopaRed *inimigo,
     }
 }
 
-static Animacao *getAnimacaoAtualInimigoKoopaRed(InimigoKoopaRed *inimigo) {
+static Animacao *getAnimacaoAtualInimigoKoopaRed(InimigoKoopaRed *inimigo)
+{
     return inimigo->animacoes[inimigo->estado];
 }

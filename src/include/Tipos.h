@@ -73,9 +73,9 @@ typedef enum EstadoInimigoTonTon {
 /* INIMIGOS MARIO*/
 typedef enum EstadoInimigoKoopaRed {
     ESTADO_KOOPA_ANDANDO,
-    ESTADO_KOOPA_MORRENDO,
     ESTADO_KOOPA_CASCO_PARADO,
     ESTADO_KOOPA_CASCO_CORRENDO,
+    ESTADO_KOOPA_MORRENDO,
 } EstadoInimigoKoopaRed;
 
 typedef enum EstadoInimigoRex {

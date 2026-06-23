@@ -56,7 +56,7 @@ InimigoRex *criarInimigoRex(Rectangle ret, Color cor)
         novoInimigo->animacaoAndando.quantidadeQuadros,
         250,        // duração padrão para todos os quadros
         1, 147,     // início
-        20, 31,     // dimensões
+        20, 32,     // dimensões
         1,          // separação
         false,      // de trás para frente
         (Rectangle){// retângulo de colisão padrão para cada quadro
@@ -75,7 +75,7 @@ InimigoRex *criarInimigoRex(Rectangle ret, Color cor)
         100,           // duração padrão para todos os quadros
         169, 1,        // início
         32, 32,        // dimensões
-        1,             // separação
+        0,             // separação
         false,         // de trás para frente
         (Rectangle){0} // retângulo de colisão padrão para cada quadro
     );
