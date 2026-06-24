@@ -97,7 +97,16 @@ void loadResourcesResourceManager(void)
     rm.texturaTerreno = LoadTexture("resources/imagens/tiles/terreno.png");
     rm.texturaFundo = LoadTexture("resources/imagens/fundo/fundo.png");
     rm.texturaCanos = LoadTexture("resources/imagens/tiles/canos.png");
-    rm.texturaTelaInicial = LoadTexture("resources/telainicialMario.jpeg");
+    printf("Tentando carregar: resources/telainicialMario.jpeg\n");
+    rm.texturaTelaInicial = LoadTexture("resources/telainicialMariomaior.png");
+    printf("ID da textura carregada: %d\n", rm.texturaTelaInicial.id);
+
+    if (rm.texturaTelaInicial.id == 0)
+    {
+        printf("ERRO: Nao conseguiu carregar a textura da tela inicial!\n");
+        printf("Diretório atual: ");
+        system("cd"); // Windows mostra o diretório atual
+    }
 
     // Filtro de textura nearest-neighbor (ponto) para todas as texturas do jogo.
     // Evita interpolação bilinear nas bordas dos tiles e sprites, que causaria

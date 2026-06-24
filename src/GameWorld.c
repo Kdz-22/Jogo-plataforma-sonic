@@ -49,7 +49,7 @@ GameWorld *createGameWorld(void)
 
     gw->personagemSelecionado = 0;
 
-    // gw->estado = ESTADO_JOGO_SELECAO_PERSONAGEM;
+    gw->estado = ESTADO_JOGO_SELECAO_PERSONAGEM;
 
     gw->estado = ESTADO_JOGO_TELA_INICIAL;
     gw->tempoTelaInicial = 0.0f;
