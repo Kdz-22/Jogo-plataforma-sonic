@@ -1531,9 +1531,10 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
 
                     return;
                 }
-                else if (!m->invulneravel)
+                else
                 {
-                    // Mario toma dano
+                    // REMOVA O "if (!m->invulneravel)" - O NEGO PRETO SEMPRE CAUSA DANO!
+                    // Mario toma dano (mesmo se estiver invulnerável)
                     if (m->grande)
                     {
                         m->grande = false;

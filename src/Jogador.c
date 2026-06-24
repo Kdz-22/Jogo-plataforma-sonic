@@ -1081,7 +1081,21 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *
 
             if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
             {
+                // Verifica se o jogador está pulando (qualquer estado de pulo)
+                if (j->estado >= ESTADO_JOGADOR_PULANDO &&
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
+                    // Mata o NegoPreto com pulo
+                    negoPreto->ativo = false;
+                    PlaySound(rm.somHitInimigo);
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
 
+                    return; // Sai da função após matar o inimigo
+                }
+
+                // Se não estiver pulando, aplica dano (se não estiver invulnerável)
                 if (!j->invulneravel)
                 {
                     if (p->quantidadeAneis > 0)
