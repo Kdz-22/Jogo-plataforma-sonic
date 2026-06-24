@@ -23,6 +23,7 @@ typedef struct ResourceManager {
     Texture2D texturaHUD2;
     Texture2D texturaGameOver;
     Texture2D texturaItensAnimadosMario;
+    Texture2D texturaTelaInicial;
 
     Sound somAnel;
     Sound somFrenagem;

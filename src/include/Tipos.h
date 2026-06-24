@@ -46,6 +46,7 @@ typedef enum EstadoMario {
  * @brief Representa o estado do jogado.
  */
 typedef enum EstadoJogo {
+    ESTADO_JOGO_TELA_INICIAL,
     ESTADO_JOGO_SELECAO_PERSONAGEM,
     ESTADO_JOGO_JOGANDO,
     ESTADO_JOGO_GAMEOVER,
@@ -602,4 +603,8 @@ struct GameWorld {
     int personagemSelecionado;
 
     char proximaFase[256];
+
+    //tela inicial
+    float tempoTelaInicial;
+    bool teclaPressionada;
 };
