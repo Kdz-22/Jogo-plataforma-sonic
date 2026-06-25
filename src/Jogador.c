@@ -54,7 +54,8 @@ static const bool MOSTRAR_RETANGULOS = true;
 /**
  * @brief Cria uma instância alocada dinamicamente da struct Jogador.
  */
-Jogador *criarJogador(float x, float y, float w, float h) {
+Jogador *criarJogador(float x, float y, float w, float h)
+{
 
     Jogador *novoJogador = (Jogador *)malloc(sizeof(Jogador));
 
@@ -278,9 +279,12 @@ Jogador *criarJogador(float x, float y, float w, float h) {
 /**
  * @brief Destrói um objeto Jogador e libera seus recursos.
  */
-void destruirJogador(Jogador *j) {
-    if (j != NULL) {
-        for (int i = 0; i < j->quantidadeAnimacoes; i++) {
+void destruirJogador(Jogador *j)
+{
+    if (j != NULL)
+    {
+        for (int i = 0; i < j->quantidadeAnimacoes; i++)
+        {
             destruirQuadrosAnimacao(j->animacoes[i]);
         }
         free(j);
@@ -290,7 +294,8 @@ void destruirJogador(Jogador *j) {
 /**
  * @brief Lê a entrada do usuário e atualiza as velocidades do jogador.
  */
-void entradaJogador(Jogador *j, Personagem *p, float delta) {
+void entradaJogador(Jogador *j, Personagem *p, float delta)
+{
 
     EstadoJogador estadoAnterior = j->estado;
 
@@ -304,76 +309,113 @@ void entradaJogador(Jogador *j, Personagem *p, float delta) {
                        (IsGamepadAvailable(0) &&
                         IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN));
 
-    if (direitaDown) {
-        if (j->vel.x < 0) {
+    if (direitaDown)
+    {
+        if (j->vel.x < 0)
+        {
             j->vel.x += j->frenagem * delta;
-            if (!j->freando && j->estado == ESTADO_JOGADOR_CORRENDO) {
+            if (!j->freando && j->estado == ESTADO_JOGADOR_CORRENDO)
+            {
                 PlaySound(rm.somFrenagem);
                 j->freando = true;
             }
-            if (j->vel.x > 0) {
+            if (j->vel.x > 0)
+            {
                 j->vel.x = 0;
                 j->freando = false;
             }
-        } else {
+        }
+        else
+        {
             j->vel.x += j->aceleracao * delta;
-            if (j->vel.x > j->velCorrendo) {
+            if (j->vel.x > j->velCorrendo)
+            {
                 j->vel.x = j->velCorrendo;
             }
         }
         j->olhandoParaDireita = true;
-    } else if (esquerdaDown) {
-        if (j->vel.x > 0) {
+    }
+    else if (esquerdaDown)
+    {
+        if (j->vel.x > 0)
+        {
             j->vel.x -= j->frenagem * delta;
-            if (!j->freando && j->estado == ESTADO_JOGADOR_CORRENDO) {
+            if (!j->freando && j->estado == ESTADO_JOGADOR_CORRENDO)
+            {
                 PlaySound(rm.somFrenagem);
                 j->freando = true;
             }
-            if (j->vel.x < 0) {
+            if (j->vel.x < 0)
+            {
                 j->vel.x = 0;
                 j->freando = false;
             }
-        } else {
+        }
+        else
+        {
             j->vel.x -= j->aceleracao * delta;
-            if (j->vel.x < -j->velCorrendo) {
+            if (j->vel.x < -j->velCorrendo)
+            {
                 j->vel.x = -j->velCorrendo;
             }
         }
         j->olhandoParaDireita = false;
-    } else {
-        if (j->vel.x > 0) {
+    }
+    else
+    {
+        if (j->vel.x > 0)
+        {
             j->vel.x -= j->desaceleracao * delta;
-            if (j->vel.x < 0) {
+            if (j->vel.x < 0)
+            {
                 j->vel.x = 0;
             }
-        } else if (j->vel.x < 0) {
+        }
+        else if (j->vel.x < 0)
+        {
             j->vel.x += j->desaceleracao * delta;
-            if (j->vel.x > 0) {
+            if (j->vel.x > 0)
+            {
                 j->vel.x = 0;
             }
         }
     }
 
     float absVelX = fabsf(j->vel.x);
-    if (j->quantidadePulos > 0) {
-        if (absVelX <= j->velAndando) {
+    if (j->quantidadePulos > 0)
+    {
+        if (absVelX <= j->velAndando)
+        {
             j->estado = ESTADO_JOGADOR_PULANDO;
-        } else if (absVelX <= j->velAndandoRapido) {
+        }
+        else if (absVelX <= j->velAndandoRapido)
+        {
             j->estado = ESTADO_JOGADOR_PULANDO_RAPIDO;
-        } else {
+        }
+        else
+        {
             j->estado = ESTADO_JOGADOR_PULANDO_CORRENDO;
         }
-    } else if (absVelX < 1.0f) {
+    }
+    else if (absVelX < 1.0f)
+    {
         j->estado = ESTADO_JOGADOR_PARADO;
-    } else if (absVelX <= j->velAndando) {
+    }
+    else if (absVelX <= j->velAndando)
+    {
         j->estado = ESTADO_JOGADOR_ANDANDO;
-    } else if (absVelX <= j->velAndandoRapido) {
+    }
+    else if (absVelX <= j->velAndandoRapido)
+    {
         j->estado = ESTADO_JOGADOR_ANDANDO_RAPIDO;
-    } else {
+    }
+    else
+    {
         j->estado = ESTADO_JOGADOR_CORRENDO;
     }
 
-    if (puloPressed && j->quantidadePulos < j->quantidadeMaxPulos) {
+    if (puloPressed && j->quantidadePulos < j->quantidadeMaxPulos)
+    {
         j->vel.y = j->velPulo;
         j->quantidadePulos++;
         PlaySound(rm.somPulo);
@@ -381,10 +423,13 @@ void entradaJogador(Jogador *j, Personagem *p, float delta) {
 
     // sincronização de animações andando e andando rápido
     if (estadoAnterior == ESTADO_JOGADOR_ANDANDO &&
-        j->estado == ESTADO_JOGADOR_ANDANDO_RAPIDO) {
+        j->estado == ESTADO_JOGADOR_ANDANDO_RAPIDO)
+    {
         sincronizarAnimacao(&j->animacaoAndandoRapido, &j->animacaoAndando);
-    } else if (estadoAnterior == ESTADO_JOGADOR_ANDANDO_RAPIDO &&
-               j->estado == ESTADO_JOGADOR_ANDANDO) {
+    }
+    else if (estadoAnterior == ESTADO_JOGADOR_ANDANDO_RAPIDO &&
+             j->estado == ESTADO_JOGADOR_ANDANDO)
+    {
         sincronizarAnimacao(&j->animacaoAndando, &j->animacaoAndandoRapido);
     }
 }
@@ -392,22 +437,27 @@ void entradaJogador(Jogador *j, Personagem *p, float delta) {
 /**
  * @brief Aplica física e resolve colisões do jogador com o mundo.
  */
-void atualizarJogador(Jogador *j, Personagem *p, GameWorld *gw, float delta) {
+void atualizarJogador(Jogador *j, Personagem *p, GameWorld *gw, float delta)
+{
 
-    if (j->estado < ESTADO_JOGADOR_PULANDO) {
+    if (j->estado < ESTADO_JOGADOR_PULANDO)
+    {
         p->comboAereo = 0;
     }
 
-    if (j->invulneravel) {
+    if (j->invulneravel)
+    {
 
         j->contadorTempoPiscaPisca += delta;
-        if (j->contadorTempoPiscaPisca >= j->tempoPiscaPisca) {
+        if (j->contadorTempoPiscaPisca >= j->tempoPiscaPisca)
+        {
             j->contadorTempoPiscaPisca = 0.0f;
             j->piscaPisca = !j->piscaPisca;
         }
 
         j->contadorTempoInvulnerabilidade += delta;
-        if (j->contadorTempoInvulnerabilidade >= j->tempoInvulnerabilidade) {
+        if (j->contadorTempoInvulnerabilidade >= j->tempoInvulnerabilidade)
+        {
             j->contadorTempoInvulnerabilidade = 0.0f;
             j->invulneravel = false;
             j->contadorTempoPiscaPisca = 0.0f;
@@ -424,7 +474,8 @@ void atualizarJogador(Jogador *j, Personagem *p, GameWorld *gw, float delta) {
 
     // fase Y: aplica gravidade, move verticalmente e resolve colisões verticais
     j->vel.y += gw->gravidade * delta;
-    if (j->vel.y > j->velMaxQueda) {
+    if (j->vel.y > j->velMaxQueda)
+    {
         j->vel.y = j->velMaxQueda;
     }
     j->ret.y += j->vel.y * delta;
@@ -438,14 +489,17 @@ void atualizarJogador(Jogador *j, Personagem *p, GameWorld *gw, float delta) {
 /**
  * @brief Desenha o jogador.
  */
-void desenharJogador(Jogador *j) {
+void desenharJogador(Jogador *j)
+{
 
-    if (!j->piscaPisca) {
+    if (!j->piscaPisca)
+    {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
         desenharQuadroAnimacaoJogador(j, qa, WHITE);
     }
 
-    if (MOSTRAR_RETANGULOS) {
+    if (MOSTRAR_RETANGULOS)
+    {
         DrawRectangleRec(j->ret, Fade(j->cor, 0.5f));
         DrawRectangleLines(j->ret.x, j->ret.y, j->ret.width, j->ret.height,
                            BLACK);
@@ -453,9 +507,11 @@ void desenharJogador(Jogador *j) {
 }
 
 static void desenharQuadroAnimacaoJogador(Jogador *j, QuadroAnimacao *qa,
-                                          Color tonalidade) {
+                                          Color tonalidade)
+{
 
-    if (qa != NULL) {
+    if (qa != NULL)
+    {
 
         DrawTexturePro(rm.texturaJogador,
                        (Rectangle){qa->fonte.x, qa->fonte.y,
@@ -464,7 +520,8 @@ static void desenharQuadroAnimacaoJogador(Jogador *j, QuadroAnimacao *qa,
                                    qa->fonte.height},
                        j->ret, (Vector2){0}, 0.0f, tonalidade);
 
-        if (MOSTRAR_RETANGULOS) {
+        if (MOSTRAR_RETANGULOS)
+        {
             float xDesenho = j->olhandoParaDireita
                                  ? j->ret.x + qa->retColisao.x
                                  : j->ret.x + j->ret.width - qa->retColisao.x -
@@ -476,22 +533,26 @@ static void desenharQuadroAnimacaoJogador(Jogador *j, QuadroAnimacao *qa,
     }
 }
 
-static QuadroAnimacao *getQuadroAnimacaoAtualJogador(Jogador *j) {
+static QuadroAnimacao *getQuadroAnimacaoAtualJogador(Jogador *j)
+{
     return getQuadroAtualAnimacao(getAnimacaoAtualJogador(j));
 }
 
-static Animacao *getAnimacaoAtualJogador(Jogador *j) {
+static Animacao *getAnimacaoAtualJogador(Jogador *j)
+{
     return j->animacoes[j->estado];
 }
 
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo X.
  */
-static void resolverColisaoJogadorObstaculosMapaX(Jogador *j, Mapa *mapa) {
+static void resolverColisaoJogadorObstaculosMapaX(Jogador *j, Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
 
@@ -507,19 +568,25 @@ static void resolverColisaoJogadorObstaculosMapaX(Jogador *j, Mapa *mapa) {
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
-        if (o->tipoColisao != COLISAO_RETANGULO) {
+        if (o->tipoColisao != COLISAO_RETANGULO)
+        {
             el = el->proximo;
             continue;
         }
-        if (checarColisaoComObstaculo(retColCalculado, o)) {
+        if (checarColisaoComObstaculo(retColCalculado, o))
+        {
             if (retColCalculado.x + retColCalculado.width / 2 <
-                o->ret.x + o->ret.width / 2) {
+                o->ret.x + o->ret.width / 2)
+            {
                 j->ret.x = o->ret.x - qa->retColisao.width - deslocamentoX;
-            } else {
+            }
+            else
+            {
                 j->ret.x = o->ret.x + o->ret.width - deslocamentoX;
             }
             j->vel.x = 0;
@@ -532,11 +599,13 @@ static void resolverColisaoJogadorObstaculosMapaX(Jogador *j, Mapa *mapa) {
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo Y.
  */
-static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa) {
+static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
 
@@ -552,33 +621,42 @@ static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa) {
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido) {
+        if (!o->solido)
+        {
             el = el->proximo;
             continue;
         }
 
-        if (checarColisaoComObstaculo(retColCalculado, o)) {
+        if (checarColisaoComObstaculo(retColCalculado, o))
+        {
 
             // tratamento especial para rampas
-            if (o->tipoColisao != COLISAO_RETANGULO) {
+            if (o->tipoColisao != COLISAO_RETANGULO)
+            {
                 float xRelativo =
                     (retColCalculado.x + retColCalculado.width / 2) - o->ret.x;
                 float proporcao = xRelativo / o->ret.width;
                 proporcao = Clamp(proporcao, 0.0f, 1.0f);
                 float alturaChao;
 
-                if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA) {
+                if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA)
+                {
                     alturaChao = o->ret.y + (o->ret.height * proporcao);
-                } else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA) {
+                }
+                else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA)
+                {
                     alturaChao =
                         o->ret.y + (o->ret.height * (1.0f - proporcao));
-                } else {
+                }
+                else
+                {
                     alturaChao = o->ret.y + (o->ret.height * proporcao);
                 }
 
                 float basePersonagem =
                     retColCalculado.y + retColCalculado.height;
-                if (basePersonagem >= alturaChao && j->vel.y >= 0) {
+                if (basePersonagem >= alturaChao && j->vel.y >= 0)
+                {
                     j->ret.y =
                         alturaChao - qa->retColisao.height - deslocamentoY;
                     j->vel.y = 0;
@@ -589,10 +667,13 @@ static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa) {
                 continue;
             }
             if (retColCalculado.y + retColCalculado.height / 2 <
-                o->ret.y + o->ret.height / 2) {
+                o->ret.y + o->ret.height / 2)
+            {
                 j->ret.y = o->ret.y - qa->retColisao.height - deslocamentoY;
                 j->quantidadePulos = 0;
-            } else {
+            }
+            else
+            {
                 j->ret.y = o->ret.y + o->ret.height - deslocamentoY;
             }
             j->vel.y = 0;
@@ -603,11 +684,13 @@ static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa) {
 }
 
 static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
-                                            Mapa *mapa) {
+                                            Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->itens;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
 
@@ -623,12 +706,14 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
 
         Item *item = (Item *)el->objeto;
 
-        if (item->tipo == TIPO_ITEM_ANEL) {
+        if (item->tipo == TIPO_ITEM_ANEL)
+        {
 
             ItemAnel *itemAnel = (ItemAnel *)item->objeto;
 
             if (!itemAnel->ativo ||
-                itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO) {
+                itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -640,18 +725,22 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
                 itemAnel->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
                 itemAnel->estado = ESTADO_ITEM_ANEL_COLETADO;
                 p->quantidadeAneis++;
                 p->score += 10;
                 PlaySound(rm.somAnel);
             }
-        } else if (item->tipo == TIPO_ITEM_ANEL_AZUL) {
+        }
+        else if (item->tipo == TIPO_ITEM_ANEL_AZUL)
+        {
 
             ItemAnelAzul *itemAnelAzul = (ItemAnelAzul *)item->objeto;
 
             if (!itemAnelAzul->ativo ||
-                itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO) {
+                itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -664,20 +753,24 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
                 itemAnelAzul->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
                 itemAnelAzul->estado = ESTADO_ITEM_ANEL_AZUL_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
             }
-        } else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO) {
+        }
+        else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO)
+        {
 
             ItemCogumeloVermelho *itemCogumeloVermelho =
                 (ItemCogumeloVermelho *)item->objeto;
 
             if (!itemCogumeloVermelho->ativo ||
                 itemCogumeloVermelho->estado ==
-                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO) {
+                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -690,19 +783,23 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
                 itemCogumeloVermelho->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
                 itemCogumeloVermelho->estado =
                     ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
             }
-        } else if (item->tipo == TIPO_ITEM_FLOR_PRETA) {
+        }
+        else if (item->tipo == TIPO_ITEM_FLOR_PRETA)
+        {
             ItemFlorPreta *itemFlorPreta = (ItemFlorPreta *)item->objeto;
 
             // Verifica se o item está ativo ou se já foi coletado
             if (!itemFlorPreta->ativo ||
-                itemFlorPreta->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA) {
+                itemFlorPreta->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -718,7 +815,8 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
 
             // Altere a lógica interna do IF se a Flor Preta der um
             // poder/pontuação diferente
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
+            {
                 itemFlorPreta->estado = ESTADO_ITEM_FLOR_PRETA_COLETADA;
                 p->score += 200; // Exemplo: Flor preta dá 200 de score
                 // Se a flor der poder de fogo/tiro ao jogador (p), você pode
@@ -733,13 +831,15 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
 }
 
 static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
-                                               Mapa *mapa) {
+                                               Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->inimigos;
     // Max = 7 inimigos mortos em sequencia
     static int tabelaComboAereo[] = {100, 200, 500, 1000, 2000, 5000, 10000};
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
 
@@ -759,12 +859,14 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
         bool *olhandoParaDireita = NULL;
         Rectangle *ret = NULL;
 
-        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG) {
+        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG)
+        {
 
             InimigoMotobug *motobug = (InimigoMotobug *)inimigo->objeto;
 
             if (!motobug->ativo ||
-                motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO) {
+                motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -783,21 +885,28 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
 
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
-                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO) {
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
                     j->vel.y = j->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound(rm.somHitInimigo);
                     int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
-                } else if (!j->invulneravel) {
-                    if (p->quantidadeAneis > 0) {
+                }
+                else if (!j->invulneravel)
+                {
+                    if (p->quantidadeAneis > 0)
+                    {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    } else {
+                    }
+                    else
+                    {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -806,12 +915,15 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
 
                 return; // um inimigo de cada vez!
             }
-        } else if (inimigo->tipo == TIPO_INIMIGO_SPIKES) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_SPIKES)
+        {
 
             InimigoSpikes *spikes = (InimigoSpikes *)inimigo->objeto;
 
             if (!spikes->ativo ||
-                spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO) {
+                spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -830,20 +942,27 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
-                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO) {
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
                     j->vel.y = j->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound(rm.somHitInimigo);
                     int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
-                } else if (!j->invulneravel) {
-                    if (p->quantidadeAneis > 0) {
+                }
+                else if (!j->invulneravel)
+                {
+                    if (p->quantidadeAneis > 0)
+                    {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    } else {
+                    }
+                    else
+                    {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -852,11 +971,14 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
 
                 return; // um inimigo de cada vez!
             }
-        } else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED)
+        {
 
             InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
 
-            if (!koopared->ativo) {
+            if (!koopared->ativo)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -875,68 +997,83 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
-
-                // Verifica se o Sonic está atacando/pulando por cima (Pulo
-                // bem-sucedido)
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
+                // Verifica se o Sonic está no ar (ataque bem-sucedido)
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
-                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO) {
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
 
-                    if (koopared->estado == ESTADO_KOOPA_ANDANDO) {
-                        // Transforma o Koopa em casco parado
+                    if (koopared->estado == ESTADO_KOOPA_ANDANDO)
+                    {
+                        // Transforma em casco parado
                         koopared->estado = ESTADO_KOOPA_CASCO_PARADO;
                         koopared->ret.width = 32;
                         koopared->ret.height = 34;
                         koopared->ret.y -= 6;
-
-                        j->vel.y = j->velPulo; // Sonic quica para cima
+                        j->vel.y = j->velPulo;
                         PlaySound(rm.somHitInimigo);
-
                         int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                         p->score += tabelaComboAereo[idx];
                         p->comboAereo++;
-                    } else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO) {
-                        // Se pular em cima do casco parado, ele começa a correr
+                    }
+                    else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
+                    {
+                        // Casco parado -> correndo
                         koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
                         koopared->velAndando = 300;
-                        j->vel.y = j->velPulo; // Quica novamente
+                        j->vel.y = j->velPulo;
                         PlaySound(rm.somHitInimigo);
                     }
-                } else if (!j->invulneravel) {
+                }
+                else
+                {
 
-                    // Se o Sonic trombar com o casco PARADO pelas laterais, ele
-                    // CHUTA o casco em vez de tomar dano
-                    if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO) {
-                        koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                        koopared->velAndando = 350;
-
-                        // Direciona o casco dependendo do lado que o Sonic
-                        // atingiu
-                        if (retColCalculado.x < koopared->ret.x) {
-                            koopared->olhandoParaDireita = true;
-                        } else {
-                            koopared->olhandoParaDireita = false;
-                        }
-                        PlaySound(rm.somHitInimigo);
-                    } else {
-                        // Se o Koopa estiver andando normal ou se o casco
-                        // estiver correndo rápido, o Sonic toma dano
-                        if (p->quantidadeAneis > 0) {
+                    // Verifica se o Koopa está em casco correndo ou andando normal
+                    if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO ||
+                        koopared->estado == ESTADO_KOOPA_ANDANDO)
+                    {
+                        // Causa dano no Sonic
+                        if (p->quantidadeAneis > 0)
+                        {
                             p->quantidadeAneis = 0;
                             PlaySound(rm.somHitComAnel);
-                        } else {
+                        }
+                        else
+                        {
                             p->quantidadeVidas--;
                             PlaySound(rm.somMorte);
                         }
                         j->invulneravel = true;
                     }
+                    // Se o Koopa estiver em casco parado, o Sonic chuta o casco em vez de tomar dano
+                    else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
+                    {
+                        // Sonic chuta o casco
+                        koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
+                        koopared->velAndando = 350;
+                        // Direciona o casco
+                        if (retColCalculado.x < koopared->ret.x)
+                        {
+                            koopared->olhandoParaDireita = true;
+                        }
+                        else
+                        {
+                            koopared->olhandoParaDireita = false;
+                        }
+                        PlaySound(rm.somHitInimigo);
+                    }
                 }
+                return; // Processa apenas uma colisão por frame
             }
-        } else if (inimigo->tipo == TIPO_INIMIGO_REX) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
 
             InimigoRex *rex = (InimigoRex *)inimigo->objeto;
 
-            if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO) {
+            if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -955,42 +1092,45 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
 
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
-                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO) {
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
+                    // Mata o Rex
                     j->vel.y = j->velPulo;
                     rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
                     PlaySound(rm.somHitInimigo);
                     int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
-                } else if (!j->invulneravel) {
-                    if (p->quantidadeAneis > 0) {
+                }
+                else
+                {
+                    // Rex SEMPRE causa dano, mesmo se estiver invulnerável
+                    if (p->quantidadeAneis > 0)
+                    {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    } else {
-                        // Se o Rex estiver andando normal ou correndo rápido
-                        // achatado, o Sonic toma dano
-                        if (p->quantidadeAneis > 0) {
-                            p->quantidadeAneis = 0;
-                            PlaySound(rm.somHitComAnel);
-                        } else {
-                            p->quantidadeVidas--;
-                            PlaySound(rm.somMorte);
-                        }
-                        j->invulneravel = true;
                     }
-                    j->invulneravel = true;
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+                    j->invulneravel = true; // Torna invulnerável após tomar dano
                 }
-
-                return; // um inimigo de cada vez!
+                return;
             }
-        } else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
+        {
 
             InimigoNegoPreto *negoPreto = (InimigoNegoPreto *)inimigo->objeto;
 
-            if (!negoPreto->ativo) {
+            if (!negoPreto->ativo)
+            {
                 el = el->proximo;
                 continue;
             }
@@ -1010,10 +1150,12 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
                 // Verifica se o jogador está pulando (qualquer estado de pulo)
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
-                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO) {
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
                     // Mata o NegoPreto com pulo
                     negoPreto->ativo = false;
                     PlaySound(rm.somHitInimigo);
@@ -1026,11 +1168,15 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
 
                 // Se não estiver pulando, aplica dano (se não estiver
                 // invulnerável)
-                if (!j->invulneravel) {
-                    if (p->quantidadeAneis > 0) {
+                if (!j->invulneravel)
+                {
+                    if (p->quantidadeAneis > 0)
+                    {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    } else {
+                    }
+                    else
+                    {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -1045,18 +1191,22 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
     }
 }
 
-static void resolverEntradaCanoMapa(Jogador *j, Personagem *p, GameWorld *gw) {
+static void resolverEntradaCanoMapa(Jogador *j, Personagem *p, GameWorld *gw)
+{
 
-    if (!IsKeyPressed(KEY_DOWN) && !IsKeyPressed(KEY_S)) {
+    if (!IsKeyPressed(KEY_DOWN) && !IsKeyPressed(KEY_S))
+    {
         return;
     }
 
     ElementoMapa *el = gw->mapa->obstaculos;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (o->eCanoSaida) {
+        if (o->eCanoSaida)
+        {
             QuadroAnimacao *qa = getQuadroAnimacaoAtualJogador(j);
 
             float deslocamentoX =
@@ -1072,7 +1222,8 @@ static void resolverEntradaCanoMapa(Jogador *j, Personagem *p, GameWorld *gw) {
             // checa se o mario está em pé em cima do cano
             Rectangle retTopoSaida = {o->ret.x, o->ret.y - 4, o->ret.width, 8};
 
-            if (CheckCollisionRecs(retColCalculado, retTopoSaida)) {
+            if (CheckCollisionRecs(retColCalculado, retTopoSaida))
+            {
                 strncpy(gw->proximaFase, o->proximaFase, 255);
                 gw->proximaFase[255] = '\0';
                 gw->estado = ESTADO_JOGO_PROXIMA_FASE;
