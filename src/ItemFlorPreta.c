@@ -24,18 +24,20 @@ static const bool MOSTRAR_RETANGULOS = false;
 /**
  * @brief Cria um novo Item (florpreta).
  */
-ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
+ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor)
+{
 
-    ItemFlorPreta *novoItem = (ItemFlorPreta*) malloc(sizeof(ItemFlorPreta));
+    ItemFlorPreta *novoItem = (ItemFlorPreta *)malloc(sizeof(ItemFlorPreta));
 
     novoItem->ret = ret;
     novoItem->cor = cor;
     novoItem->estado = ESTADO_ITEM_FLOR_PRETA_PARADA;
     novoItem->ativo = true;
+    novoItem->tempoColetado = 0.0f; // NOVO: timer para a moeda
 
     int quantidadeAnimacoes = 0;
 
-    // Estado PARADO
+    // Estado PARADO (flor parada)
     novoItem->animacaoParado.quantidadeQuadros = 4;
     novoItem->animacaoParado.quadroAtual = 0;
     novoItem->animacaoParado.contadorTempoQuadro = 0.0f;
@@ -43,7 +45,7 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
     novoItem->animacaoParado.executarUmaVez = false;
     novoItem->animacaoParado.finalizada = false;
     criarQuadrosAnimacao(&novoItem->animacaoParado, novoItem->animacaoParado.quantidadeQuadros);
-    inicializarQuadrosAnimacao( 
+    inicializarQuadrosAnimacao(
         novoItem->animacaoParado.quadros,
         novoItem->animacaoParado.quantidadeQuadros,
         100,
@@ -51,10 +53,9 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
         16, 16,
         1,
         false,
-        (Rectangle) {2, 2, 32, 32}
-    );
+        (Rectangle){2, 2, 32, 32});
 
-    // Estado SAINDO_DO_BLOCO
+    // Estado SAINDO_DO_BLOCO (flor saindo)
     novoItem->animacaoSaindoDoBloco.quantidadeQuadros = 4;
     novoItem->animacaoSaindoDoBloco.quadroAtual = 0;
     novoItem->animacaoSaindoDoBloco.contadorTempoQuadro = 0.0f;
@@ -62,7 +63,7 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
     novoItem->animacaoSaindoDoBloco.executarUmaVez = true;
     novoItem->animacaoSaindoDoBloco.finalizada = false;
     criarQuadrosAnimacao(&novoItem->animacaoSaindoDoBloco, novoItem->animacaoSaindoDoBloco.quantidadeQuadros);
-    inicializarQuadrosAnimacao( 
+    inicializarQuadrosAnimacao(
         novoItem->animacaoSaindoDoBloco.quadros,
         novoItem->animacaoSaindoDoBloco.quantidadeQuadros,
         80,
@@ -70,10 +71,9 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
         16, 16,
         1,
         false,
-        (Rectangle) {0, 0, 32, 32}
-    );
+        (Rectangle){0, 0, 32, 32});
 
-    // Estado COLETADO (atacando/disparando)
+    // Estado COLETADA (flor atacando/disparando)
     novoItem->animacaoColetando.quantidadeQuadros = 4;
     novoItem->animacaoColetando.quadroAtual = 0;
     novoItem->animacaoColetando.contadorTempoQuadro = 0.0f;
@@ -81,7 +81,7 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
     novoItem->animacaoColetando.executarUmaVez = false;
     novoItem->animacaoColetando.finalizada = false;
     criarQuadrosAnimacao(&novoItem->animacaoColetando, novoItem->animacaoColetando.quantidadeQuadros);
-    inicializarQuadrosAnimacao( 
+    inicializarQuadrosAnimacao(
         novoItem->animacaoColetando.quadros,
         novoItem->animacaoColetando.quantidadeQuadros,
         80,
@@ -89,14 +89,33 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
         16, 16,
         1,
         false,
-        (Rectangle) {0, 0, 32, 32}
-    );
+        (Rectangle){0, 0, 32, 32});
 
-    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_PARADA] = &novoItem->animacaoParado; 
+    // NOVO: Estado COLETADA_COMO_MOEDA (flor virou moeda)
+    novoItem->animacaoMoeda.quantidadeQuadros = 4;
+    novoItem->animacaoMoeda.quadroAtual = 0;
+    novoItem->animacaoMoeda.contadorTempoQuadro = 0.0f;
+    novoItem->animacaoMoeda.pararNoUltimoQuadro = false;
+    novoItem->animacaoMoeda.executarUmaVez = false;
+    novoItem->animacaoMoeda.finalizada = false;
+    criarQuadrosAnimacao(&novoItem->animacaoMoeda, novoItem->animacaoMoeda.quantidadeQuadros);
+    inicializarQuadrosAnimacao(
+        novoItem->animacaoMoeda.quadros,
+        novoItem->animacaoMoeda.quantidadeQuadros,
+        100,
+        1, 9, // Mesma posição da moeda (ajuste conforme sua sprite sheet)
+        16, 16,
+        1,
+        false,
+        (Rectangle){2, 2, 12, 12});
+
+    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_PARADA] = &novoItem->animacaoParado;
     quantidadeAnimacoes++;
-    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO] = &novoItem->animacaoSaindoDoBloco; 
+    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO] = &novoItem->animacaoSaindoDoBloco;
     quantidadeAnimacoes++;
-    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_COLETADA] = &novoItem->animacaoColetando; 
+    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_COLETADA] = &novoItem->animacaoColetando;
+    quantidadeAnimacoes++;
+    novoItem->animacoes[ESTADO_ITEM_FLOR_PRETA_COLETADA_COMO_MOEDA] = &novoItem->animacaoMoeda;
     quantidadeAnimacoes++;
     novoItem->quantidadeAnimacoes = quantidadeAnimacoes;
 
@@ -106,9 +125,12 @@ ItemFlorPreta *criarItemFlorPreta(Rectangle ret, Color cor) {
 /**
  * @brief Destroi um item (florpreta).
  */
-void destruirItemFlorPreta(ItemFlorPreta *item) {
-    if (item != NULL) {
-        for (int i = 0; i < item->quantidadeAnimacoes; i++) {
+void destruirItemFlorPreta(ItemFlorPreta *item)
+{
+    if (item != NULL)
+    {
+        for (int i = 0; i < item->quantidadeAnimacoes; i++)
+        {
             destruirQuadrosAnimacao(item->animacoes[i]);
         }
         free(item);
@@ -118,14 +140,27 @@ void destruirItemFlorPreta(ItemFlorPreta *item) {
 /**
  * @brief Atualiza um item (florpreta).
  */
-void atualizarItemFlorPreta(ItemFlorPreta *item, float delta) {
-    if (item->ativo) {
+void atualizarItemFlorPreta(ItemFlorPreta *item, float delta)
+{
+    if (item->ativo)
+    {
         Animacao *animacaoAtual = getAnimacaoAtualItemFlorPreta(item);
         atualizarAnimacao(animacaoAtual, delta);
-        
+
         // Transição: SAINDO_DO_BLOCO -> COLETADA (atacando)
-        if (item->estado == ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO && animacaoAtual->finalizada) {
+        if (item->estado == ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO && animacaoAtual->finalizada)
+        {
             item->estado = ESTADO_ITEM_FLOR_PRETA_COLETADA;
+        }
+
+        // NOVO: Transição: COLETADA_COMO_MOEDA -> INATIVO (desaparece após 1 segundo)
+        if (item->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA_COMO_MOEDA)
+        {
+            item->tempoColetado += delta;
+            if (item->tempoColetado >= 1.0f) // Desaparece após 1 segundo
+            {
+                item->ativo = false;
+            }
         }
     }
 }
@@ -133,11 +168,14 @@ void atualizarItemFlorPreta(ItemFlorPreta *item, float delta) {
 /**
  * @brief Desenha um item (florpreta).
  */
-void desenharItemFlorPreta(ItemFlorPreta *item) {
-    if (item->ativo) {
+void desenharItemFlorPreta(ItemFlorPreta *item)
+{
+    if (item->ativo)
+    {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualItemFlorPreta(item);
         desenharQuadroAnimacaoItemFlorPreta(item, qa, WHITE);
-        if (MOSTRAR_RETANGULOS) {
+        if (MOSTRAR_RETANGULOS)
+        {
             DrawRectangleRec(item->ret, Fade(item->cor, 0.5f));
             DrawRectangleLines(item->ret.x, item->ret.y, item->ret.width, item->ret.height, BLACK);
         }
@@ -147,24 +185,27 @@ void desenharItemFlorPreta(ItemFlorPreta *item) {
 /**
  * @brief Obtém o quadro de animação atual de um item (florpreta).
  */
-QuadroAnimacao *getQuadroAnimacaoAtualItemFlorPreta(ItemFlorPreta *item) {
+QuadroAnimacao *getQuadroAnimacaoAtualItemFlorPreta(ItemFlorPreta *item)
+{
     return getQuadroAtualAnimacao(getAnimacaoAtualItemFlorPreta(item));
 }
 
-static void desenharQuadroAnimacaoItemFlorPreta(ItemFlorPreta *item, QuadroAnimacao *qa, Color tonalidade) {
+static void desenharQuadroAnimacaoItemFlorPreta(ItemFlorPreta *item, QuadroAnimacao *qa, Color tonalidade)
+{
 
-    if (qa != NULL) {
+    if (qa != NULL)
+    {
 
         DrawTexturePro(
             rm.texturaItens,
             qa->fonte,
             item->ret,
-            (Vector2) {0},
+            (Vector2){0},
             0.0f,
-            tonalidade
-        );
+            tonalidade);
 
-        if (MOSTRAR_RETANGULOS) {
+        if (MOSTRAR_RETANGULOS)
+        {
             float xDesenho = item->ret.x + qa->retColisao.x;
             float yDesenho = item->ret.y + qa->retColisao.y;
             DrawRectangle(xDesenho, yDesenho, qa->retColisao.width, qa->retColisao.height, Fade(GREEN, 0.5f));
@@ -172,6 +213,7 @@ static void desenharQuadroAnimacaoItemFlorPreta(ItemFlorPreta *item, QuadroAnima
     }
 }
 
-static Animacao *getAnimacaoAtualItemFlorPreta(ItemFlorPreta *item) {
+static Animacao *getAnimacaoAtualItemFlorPreta(ItemFlorPreta *item)
+{
     return item->animacoes[item->estado];
 }

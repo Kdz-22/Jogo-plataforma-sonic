@@ -551,7 +551,7 @@ void destruirMapa(Mapa *m)
         el = m->obstaculos;
         while (el != NULL)
         {
-            printf("  destruindo obstaculo %p\n", (void *)el);
+            //printf("  destruindo obstaculo %p\n", (void *)el);
 
             destruirObstaculo((Obstaculo *)el->objeto);
             ElementoMapa *t = el;

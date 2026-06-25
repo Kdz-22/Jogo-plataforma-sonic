@@ -145,7 +145,8 @@ typedef enum EstadoItemFlorPreta
 {
     ESTADO_ITEM_FLOR_PRETA_PARADA,
     ESTADO_ITEM_FLOR_PRETA_SAINDO_DO_BLOCO,
-    ESTADO_ITEM_FLOR_PRETA_COLETADA
+    ESTADO_ITEM_FLOR_PRETA_COLETADA,
+    ESTADO_ITEM_FLOR_PRETA_COLETADA_COMO_MOEDA
 } EstadoItemFlorPreta;
 
 /**
@@ -571,6 +572,7 @@ typedef struct ItemFlorPreta
 
     EstadoItemFlorPreta estado;
     bool ativo;
+     float tempoColetado;
 
     Animacao *animacoes[3];
     int quantidadeAnimacoes;
@@ -578,6 +580,7 @@ typedef struct ItemFlorPreta
     Animacao animacaoParado;
     Animacao animacaoSaindoDoBloco;
     Animacao animacaoColetando;
+    Animacao animacaoMoeda;
 
 } ItemFlorPreta;
 
