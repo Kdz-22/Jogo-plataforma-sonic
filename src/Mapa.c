@@ -17,6 +17,7 @@
 #include "InimigoRex.h"
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
+#include "InimigoFlorCarnivora.h"
 
 #include "Macros.h"
 #include "Mapa.h"
@@ -38,7 +39,8 @@ static void inserirInimigo(Mapa *mapa, ElementoMapa *inimigo);
 /**
  * @brief Carrega um mapa a partir de uma arquivo.
  */
-Mapa *carregarMapa(const char *caminhoArquivo) {
+Mapa *carregarMapa(const char *caminhoArquivo)
+{
 
     // aloca um novo mapa
     Mapa *novoMapa = (Mapa *)malloc(sizeof(Mapa));
@@ -67,31 +69,38 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
     // caractere atual marca inicialmente a primeira posição de dadosMapa
     // C-strings terminam em '\0', sendo assim, caminhamos caractere por
     // caractere até o fim
-    while (*caractereAtual != '\0') {
+    while (*caractereAtual != '\0')
+    {
 
         char c = *caractereAtual;
 
         // fim de linha?
-        if (c == '\n') {
+        if (c == '\n')
+        {
 
             linhaAtual++;
             colunaAtual = 0;
 
             novoMapa->linhas = linhaAtual;
-        } else {
+        }
+        else
+        {
 
-            if (c != ' ') {
+            if (c != ' ')
+            {
 
                 ElementoMapa *el = (ElementoMapa *)malloc(sizeof(ElementoMapa));
                 el->proximo = NULL;
 
-                if (c >= 'A' && c <= 'Z') {
+                if (c >= 'A' && c <= 'Z')
+                {
                     bool solido = true;
                     int deslocamento = c - 'A';
 
                     if (c == 'A' || c == 'R' || c == 'S' || c == 'U' ||
                         c == 'Q' || c == 'P' || c == 'M' || c == 'F' ||
-                        c == 'G') {
+                        c == 'G')
+                    {
                         solido = false;
                     }
 
@@ -113,21 +122,27 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
 
                     inserirObstaculo(novoMapa, el);
-                    
+
                     Obstaculo *obs = (Obstaculo *)el->objeto;
-                    if (c == 'N' || c == 'Q' || c == 'R' || c == 'U') {
+                    if (c == 'N' || c == 'Q' || c == 'R' || c == 'U')
+                    {
                         obs->tipoColisao = COLISAO_RAMPA_CIMA_DIREITA;
-                    } else if (c == 'O' || c == 'W') {
+                    }
+                    else if (c == 'O' || c == 'W')
+                    {
                         obs->tipoColisao = COLISAO_RAMPA_BAIXO_DIREITA;
-                    } else if (c == 'P' || c == 'S' || c == 'Z') {
+                    }
+                    else if (c == 'P' || c == 'S' || c == 'Z')
+                    {
                         obs->tipoColisao = COLISAO_RAMPA_BAIXO_ESQUERDA;
                     }
-
-                } else if (c == '!' || c == '@' || c == '#' || c == '$' ||
-                           c == '%' || c == '&' || c == '*' || c == '(' ||
-                           c == ')' || c == '[' || c == ']' || c == '{' ||
-                           c == '}' || c == '?' || c == ';' || c == ':' ||
-                           c == ',' || c == '.' || c == '<' || c == '>') {
+                }
+                else if (c == '!' || c == '@' || c == '#' || c == '$' ||
+                         c == '%' || c == '&' || c == '*' || c == '(' ||
+                         c == ')' || c == '[' || c == ']' || c == '{' ||
+                         c == '}' || c == '?' || c == ';' || c == ':' ||
+                         c == ',' || c == '.' || c == '<' || c == '>')
+                {
                     // mapeia cada caractere para um tile do cano
                     int deslocamento = 0;
                     if (c == '!')
@@ -168,7 +183,8 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                         deslocamento = 17; // corpo direito
                     else if (c == '<')
                         deslocamento = 18; // corpo direito
-                    else if (c == '>') {
+                    else if (c == '>')
+                    {
                         deslocamento = 19; // corpo direito
                     }
 
@@ -190,8 +206,9 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
-
-                } else if (c == '+') {
+                }
+                else if (c == '+')
+                {
                     // pega o deslocamento do tile do cano na spritesheet
                     // use o mesmo deslocamento do topo do cano normal que já
                     // existe
@@ -221,7 +238,9 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
-                } else if (c == '-') {
+                }
+                else if (c == '-')
+                {
                     el->objeto = criarObstaculo(
                         (Rectangle){
                             .x =
@@ -245,11 +264,14 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
-                } else if (c >= 'a' && c <= 'z') {
+                }
+                else if (c >= 'a' && c <= 'z')
+                {
 
                     Item *item = NULL;
 
-                    switch (c) {
+                    switch (c)
+                    {
 
                     case 'a':
 
@@ -337,11 +359,14 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     }
 
                     inserirItem(novoMapa, el);
-                } else if (c >= '0' && c <= '9') {
+                }
+                else if (c >= '0' && c <= '9')
+                {
 
                     Inimigo *inimigo = NULL;
 
-                    switch (c) {
+                    switch (c)
+                    {
 
                     case '0':
 
@@ -453,6 +478,24 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                         el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
 
                         break;
+                    case '6':
+
+                        inimigo = criarInimigo(TIPO_INIMIGO_FLORCARNIVORA);
+
+                        inimigo->objeto = criarInimigoFlorCarnivora(
+                            (Rectangle){.x = novoMapa->dimensaoPadraoElementos *
+                                             colunaAtual,
+                                        .y = novoMapa->dimensaoPadraoElementos *
+                                                 linhaAtual -
+                                             21,
+                                        .width = 128,
+                                        .height = 128},
+                            BLUE);
+
+                        el->objeto = inimigo;
+                        el->tipo = TIPO_ELEMENTO_MAPA_INIMIGO;
+
+                        break;
 
                     default:
                         TraceLog(LOG_ERROR, "Tipo de inimigo desconhecido.");
@@ -461,7 +504,9 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     }
 
                     inserirInimigo(novoMapa, el);
-                } else {
+                }
+                else
+                {
                     TraceLog(LOG_ERROR, "Entidade inválida no mapa.");
                     abort();
                 }
@@ -469,7 +514,8 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 
             colunaAtual++;
 
-            if (novoMapa->colunas < colunaAtual) {
+            if (novoMapa->colunas < colunaAtual)
+            {
                 novoMapa->colunas = colunaAtual;
             }
         }
@@ -488,15 +534,18 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 /**
  * @brief Destroi um mapa.
  */
-void destruirMapa(Mapa *m) {
+void destruirMapa(Mapa *m)
+{
 
-    if (m != NULL) {
+    if (m != NULL)
+    {
 
         ElementoMapa *el = NULL;
         printf("destruindo obstaculos...\n");
 
         el = m->obstaculos;
-        while (el != NULL) {
+        while (el != NULL)
+        {
             printf("  destruindo obstaculo %p\n", (void *)el);
 
             destruirObstaculo((Obstaculo *)el->objeto);
@@ -507,7 +556,8 @@ void destruirMapa(Mapa *m) {
         printf("destruindo itens...\n");
 
         el = m->itens;
-        while (el != NULL) {
+        while (el != NULL)
+        {
             destruirItem((Item *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
@@ -516,7 +566,8 @@ void destruirMapa(Mapa *m) {
         printf("destruindo inimigos...\n");
 
         el = m->inimigos;
-        while (el != NULL) {
+        while (el != NULL)
+        {
             destruirInimigo((Inimigo *)el->objeto);
             ElementoMapa *t = el;
             el = el->proximo;
@@ -531,24 +582,28 @@ void destruirMapa(Mapa *m) {
 /**
  * @brief Atualiza um mapa.
  */
-void atualizarMapa(Mapa *m, GameWorld *gw, float delta) {
+void atualizarMapa(Mapa *m, GameWorld *gw, float delta)
+{
 
     ElementoMapa *el = NULL;
 
     el = m->itens;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         atualizarItem((Item *)el->objeto, delta);
         el = el->proximo;
     }
 
     el = m->inimigos;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         atualizarInimigo((Inimigo *)el->objeto, gw, delta);
         el = el->proximo;
     }
 
     el = m->obstaculos;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         atualizarObstaculo((Obstaculo *)el->objeto, delta);
         el = el->proximo;
     }
@@ -557,24 +612,28 @@ void atualizarMapa(Mapa *m, GameWorld *gw, float delta) {
 /**
  * @brief Desenha um mapa.
  */
-void desenharMapa(Mapa *m) {
+void desenharMapa(Mapa *m)
+{
 
     ElementoMapa *el = NULL;
 
     el = m->obstaculos;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         desenharObstaculo((Obstaculo *)el->objeto);
         el = el->proximo;
     }
 
     el = m->itens;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         desenharItem((Item *)el->objeto);
         el = el->proximo;
     }
 
     el = m->inimigos;
-    while (el != NULL) {
+    while (el != NULL)
+    {
         desenharInimigo((Inimigo *)el->objeto);
         el = el->proximo;
     }
@@ -583,24 +642,30 @@ void desenharMapa(Mapa *m) {
 /**
  * @brief Calcula a largura do mapa.
  */
-int calcularLarguraMapa(Mapa *m) {
+int calcularLarguraMapa(Mapa *m)
+{
     return (int)(m->dimensaoPadraoElementos * m->colunas);
 }
 
 /**
  * @brief Calcula a altura do mapa.
  */
-int calcularAlturaMapa(Mapa *m) {
+int calcularAlturaMapa(Mapa *m)
+{
     return (int)(m->dimensaoPadraoElementos * m->linhas);
 }
 
 /**
  * @brief Insere um obstáculo na lista de obstáculos.
  */
-static void inserirObstaculo(Mapa *mapa, ElementoMapa *obstaculo) {
-    if (mapa->obstaculos == NULL) {
+static void inserirObstaculo(Mapa *mapa, ElementoMapa *obstaculo)
+{
+    if (mapa->obstaculos == NULL)
+    {
         mapa->obstaculos = obstaculo;
-    } else {
+    }
+    else
+    {
         obstaculo->proximo = mapa->obstaculos;
         mapa->obstaculos = obstaculo;
     }
@@ -610,10 +675,14 @@ static void inserirObstaculo(Mapa *mapa, ElementoMapa *obstaculo) {
 /**
  * @brief Insere um item na lista de itens.
  */
-static void inserirItem(Mapa *mapa, ElementoMapa *item) {
-    if (mapa->itens == NULL) {
+static void inserirItem(Mapa *mapa, ElementoMapa *item)
+{
+    if (mapa->itens == NULL)
+    {
         mapa->itens = item;
-    } else {
+    }
+    else
+    {
         item->proximo = mapa->itens;
         mapa->itens = item;
     }
@@ -623,10 +692,14 @@ static void inserirItem(Mapa *mapa, ElementoMapa *item) {
 /**
  * @brief Insere um inimigo na lista de inimigos.
  */
-static void inserirInimigo(Mapa *mapa, ElementoMapa *inimigo) {
-    if (mapa->inimigos == NULL) {
+static void inserirInimigo(Mapa *mapa, ElementoMapa *inimigo)
+{
+    if (mapa->inimigos == NULL)
+    {
         mapa->inimigos = inimigo;
-    } else {
+    }
+    else
+    {
         inimigo->proximo = mapa->inimigos;
         mapa->inimigos = inimigo;
     }

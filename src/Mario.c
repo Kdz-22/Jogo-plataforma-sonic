@@ -20,6 +20,7 @@
 #include "InimigoNegoPreto.h"
 #include "InimigoRex.h"
 #include "InimigoSpikes.h"
+#include "InimigoFlorCarnivora.h"
 
 #include "Item.h"
 #include "ItemAnel.h"
@@ -1691,7 +1692,96 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 return;
             }
         }
+        else if (inimigo->tipo == TIPO_INIMIGO_FLORCARNIVORA)
+        {
+            InimigoFlorCarnivora *flor = (InimigoFlorCarnivora *)inimigo->objeto;
 
+            if (!flor->ativo || flor->estado == ESTADO_FLOR_CARNIVORA_MORRENDO)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            qaInimigo = getQuadroAnimacaoAtualInimigoFlorCarnivora(flor);
+            ret = &flor->ret;
+
+            float deslocamentoX = flor->olhandoParaDireita
+                                      ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
+                                      : qaInimigo->retColisao.x;
+            float deslocamentoY = qaInimigo->retColisao.y;
+
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
+                // VERIFICA SE O MARIO ESTÁ PULANDO GIRANDO (mata a flor)
+                if (m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
+                {
+                    // Mario mata a flor com pulo girando
+                    flor->estado = ESTADO_FLOR_CARNIVORA_MORRENDO;
+                    flor->ativo = true;    // Mantém ativo até a animação terminar
+                    m->vel.y = m->velPulo; // Quica
+
+                    PlaySound(rm.somHitInimigo);
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
+                }
+                // VERIFICA SE O MARIO ESTÁ EM OUTROS ESTADOS DE PULO (NÃO MATA, TOMA DANO)
+                else if (m->estado == ESTADO_MARIO_PULANDO ||
+                         m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
+                         m->estado == ESTADO_MARIO_CAINDO)
+                {
+                    // Mario toma dano da flor (mesmo que esteja pulando, se não for girando)
+                    if (m->grande)
+                    {
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else if (p->quantidadeAneis > 0)
+                    {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+                    m->invulneravel = true;
+                }
+                // MARIO NO CHÃO - TOMA DANO
+                else
+                {
+                    if (m->grande)
+                    {
+                        m->grande = false;
+                        m->ret.width = m->retOriginal.width;
+                        m->ret.height = m->retOriginal.height;
+                        m->ret.y -= m->ret.height;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else if (p->quantidadeAneis > 0)
+                    {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
+                    m->invulneravel = true;
+                }
+
+                return;
+            }
+        }
         el = el->proximo;
     }
 }

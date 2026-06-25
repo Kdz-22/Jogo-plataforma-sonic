@@ -19,12 +19,14 @@
 #include "InimigoKoopaRed.h"
 #include "InimigoRex.h"
 #include "InimigoNegoPreto.h"
+#include "InimigoFlorCarnivora.h"
 #include "Tipos.h"
 
 /**
  * @brief Cria um novo Inimigo.
  */
-Inimigo *criarInimigo(TipoInimigo tipo) {
+Inimigo *criarInimigo(TipoInimigo tipo)
+{
 
     Inimigo *novoInimigo = (Inimigo *)malloc(sizeof(Inimigo));
     novoInimigo->objeto = NULL;
@@ -36,12 +38,15 @@ Inimigo *criarInimigo(TipoInimigo tipo) {
 /**
  * @brief Destroi um inimigo.
  */
-void destruirInimigo(Inimigo *inimigo) {
+void destruirInimigo(Inimigo *inimigo)
+{
     printf("  destruindo inimigo tipo %d objeto %p\n", inimigo->tipo,
            (void *)inimigo->objeto);
 
-    if (inimigo != NULL) {
-        switch (inimigo->tipo) {
+    if (inimigo != NULL)
+    {
+        switch (inimigo->tipo)
+        {
         case TIPO_INIMIGO_MOTOBUG:
             destruirInimigoMotobug((InimigoMotobug *)inimigo->objeto);
             break;
@@ -60,6 +65,9 @@ void destruirInimigo(Inimigo *inimigo) {
         case TIPO_INIMIGO_NEGOPRETO:
             destruirInimigoNegoPreto((InimigoNegoPreto *)inimigo->objeto);
             break;
+        case TIPO_INIMIGO_FLORCARNIVORA:
+            destruirInimigoFlorCarnivora((InimigoFlorCarnivora *)inimigo->objeto);
+            break;
         default:
             break;
         }
@@ -70,9 +78,11 @@ void destruirInimigo(Inimigo *inimigo) {
 /**
  * @brief Atualiza um inimigo.
  */
-void atualizarInimigo(Inimigo *inimigo, GameWorld *gw, float delta) {
+void atualizarInimigo(Inimigo *inimigo, GameWorld *gw, float delta)
+{
 
-    switch (inimigo->tipo) {
+    switch (inimigo->tipo)
+    {
     case TIPO_INIMIGO_MOTOBUG:
         atualizarInimigoMotobug((InimigoMotobug *)inimigo->objeto, gw, delta);
         break;
@@ -89,11 +99,10 @@ void atualizarInimigo(Inimigo *inimigo, GameWorld *gw, float delta) {
         atualizarInimigoRex((InimigoRex *)inimigo->objeto, gw, delta);
         break;
     case TIPO_INIMIGO_NEGOPRETO:
-        atualizarInimigoNegoPreto(
-            (InimigoNegoPreto *)inimigo->objeto,
-            gw,
-            delta
-        );
+        atualizarInimigoNegoPreto((InimigoNegoPreto *)inimigo->objeto, gw, delta);
+        break;
+    case TIPO_INIMIGO_FLORCARNIVORA:
+        atualizarInimigoFlorCarnivora((InimigoFlorCarnivora *)inimigo->objeto, gw, delta);
         break;
     default:
         return;
@@ -103,9 +112,11 @@ void atualizarInimigo(Inimigo *inimigo, GameWorld *gw, float delta) {
 /**
  * @brief Desenha um inimigo.
  */
-void desenharInimigo(Inimigo *inimigo) {
+void desenharInimigo(Inimigo *inimigo)
+{
 
-    switch (inimigo->tipo) {
+    switch (inimigo->tipo)
+    {
     case TIPO_INIMIGO_MOTOBUG:
         desenharInimigoMotobug((InimigoMotobug *)inimigo->objeto);
         break;
@@ -122,9 +133,10 @@ void desenharInimigo(Inimigo *inimigo) {
         desenharInimigoRex((InimigoRex *)inimigo->objeto);
         break;
     case TIPO_INIMIGO_NEGOPRETO:
-        desenharInimigoNegoPreto(
-        (InimigoNegoPreto *)inimigo->objeto
-        );
+        desenharInimigoNegoPreto((InimigoNegoPreto *)inimigo->objeto);
+        break;
+    case TIPO_INIMIGO_FLORCARNIVORA:
+        desenharInimigoFlorCarnivora((InimigoFlorCarnivora *)inimigo->objeto);
         break;
     default:
         return;
@@ -134,38 +146,49 @@ void desenharInimigo(Inimigo *inimigo) {
 /**
  * @brief Resolve colisões do inimigo com o mapa no eixo X.
  */
-void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa) {
+void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         QuadroAnimacao *qa = NULL;
 
         bool *olhandoParaDireita = NULL;
         Rectangle *ret = NULL;
 
-        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG) {
+        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG)
+        {
             InimigoMotobug *motobug = (InimigoMotobug *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoMotobug(motobug);
             olhandoParaDireita = &motobug->olhandoParaDireita;
             ret = &motobug->ret;
-        } else if (inimigo->tipo == TIPO_INIMIGO_SPIKES) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_SPIKES)
+        {
             InimigoSpikes *spikes = (InimigoSpikes *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoSpikes(spikes);
             olhandoParaDireita = &spikes->olhandoParaDireita;
             ret = &spikes->ret;
-        } else if (inimigo->tipo == TIPO_INIMIGO_TONTON) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_TONTON)
+        {
             InimigoTonTon *tonton = (InimigoTonTon *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoTonTon(tonton);
             olhandoParaDireita = &tonton->olhandoParaDireita;
             ret = &tonton->ret;
-        } else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED)
+        {
             InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoKoopaRed(koopared);
             olhandoParaDireita = &koopared->olhandoParaDireita;
             ret = &koopared->ret;
-        } else if (inimigo->tipo == TIPO_INIMIGO_REX) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
             InimigoRex *rex = (InimigoRex *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoRex(rex);
             olhandoParaDireita = &rex->olhandoParaDireita;
@@ -173,12 +196,17 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa) {
         }
         else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
         {
-            InimigoNegoPreto *negopreto =
-                (InimigoNegoPreto *)inimigo->objeto;
-
+            InimigoNegoPreto *negopreto = (InimigoNegoPreto *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoNegoPreto(negopreto);
             olhandoParaDireita = &negopreto->olhandoParaDireita;
             ret = &negopreto->ret;
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_FLORCARNIVORA)
+        {
+            InimigoFlorCarnivora *florcarnivora = (InimigoFlorCarnivora *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoFlorCarnivora(florcarnivora);
+            olhandoParaDireita = &florcarnivora->olhandoParaDireita;
+            ret = &florcarnivora->ret;
         }
         else
         {
@@ -198,12 +226,16 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa) {
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+        if (CheckCollisionRecs(retColCalculado, o->ret))
+        {
             if (retColCalculado.x + retColCalculado.width / 2 <
-                o->ret.x + o->ret.width / 2) {
+                o->ret.x + o->ret.width / 2)
+            {
                 ret->x = o->ret.x - qa->retColisao.width - deslocamentoX;
                 *olhandoParaDireita = !*olhandoParaDireita;
-            } else {
+            }
+            else
+            {
                 ret->x = o->ret.x + o->ret.width - deslocamentoX;
                 *olhandoParaDireita = !*olhandoParaDireita;
             }
@@ -216,11 +248,13 @@ void resolverColisaoInimigoObstaculosMapaX(Inimigo *inimigo, Mapa *mapa) {
 /**
  * @brief Resolve colisões do inimigo com o mapa no eixo Y.
  */
-void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa) {
+void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa)
+{
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL) {
+    while (el != NULL)
+    {
 
         Obstaculo *o = (Obstaculo *)el->objeto;
         QuadroAnimacao *qa = NULL;
@@ -229,31 +263,40 @@ void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa) {
         Rectangle *ret = NULL;
         Vector2 *vel = NULL;
 
-        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG) {
+        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG)
+        {
             InimigoMotobug *motobug = (InimigoMotobug *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoMotobug(motobug);
             olhandoParaDireita = &motobug->olhandoParaDireita;
             ret = &motobug->ret;
             vel = &motobug->vel;
-        } else if (inimigo->tipo == TIPO_INIMIGO_SPIKES) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_SPIKES)
+        {
             InimigoSpikes *spikes = (InimigoSpikes *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoSpikes(spikes);
             olhandoParaDireita = &spikes->olhandoParaDireita;
             ret = &spikes->ret;
             vel = &spikes->vel;
-        } else if (inimigo->tipo == TIPO_INIMIGO_TONTON) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_TONTON)
+        {
             InimigoTonTon *tonton = (InimigoTonTon *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoTonTon(tonton);
             olhandoParaDireita = &tonton->olhandoParaDireita;
             ret = &tonton->ret;
             vel = &tonton->vel;
-        } else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED)
+        {
             InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoKoopaRed(koopared);
             olhandoParaDireita = &koopared->olhandoParaDireita;
             ret = &koopared->ret;
             vel = &koopared->vel;
-        } else if (inimigo->tipo == TIPO_INIMIGO_REX) {
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_REX)
+        {
             InimigoRex *rex = (InimigoRex *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoRex(rex);
             olhandoParaDireita = &rex->olhandoParaDireita;
@@ -262,13 +305,19 @@ void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa) {
         }
         else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
         {
-            InimigoNegoPreto *negopreto =
-                (InimigoNegoPreto *)inimigo->objeto;
-
+            InimigoNegoPreto *negopreto = (InimigoNegoPreto *)inimigo->objeto;
             qa = getQuadroAnimacaoAtualInimigoNegoPreto(negopreto);
             olhandoParaDireita = &negopreto->olhandoParaDireita;
             ret = &negopreto->ret;
             vel = &negopreto->vel;
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_FLORCARNIVORA)
+        {
+            InimigoFlorCarnivora *florcarnivora = (InimigoFlorCarnivora *)inimigo->objeto;
+            qa = getQuadroAnimacaoAtualInimigoFlorCarnivora(florcarnivora);
+            olhandoParaDireita = &florcarnivora->olhandoParaDireita;
+            ret = &florcarnivora->ret;
+            vel = &florcarnivora->vel;
         }
         else
         {
@@ -286,11 +335,15 @@ void resolverColisaoInimigoObstaculosMapaY(Inimigo *inimigo, Mapa *mapa) {
             ret->x + deslocamentoX, ret->y + deslocamentoY,
             qa->retColisao.width, qa->retColisao.height};
 
-        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+        if (CheckCollisionRecs(retColCalculado, o->ret))
+        {
             if (retColCalculado.y + retColCalculado.height / 2 <
-                o->ret.y + o->ret.height / 2) {
+                o->ret.y + o->ret.height / 2)
+            {
                 ret->y = o->ret.y - qa->retColisao.height - deslocamentoY;
-            } else {
+            }
+            else
+            {
                 ret->y = o->ret.y + o->ret.height - deslocamentoY;
             }
             vel->y = 0;
