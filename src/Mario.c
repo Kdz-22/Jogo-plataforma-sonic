@@ -739,7 +739,11 @@ void entradaMario(void *dados, Personagem *p, float delta)
         m->vel.y = m->velPulo;
         m->quantidadePulos++;
         m->pulandoGirando = pulandoGirandoPressed;
-        // PlaySound( rm.somPulo );
+        if( pulandoGirandoPressed ) {
+            PlaySound(rm.somPuloGirando);
+        } else {
+            PlaySound(rm.somPuloMario);
+        }
     }
 
     // sincronização de animações andando e andando rápido
@@ -1189,7 +1193,7 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                     ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
-                PlaySound(rm.somAnel);
+                PlaySound(rm.som1Up);
                 printf("Cogumelo vermelho coletado!\n");
 
                 // faz o Mario crescer
@@ -1201,6 +1205,7 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                     m->ret.y -= m->ret.height; // sobe para não entrar no chão
                     m->ret.height *= 1.2;
                     m->ret.width *= 1.2;
+                    PlaySound(rm.somPowerUp);
                 }
                 else
                 {
@@ -1262,7 +1267,8 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                     else
                     {
                         p->quantidadeVidas--;
-                        PlaySound(rm.somMorte);
+                        PlaySound(rm.somMorrendo);
+                        
                     }
                     m->invulneravel = true;
                     return;
@@ -1366,7 +1372,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     else
                     {
                         p->quantidadeVidas--;
-                        PlaySound(rm.somMorte);
+                        PlaySound(rm.somMorrendo);
                     }
                     m->invulneravel = true;
                 }
@@ -1439,7 +1445,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     else
                     {
                         p->quantidadeVidas--;
-                        PlaySound(rm.somMorte);
+                        PlaySound(rm.somMorrendo);
                     }
                     m->invulneravel = true;
                 }
@@ -1589,7 +1595,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         else
                         {
                             p->quantidadeVidas--;
-                            PlaySound(rm.somMorte);
+                            PlaySound(rm.somMorrendo);
                         }
                         m->invulneravel =
                             true; // Torna invulnerável após tomar dano
@@ -1664,7 +1670,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     else
                     {
                         p->quantidadeVidas--;
-                        PlaySound(rm.somMorte);
+                        PlaySound(rm.somMorrendo);
                     }
                     m->invulneravel =
                         true; // Torna invulnerável após tomar dano
