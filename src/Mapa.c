@@ -145,45 +145,84 @@ Mapa *carregarMapa(const char *caminhoArquivo)
                 {
                     // mapeia cada caractere para um tile do cano
                     int deslocamento = 0;
-                    if (c == '!') {
+                    if (c == '!')
+                    {
                         deslocamento = 0; // topo esquerdo do cano
-                    } else if (c == '@') {
+                    }
+                    else if (c == '@')
+                    {
                         deslocamento = 1; // topo direito
-                    } else if (c == '#') {
+                    }
+                    else if (c == '#')
+                    {
                         deslocamento = 2; // corpo esquerdo
-                    } else if (c == '$') {
+                    }
+                    else if (c == '$')
+                    {
                         deslocamento = 3; // corpo direito
-                    } else if (c == '%') {
+                    }
+                    else if (c == '%')
+                    {
                         deslocamento = 4; // corpo direito
-                    } else if (c == '&') {
+                    }
+                    else if (c == '&')
+                    {
                         deslocamento = 5; // corpo direito
-                    } else if (c == '*') {
+                    }
+                    else if (c == '*')
+                    {
                         deslocamento = 6; // corpo direito
-                    } else if (c == '(') {
+                    }
+                    else if (c == '(')
+                    {
                         deslocamento = 7; // corpo direito
-                    } else if (c == ')') {
+                    }
+                    else if (c == ')')
+                    {
                         deslocamento = 8; // corpo direito
-                    } else if (c == '[') {
+                    }
+                    else if (c == '[')
+                    {
                         deslocamento = 9; // corpo direito
-                    } else if (c == ']') {
+                    }
+                    else if (c == ']')
+                    {
                         deslocamento = 10; // corpo direito
-                    } else if (c == '{') {
+                    }
+                    else if (c == '{')
+                    {
                         deslocamento = 11; // corpo direito
-                    } else if (c == '}') {
+                    }
+                    else if (c == '}')
+                    {
                         deslocamento = 12; // corpo direito
-                    } else if (c == '?') {
+                    }
+                    else if (c == '?')
+                    {
                         deslocamento = 13; // corpo direito
-                    } else if (c == ';') {
+                    }
+                    else if (c == ';')
+                    {
                         deslocamento = 14; // corpo direito
-                    } else if (c == ':') {
+                    }
+                    else if (c == ':')
+                    {
                         deslocamento = 15; // corpo direito
-                    } else if (c == ',') {
+                    }
+                    else if (c == ',')
+                    {
                         deslocamento = 16; // corpo direito
-                    } else if (c == '.') {
+                    }
+                    else if (c == '.')
+                    {
                         deslocamento = 17; // corpo direito
-                    } else if (c == '<') {
+                    }
+                    else if (c == '<')
+                    {
                         deslocamento = 18; // corpo direito
-                    } else if (c == '>') {
+                    }
+                    else if (c == '>')
+                    {
                         deslocamento = 19; // corpo direito
                     }
 
@@ -207,13 +246,17 @@ Mapa *carregarMapa(const char *caminhoArquivo)
                     inserirObstaculo(novoMapa, el);
 
                     Obstaculo *obs = (Obstaculo *)el->objeto;
-                    if (c == '!' || c == ']') {
+                    if (c == '!' || c == ']')
+                    {
                         obs->tipoColisao = COLISAO_RAMPA_BAIXO_DIREITA;
-                    } else if (c == '&' || c == '{') {
+                    }
+                    else if (c == '&' || c == '{')
+                    {
                         obs->tipoColisao = COLISAO_RAMPA_BAIXO_ESQUERDA;
                     }
-
-                } else if (c == '+') {
+                }
+                else if (c == '+')
+                {
                     // pega o deslocamento do tile do cano na spritesheet
                     // use o mesmo deslocamento do topo do cano normal que já
                     // existe
@@ -488,13 +531,11 @@ Mapa *carregarMapa(const char *caminhoArquivo)
                         inimigo = criarInimigo(TIPO_INIMIGO_FLORCARNIVORA);
 
                         inimigo->objeto = criarInimigoFlorCarnivora(
-                            (Rectangle){.x = novoMapa->dimensaoPadraoElementos *
-                                             colunaAtual,
-                                        .y = novoMapa->dimensaoPadraoElementos *
-                                                 linhaAtual -
-                                             21,
-                                        .width = 128,
-                                        .height = 128},
+                            (Rectangle){
+                                .x = novoMapa->dimensaoPadraoElementos * colunaAtual + 48, // ao lado do cano
+                                .y = novoMapa->dimensaoPadraoElementos * (linhaAtual - 1) + 10,
+                                .width = 32,
+                                .height = 42},
                             BLUE);
 
                         el->objeto = inimigo;
@@ -551,7 +592,7 @@ void destruirMapa(Mapa *m)
         el = m->obstaculos;
         while (el != NULL)
         {
-            //printf("  destruindo obstaculo %p\n", (void *)el);
+            // printf("  destruindo obstaculo %p\n", (void *)el);
 
             destruirObstaculo((Obstaculo *)el->objeto);
             ElementoMapa *t = el;
