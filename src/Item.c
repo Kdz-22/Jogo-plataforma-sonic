@@ -41,15 +41,19 @@ void destruirItem(Item *item)
         {
         case TIPO_ITEM_ANEL:
             destruirItemAnel((ItemAnel *)item->objeto);
+                        printf("    -> destruindo ItemAnel\n");
             break;
         case TIPO_ITEM_ANEL_AZUL:
             destruirItemAnelAzul((ItemAnelAzul *)item->objeto);
+                        printf("    -> destruindo ItemAnelAzul\n");
             break;
         case TIPO_ITEM_COGUMELO_VERMELHO:
             destruirItemCogumeloVermelho((ItemCogumeloVermelho *)item->objeto);
+                        printf("    -> destruindo ItemCogumeloVermelho\n");
             break;
         case TIPO_ITEM_FLOR_PRETA:
             destruirItemFlorPreta((ItemFlorPreta *)item->objeto);
+                        printf("    -> destruindo ItemFlorPreta\n");
             break;
         default:
             break;
