@@ -68,21 +68,14 @@ void loadResourcesResourceManager(void)
         "resources/imagens/hud/hud.png",
         (Color[]){
             {16, 112, 132, 255},
-        },
-        (Color[]){
-            BLANK,
-        },
-        1);
-
-    rm.texturaHUD2 = carregarTexturaAlterandoCores(
-        "resources/imagens/hud/hud.png",
-        (Color[]){
             {25, 214, 247, 255},
+
         },
         (Color[]){
             BLANK,
+            BLANK,
         },
-        1);
+        2);
 
     rm.texturaItensAnimadosMario = carregarTexturaAlterandoCores(
         "resources/imagens/itens/itens-animados-mario.png",
