@@ -1003,6 +1003,7 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                 if (j->estado >= ESTADO_JOGADOR_PULANDO &&
                     j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
                 {
+                    j->vel.y = j->velPulo;
 
                     if (koopared->estado == ESTADO_KOOPA_ANDANDO)
                     {
@@ -1011,29 +1012,82 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                         koopared->ret.width = 32;
                         koopared->ret.height = 34;
                         koopared->ret.y -= 6;
-                        j->vel.y = j->velPulo;
+
+                        // Ganha pontos por derrubar o Koopa
                         PlaySound(rm.somHitInimigo);
                         int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                         p->score += tabelaComboAereo[idx];
                         p->comboAereo++;
                     }
+                    // Quando pular em cima do casco parado
                     else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
                     {
-                        // Casco parado -> correndo
+                        // Ativa o casco correndo com animação de 4 quadros
                         koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                        koopared->velAndando = 300;
-                        j->vel.y = j->velPulo;
+                        koopared->velAndando = 350;
+
+                        // Define a direção baseado na posição do Sonic em relação ao casco
+                        if (retColCalculado.x + retColCalculado.width / 2 <
+                            koopared->ret.x + koopared->ret.width / 2)
+                        {
+                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
+                        }
+                        else
+                        {
+                            koopared->olhandoParaDireita = true; // Casco vai para a direita
+                        }
+
+                        // Ganha pontos por chutar o casco
                         PlaySound(rm.somHitInimigo);
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx];
+                        p->comboAereo++;
+                    }
+                    // Se o casco estiver correndo e o Sonic pular em cima, ele quebra/morre
+                    else if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO)
+                    {
+                        // Sonic destrói o casco correndo
+                        koopared->estado = ESTADO_KOOPA_MORRENDO;
+                        koopared->ativo = false; // Ou deixa a animação de morte tocar
+
+                        PlaySound(rm.somHitInimigo);
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx] * 2; // Bônus maior por destruir o casco
+                        p->comboAereo++;
                     }
                 }
                 else
                 {
+                    // Koopa Red SEMPRE causa dano, mesmo se estiver invulnerável
+                    bool causouDano = false;
 
-                    // Verifica se o Koopa está em casco correndo ou andando normal
-                    if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO ||
-                        koopared->estado == ESTADO_KOOPA_ANDANDO)
+                    // Caso especial: Se o Koopa estiver em casco parado e o Sonic trombar
+                    // pelas laterais, ele chuta o casco em vez de tomar dano
+                    if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
                     {
-                        // Causa dano no Sonic
+                        // Sonic chuta o casco parado
+                        koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
+                        koopared->velAndando = 350;
+
+                        // Define a direção baseado em qual lado o Sonic está
+                        if (retColCalculado.x + retColCalculado.width / 2 <
+                            koopared->ret.x + koopared->ret.width / 2)
+                        {
+                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
+                        }
+                        else
+                        {
+                            koopared->olhandoParaDireita = true; // Casco vai para a direita
+                        }
+
+                        PlaySound(rm.somHitInimigo);
+                        // Não ganha pontos por chutar, apenas evita o dano
+                        // (ou pode ganhar poucos pontos se quiser)
+                        // p->score += 50;
+                    }
+                    else
+                    {
+                        // Casco correndo OU Koopa andando -> causa dano no Sonic
                         if (p->quantidadeAneis > 0)
                         {
                             p->quantidadeAneis = 0;
@@ -1045,23 +1099,7 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                             PlaySound(rm.somMorte);
                         }
                         j->invulneravel = true;
-                    }
-                    // Se o Koopa estiver em casco parado, o Sonic chuta o casco em vez de tomar dano
-                    else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
-                    {
-                        // Sonic chuta o casco
-                        koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                        koopared->velAndando = 350;
-                        // Direciona o casco
-                        if (retColCalculado.x < koopared->ret.x)
-                        {
-                            koopared->olhandoParaDireita = true;
-                        }
-                        else
-                        {
-                            koopared->olhandoParaDireita = false;
-                        }
-                        PlaySound(rm.somHitInimigo);
+                        causouDano = true;
                     }
                 }
                 return; // Processa apenas uma colisão por frame

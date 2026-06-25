@@ -1447,7 +1447,6 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     m->estado == ESTADO_MARIO_CAINDO ||
                     m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
                 {
-
                     m->vel.y = m->velPulo;
 
                     if (koopared->estado == ESTADO_KOOPA_ANDANDO)
@@ -1457,50 +1456,80 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         koopared->ret.width = 32;
                         koopared->ret.height = 34;
                         koopared->ret.y -= 6;
+
+                        // Ganha pontos por derrubar o Koopa
+                        PlaySound(rm.somHitInimigo);
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx];
+                        p->comboAereo++;
                     }
+                    // Quando pular em cima do casco parado
                     else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
                     {
-                        // Casco parado -> correndo
+                        // Ativa o casco correndo com animação de 4 quadros
                         koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
-                        koopared->velAndando = 300;
+                        koopared->velAndando = 350;
+
+                        // Define a direção baseado na posição do Mario em relação ao casco
+                        if (retColCalculado.x + retColCalculado.width / 2 <
+                            koopared->ret.x + koopared->ret.width / 2)
+                        {
+                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
+                        }
+                        else
+                        {
+                            koopared->olhandoParaDireita = true; // Casco vai para a direita
+                        }
+
+                        // Ganha pontos por chutar o casco
+                        PlaySound(rm.somHitInimigo);
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx];
+                        p->comboAereo++;
                     }
-                    PlaySound(rm.somHitInimigo);
-                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
-                    p->score += tabelaComboAereo[idx];
-                    p->comboAereo++;
+                    // Se o casco estiver correndo e o Mario pular em cima, ele quebra/morre
+                    else if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO)
+                    {
+                        // Mario destrói o casco correndo
+                        koopared->estado = ESTADO_KOOPA_MORRENDO;
+                        koopared->ativo = false; // Ou deixa a animação de morte tocar
+
+                        PlaySound(rm.somHitInimigo);
+                        int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                        p->score += tabelaComboAereo[idx] * 2; // Bônus maior por destruir o casco
+                        p->comboAereo++;
+                    }
                 }
                 else
                 {
                     // Koopa Red SEMPRE causa dano, mesmo se estiver invulnerável
-                    // (Remove o if (!m->invulneravel))
+                    bool causouDano = false;
 
-                    // Verifica se o Koopa está em estado de casco correndo
-                    if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO)
+                    // Caso especial: Se o Koopa estiver em casco parado e o Mario trombar
+                    // pelas laterais, ele chuta o casco em vez de tomar dano
+                    if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
                     {
-                        // Se o casco estiver correndo, ele causa dano
-                        if (m->grande)
+                        // Mario chuta o casco parado
+                        koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
+                        koopared->velAndando = 350;
+
+                        // Define a direção baseado em qual lado o Mario está
+                        if (retColCalculado.x + retColCalculado.width / 2 <
+                            koopared->ret.x + koopared->ret.width / 2)
                         {
-                            m->grande = false;
-                            m->ret.width = m->retOriginal.width;
-                            m->ret.height = m->retOriginal.height;
-                            m->ret.y -= m->ret.height;
-                            PlaySound(rm.somHitComAnel);
-                        }
-                        else if (p->quantidadeAneis > 0)
-                        {
-                            p->quantidadeAneis = 0;
-                            PlaySound(rm.somHitComAnel);
+                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
                         }
                         else
                         {
-                            p->quantidadeVidas--;
-                            PlaySound(rm.somMorte);
+                            koopared->olhandoParaDireita = true; // Casco vai para a direita
                         }
-                        m->invulneravel = true;
+
+                        PlaySound(rm.somHitInimigo);
+                        // Não ganha pontos por chutar, apenas evita o dano
                     }
-                    // Se o Koopa estiver andando normal ou casco parado, também causa dano
                     else
                     {
+                        // Casco correndo OU Koopa andando -> causa dano
                         if (m->grande)
                         {
                             m->grande = false;
@@ -1520,6 +1549,7 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                             PlaySound(rm.somMorte);
                         }
                         m->invulneravel = true;
+                        causouDano = true;
                     }
                 }
                 return; // Processa apenas uma colisão por frame
