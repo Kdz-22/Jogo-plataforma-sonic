@@ -21,9 +21,6 @@
 
 #include "raylib/raylib.h"
 #include "raylib/raymath.h"
-// #define RAYGUI_IMPLEMENTATION    // to use raygui, comment these three lines.
-// #include "raylib/raygui.h"       // other compilation units must only include
-// #undef RAYGUI_IMPLEMENTATION     // raygui.h
 
 static void desenharFundo(GameWorld *gw);
 static void atualizarCamera(GameWorld *gw);
@@ -49,8 +46,6 @@ GameWorld *createGameWorld(void)
 
     gw->personagemSelecionado = 0;
 
-    gw->estado = ESTADO_JOGO_SELECAO_PERSONAGEM;
-
     gw->estado = ESTADO_JOGO_TELA_INICIAL;
     gw->tempoTelaInicial = 0.0f;
     gw->teclaPressionada = false;
@@ -65,9 +60,15 @@ void destroyGameWorld(GameWorld *gw)
 {
     if (gw != NULL)
     {
-        destruirMapa(gw->mapa);
-        gw->personagem->funcoes->destruir(gw->personagem->dados);
-        free(gw->personagem);
+        if (gw->mapa != NULL)
+        {
+            destruirMapa(gw->mapa);
+        }
+        if (gw->personagem != NULL)
+        {
+            gw->personagem->funcoes->destruir(gw->personagem->dados);
+            free(gw->personagem);
+        }
         free(gw);
     }
 }
@@ -132,42 +133,100 @@ void updateGameWorld(GameWorld *gw, float delta)
             return;
         }
 
-        atualizarMapa(gw->mapa, gw, delta);
-        gw->personagem->funcoes->entrada(gw->personagem->dados, gw->personagem,
-                                         delta);
-        gw->personagem->funcoes->atualizar(gw->personagem->dados,
-                                           gw->personagem, gw, delta);
-
-        gw->personagem->time += delta;
-
-        if (gw->estado == ESTADO_JOGO_JOGANDO)
+        if (gw->mapa != NULL && gw->personagem != NULL)
         {
-            atualizarCamera(gw);
-        }
-        // GAMEOVER
-        if (gw->personagem->quantidadeVidas < 0)
-        {
-            gw->estado = ESTADO_JOGO_GAMEOVER;
+            atualizarMapa(gw->mapa, gw, delta);
+            gw->personagem->funcoes->entrada(gw->personagem->dados, gw->personagem,
+                                             delta);
+            gw->personagem->funcoes->atualizar(gw->personagem->dados,
+                                               gw->personagem, gw, delta);
+
+            gw->personagem->time += delta;
+
+            if (gw->estado == ESTADO_JOGO_JOGANDO)
+            {
+                atualizarCamera(gw);
+            }
+            // GAMEOVER
+            if (gw->personagem->quantidadeVidas < 0)
+            {
+                gw->estado = ESTADO_JOGO_GAMEOVER;
+                gw->tempoTelaInicial = 0.0f;
+            }
         }
     }
     else if (gw->estado == ESTADO_JOGO_GAMEOVER)
     {
+        gw->tempoTelaInicial += delta;
 
-        // Se GAMEOVER apertar R p/reiniciar
+        // Se GAMEOVER apertar R para reiniciar (versão simples - sem destruir nada)
         if (IsKeyPressed(KEY_R))
         {
-            reiniciar(gw);
+            printf("=== REINICIANDO JOGO (SIMPLES) ===\n");
 
-            // reset do jogo
-            gw->personagem->quantidadeVidas = 3;
-            gw->personagem->quantidadeAneis = 0;
-            gw->personagem->score = 0;
-            gw->personagem->comboAereo = 0;
-            gw->personagem->time = 0.0f;
+            // Reseta os dados do personagem
+            if (gw->personagem != NULL)
+            {
+                gw->personagem->quantidadeVidas = 3;
+                gw->personagem->quantidadeAneis = 0;
+                gw->personagem->score = 0;
+                gw->personagem->comboAereo = 0;
+                gw->personagem->time = 0.0f;
+                gw->personagem->funcoes->resetar(gw->personagem->dados);
+            }
 
-            gw->personagem->funcoes->resetar(gw->personagem->dados);
+            // Reposiciona o personagem no início
+            if (gw->personagem != NULL && gw->mapa != NULL)
+            {
+                int alturaMapa = calcularAlturaMapa(gw->mapa);
+                int screenWidth = GetScreenWidth();
 
+                if (gw->personagemSelecionado == 0)
+                {
+                    Mario *m = (Mario *)gw->personagem->dados;
+                    m->ret.x = screenWidth / 2 + 144;
+                    m->ret.y = alturaMapa - 400;
+                    m->vel = (Vector2){0};
+                    m->quantidadePulos = 0;
+                    m->estado = ESTADO_MARIO_PARADO;
+                    m->invulneravel = false;
+                    m->grande = false;
+                    m->pulandoGirando = false;
+                    m->freando = false;
+                    // Reseta o retOriginal
+                    m->retOriginal = m->ret;
+                }
+                else
+                {
+                    Jogador *j = (Jogador *)gw->personagem->dados;
+                    j->ret.x = screenWidth / 2 + 144;
+                    j->ret.y = alturaMapa - 400;
+                    j->vel = (Vector2){0};
+                    j->quantidadePulos = 0;
+                    j->estado = ESTADO_JOGADOR_PARADO;
+                    j->invulneravel = false;
+                    j->freando = false;
+                }
+            }
+
+            // Volta para o jogo
             gw->estado = ESTADO_JOGO_JOGANDO;
+            printf("=== REINICIO CONCLUÍDO ===\n");
+            return;
+        }
+        // Se apertar M, volta para a tela inicial
+        else if (IsKeyPressed(KEY_M))
+        {
+            printf("=== VOLTANDO AO MENU ===\n");
+            gw->estado = ESTADO_JOGO_TELA_INICIAL;
+            gw->tempoTelaInicial = 0.0f;
+            gw->teclaPressionada = false;
+
+            if (IsMusicStreamPlaying(rm.musicaFase01))
+            {
+                StopMusicStream(rm.musicaFase01);
+            }
+            return;
         }
     }
     else if (gw->estado == ESTADO_JOGO_PROXIMA_FASE)
@@ -175,7 +234,7 @@ void updateGameWorld(GameWorld *gw, float delta)
         printf("proximaFase = %s\n", gw->proximaFase);
         printf("destruindo mapa...\n");
         destruirMapa(gw->mapa);
-        gw->mapa = NULL; // evita double free
+        gw->mapa = NULL;
         printf("carregando novo mapa...\n");
         gw->mapa = carregarMapa(gw->proximaFase);
         printf("resetando personagem...\n");
@@ -220,10 +279,6 @@ void drawGameWorld(GameWorld *gw)
         DrawText("DIMINUIR = -", 640, 105, 20, YELLOW);
         desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
                           (Vector2){700, 45});
-        // desenharTexto(rm.texturaHUD2,
-        //               "VOL",
-        //             (Vector2){660, 48},
-        //           2.0f);
 
         // Score
         DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
@@ -238,7 +293,7 @@ void drawGameWorld(GameWorld *gw)
                        (Rectangle){20, 75, 80, 32}, (Vector2){0, 0}, 0.0f,
                        WHITE);
 
-        Vector2 posVidas = {20, 380}; // muda só aqui para mover tudo junto
+        Vector2 posVidas = {20, 380};
 
         // Life (fotinha do Sonic)
         DrawTexturePro(rm.texturaHUD, (Rectangle){40, 400, 16, 16},
@@ -262,8 +317,6 @@ void drawGameWorld(GameWorld *gw)
                       (Vector2){94, 45});
         desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeAneis,
                           (Vector2){110, 75});
-
-        // DrawFPS( 700, 15 );
     }
     else if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM)
     {
@@ -316,19 +369,32 @@ void drawGameWorld(GameWorld *gw)
     }
     else if (gw->estado == ESTADO_JOGO_GAMEOVER)
     {
-
         ClearBackground(BLACK);
 
         int larguraTela = GetScreenWidth();
         int alturaTela = GetScreenHeight();
 
-        int tamTexto1 = MeasureText("GAME OVER", 40);
-        DrawText("GAME OVER", larguraTela / 2 - tamTexto1 / 2,
-                 alturaTela / 2 - 40, 40, RED);
+        // Efeito de fade/pisca no título
+        float alpha = 0.5f + 0.5f * sinf(gw->tempoTelaInicial * 3.0f);
 
-        int tamTexto2 = MeasureText("PRESSIONE 'R' PARA REINICIAR", 20);
-        DrawText("PRESSIONE 'R' PARA REINICIAR",
-                 larguraTela / 2 - tamTexto2 / 2, alturaTela / 2 + 20, 20,
+        // Título GAME OVER
+        int tamTexto1 = MeasureText("GAME OVER", 60);
+        DrawText("GAME OVER", larguraTela / 2 - tamTexto1 / 2,
+                 alturaTela / 2 - 80, 60, (Color){255, 0, 0, (unsigned char)(alpha * 255)});
+
+        // Mensagem para reiniciar (piscando)
+        if ((int)(gw->tempoTelaInicial * 1.5f) % 2 == 0)
+        {
+            int tamTexto2 = MeasureText("PRESSIONE 'R' PARA REINICIAR", 25);
+            DrawText("PRESSIONE 'R' PARA REINICIAR",
+                     larguraTela / 2 - tamTexto2 / 2, alturaTela / 2 + 20, 25,
+                     YELLOW);
+        }
+
+        // Mensagem para voltar à tela inicial
+        int tamTexto3 = MeasureText("PRESSIONE 'M' PARA VOLTAR AO MENU", 20);
+        DrawText("PRESSIONE 'M' PARA VOLTAR AO MENU",
+                 larguraTela / 2 - tamTexto3 / 2, alturaTela / 2 + 70, 20,
                  LIGHTGRAY);
     }
     EndDrawing();
@@ -359,7 +425,7 @@ static void desenharTelaInicial(GameWorld *gw)
         // Calcula a escala para caber na tela mantendo a proporção
         float scaleX = (float)GetScreenWidth() / textura.width;
         float scaleY = (float)GetScreenHeight() / textura.height;
-        float scale = fmin(scaleX, scaleY); // Mantém a proporção
+        float scale = fmin(scaleX, scaleY);
 
         float destWidth = textura.width * scale;
         float destHeight = textura.height * scale;
@@ -449,44 +515,94 @@ static void atualizarCamera(GameWorld *gw)
 
 static void inicializar(GameWorld *gw)
 {
-
-    // gw->mapa = carregarMapa( "resources/mapas/mapaTeste.txt" );
-    // gw->mapa = carregarMapa( "resources/mapas/mapa01.txt" );
+    // Carrega o mapa
     gw->mapa = carregarMapa("resources/mapas/yoshi-island-1.txt");
+
+    if (gw->mapa == NULL)
+    {
+        printf("ERRO: Não foi possível carregar o mapa!\n");
+        return;
+    }
+
+    int alturaMapa = calcularAlturaMapa(gw->mapa);
+    int screenWidth = GetScreenWidth();
+
     if (gw->personagemSelecionado == 0)
     {
-        gw->personagem = criarMario(GetScreenWidth() / 2 + 144,
-                                    calcularAlturaMapa(gw->mapa) - 400, 96, 96);
+        gw->personagem = criarMario(screenWidth / 2 + 144,
+                                    alturaMapa - 400, 96, 96);
     }
     else
     {
-        gw->personagem = criarSonic(GetScreenWidth() / 2 + 144,
-                                    calcularAlturaMapa(gw->mapa) - 400, 96, 96);
+        gw->personagem = criarSonic(screenWidth / 2 + 144,
+                                    alturaMapa - 400, 96, 96);
+    }
+
+    if (gw->personagem == NULL)
+    {
+        printf("ERRO: Não foi possível criar o personagem!\n");
+        return;
     }
 
     gw->camera = (Camera2D){
-        .offset = {0},    // deslocamento relativo da câmera em relação ao alvo
-        .target = {0},    // o alvo da câmera, ou seja, a coordenada em que ela
-                          // está centralizada
-        .rotation = 0.0f, // rotação da câmera em graus. o pivô é o alvo.
-        .zoom = 0.9f      // zoom da câmera. 1.0f significa sem escala
-    };
+        .offset = {0},
+        .target = {0},
+        .rotation = 0.0f,
+        .zoom = 0.9f};
 
     gw->gravidade = 900;
 }
 
 static void reiniciar(GameWorld *gw)
 {
+    printf("=== REINICIANDO JOGO (DURANTE O JOGO) ===\n");
 
-    destruirMapa(gw->mapa);
-    gw->personagem->funcoes->destruir(gw->personagem->dados);
-
+    // Para a música se estiver tocando
     if (IsMusicStreamPlaying(rm.musicaFase01))
     {
         StopMusicStream(rm.musicaFase01);
+        printf("Música parada.\n");
     }
 
+    // Salva a seleção de personagem antes de destruir
+    int personagemSelecionado = gw->personagemSelecionado;
+
+    // Destroi o mapa atual
+    if (gw->mapa != NULL)
+    {
+        printf("Destruindo mapa...\n");
+        destruirMapa(gw->mapa);
+        gw->mapa = NULL;
+        printf("Mapa destruído.\n");
+    }
+
+    // Destroi o personagem atual
+    if (gw->personagem != NULL)
+    {
+        printf("Destruindo personagem...\n");
+        gw->personagem->funcoes->destruir(gw->personagem->dados);
+        free(gw->personagem);
+        gw->personagem = NULL;
+        printf("Personagem destruído.\n");
+    }
+
+    // Recria o mapa e o personagem
+    printf("Recriando mapa e personagem...\n");
+    gw->personagemSelecionado = personagemSelecionado;
     inicializar(gw);
+
+    // Reseta os dados do personagem (vidas, anéis, score, etc)
+    if (gw->personagem != NULL)
+    {
+        gw->personagem->quantidadeVidas = 3;
+        gw->personagem->quantidadeAneis = 0;
+        gw->personagem->score = 0;
+        gw->personagem->comboAereo = 0;
+        gw->personagem->time = 0.0f;
+        gw->personagem->funcoes->resetar(gw->personagem->dados);
+    }
+
+    printf("=== REINICIO CONCLUÍDO ===\n");
 }
 
 static void desenharPontuacao(Texture2D hud, int valor, Vector2 posicao)
@@ -522,7 +638,6 @@ static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao)
 
     char buffer[16];
     sprintf(buffer, "%d:%02d", minutos, segundos);
-    // printf("%s\n", buffer);
 
     int digitoW = 8;
     int digitoH = 16;
@@ -564,7 +679,7 @@ static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
     int inicioX = 9;
     int inicioY = 82;
     int espacamento = 2;
-    int cursor = 0; // <-- contador separado para posição X
+    int cursor = 0;
 
     for (int i = 0; texto[i] != '\0'; i++)
     {
@@ -578,7 +693,7 @@ static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
         }
         else if (c == ' ')
         {
-            cursor++; // avança o cursor mas não desenha
+            cursor++;
             continue;
         }
 
