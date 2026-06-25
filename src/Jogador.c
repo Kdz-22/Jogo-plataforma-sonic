@@ -843,7 +843,7 @@ static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p,
                     j->invulneravel = true;
                     return;
                 }
-            } // <-- ESTA CHAVE ESTÁ FALTANDO no seu arquivo
+            }
         }
 
         el = el->proximo;

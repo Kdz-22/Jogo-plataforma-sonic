@@ -19,7 +19,7 @@
 #include "ResourceManager.h"
 #include "Tipos.h"
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 
 static Animacao *getAnimacaoAtualInimigoFlorCarnivora(InimigoFlorCarnivora *flor);
 static void desenharQuadroAnimacaoInimigoFlorCarnivora(InimigoFlorCarnivora *flor,
@@ -65,13 +65,13 @@ InimigoFlorCarnivora *criarInimigoFlorCarnivora(Rectangle ret, Color cor)
         flor->animacaoEspreitando.quadros,
         flor->animacaoEspreitando.quantidadeQuadros,
         500,
-        1, 309, // X=1, Y=309 - boca fechada
+        1, 309, 
         16, 21,
         1,
         false,
         (Rectangle){2, 2, 12, 17});
 
-    // ===== ANIMAÇÃO APARECENDO (2 quadros - subindo) =====
+    // ===== ANIMAÇÃO APARECENDO
     flor->animacaoAparecendo.quantidadeQuadros = 2;
     flor->animacaoAparecendo.quadroAtual = 0;
     flor->animacaoAparecendo.contadorTempoQuadro = 0.0f;
@@ -90,9 +90,7 @@ InimigoFlorCarnivora *criarInimigoFlorCarnivora(Rectangle ret, Color cor)
         false,
         (Rectangle){2, 2, 12, 17});
 
-    // ===== ANIMAÇÃO ATACANDO (2 quadros - alternando) =====
-    // QUADRO 1: boca fechada (X=1, Y=309)
-    // QUADRO 2: boca aberta (X=35, Y=309)
+    // ===== ANIMAÇÃO ATACANDO 
     flor->animacaoAtacando.quantidadeQuadros = 2;
     flor->animacaoAtacando.quadroAtual = 0;
     flor->animacaoAtacando.contadorTempoQuadro = 0.0f;
