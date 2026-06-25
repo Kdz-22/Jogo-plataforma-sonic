@@ -41,7 +41,7 @@ static void resolverColisaoJogadorObstaculosMapaY(Jogador *j, Mapa *mapa);
 static void resolverColisaoJogadorItensMapa(Jogador *j, Personagem *p, Mapa *mapa);
 static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p, Mapa *mapa);
 
-static const bool MOSTRAR_RETANGULOS = false;
+static const bool MOSTRAR_RETANGULOS = true;
 
 /**
  * @brief Cria uma instância alocada dinamicamente da struct Jogador.
