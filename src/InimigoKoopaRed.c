@@ -102,30 +102,7 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor)
         false,
         (Rectangle){2, 2, 32, 32});
 
-    // SE OS QUADROS ESTIVEREM EM POSIÇÕES DIFERENTES, USE ISSO:
-    /*
-    // Quadro 0
-    novoInimigo->animacaoCascoCorrendo.quadros[0].fonte = (Rectangle){35, 113, 32, 34};
-    novoInimigo->animacaoCascoCorrendo.quadros[0].duracao = 50;
-    novoInimigo->animacaoCascoCorrendo.quadros[0].retColisao = (Rectangle){2, 2, 32, 34};
-
-    // Quadro 1
-    novoInimigo->animacaoCascoCorrendo.quadros[1].fonte = (Rectangle){67, 113, 32, 34};
-    novoInimigo->animacaoCascoCorrendo.quadros[1].duracao = 50;
-    novoInimigo->animacaoCascoCorrendo.quadros[1].retColisao = (Rectangle){2, 2, 32, 34};
-
-    // Quadro 2
-    novoInimigo->animacaoCascoCorrendo.quadros[2].fonte = (Rectangle){99, 113, 32, 34};
-    novoInimigo->animacaoCascoCorrendo.quadros[2].duracao = 50;
-    novoInimigo->animacaoCascoCorrendo.quadros[2].retColisao = (Rectangle){2, 2, 32, 34};
-
-    // Quadro 3
-    novoInimigo->animacaoCascoCorrendo.quadros[3].fonte = (Rectangle){131, 113, 32, 34};
-    novoInimigo->animacaoCascoCorrendo.quadros[3].duracao = 50;
-    novoInimigo->animacaoCascoCorrendo.quadros[3].retColisao = (Rectangle){2, 2, 32, 34};
-    */
-
-    // ===== ANIMAÇÃO MORRENDO =====
+    //ANIMAÇÃO MORRENDO
     novoInimigo->animacaoMorrendo.quantidadeQuadros = 4;
     novoInimigo->animacaoMorrendo.quadroAtual = 0;
     novoInimigo->animacaoMorrendo.contadorTempoQuadro = 0.0f;
@@ -138,13 +115,12 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor)
         novoInimigo->animacaoMorrendo.quadros,
         novoInimigo->animacaoMorrendo.quantidadeQuadros,
         100,
-        67, 113, // posição inicial (ajuste conforme sua sprite sheet)
+        67, 113, // posição inicial
         32, 34,
         0,
         false,
         (Rectangle){0});
 
-    // ===== REGISTRAR ANIMAÇÕES =====
     novoInimigo->animacoes[ESTADO_KOOPA_ANDANDO] = &novoInimigo->animacaoAndando;
     quantidadeAnimacoes++;
 

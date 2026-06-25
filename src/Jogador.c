@@ -21,6 +21,7 @@
 #include "InimigoRex.h"
 #include "InimigoSpikes.h"
 #include "InimigoTonTon.h"
+#include "InimigoFlorCarnivora.h"
 
 #include "Item.h"
 #include "ItemAnel.h"
@@ -1219,6 +1220,63 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
                         PlaySound(rm.somMorte);
                     }
 
+                    j->invulneravel = true;
+                }
+
+                return;
+            }
+        }
+        else if (inimigo->tipo == TIPO_INIMIGO_FLORCARNIVORA)
+        {
+            InimigoFlorCarnivora *flor = (InimigoFlorCarnivora *)inimigo->objeto;
+
+            if (!flor->ativo || flor->estado == ESTADO_FLOR_CARNIVORA_MORRENDO)
+            {
+                el = el->proximo;
+                continue;
+            }
+
+            qaInimigo = getQuadroAnimacaoAtualInimigoFlorCarnivora(flor);
+            ret = &flor->ret;
+
+            float deslocamentoX = flor->olhandoParaDireita
+                                      ? ret->width - qaInimigo->retColisao.x - qaInimigo->retColisao.width
+                                      : qaInimigo->retColisao.x;
+            float deslocamentoY = qaInimigo->retColisao.y;
+
+            Rectangle retColInimigoCalculado = {
+                ret->x + deslocamentoX, ret->y + deslocamentoY,
+                qaInimigo->retColisao.width, qaInimigo->retColisao.height};
+
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
+            {
+                // Sonic só pode matar a flor se estiver pulando (qualquer estado de pulo)
+                if (j->estado >= ESTADO_JOGADOR_PULANDO &&
+                    j->estado <= ESTADO_JOGADOR_PULANDO_CORRENDO)
+                {
+                    // Sonic mata a flor com pulo
+                    flor->estado = ESTADO_FLOR_CARNIVORA_MORRENDO;
+                    flor->ativo = true;
+                    j->vel.y = j->velPulo;
+
+                    PlaySound(rm.somHitInimigo);
+                    int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
+                    p->score += tabelaComboAereo[idx];
+                    p->comboAereo++;
+                }
+                else
+                {
+                    // Sonic toma dano da flor
+                    if (p->quantidadeAneis > 0)
+                    {
+                        p->quantidadeAneis = 0;
+                        PlaySound(rm.somHitComAnel);
+                    }
+                    else
+                    {
+                        p->quantidadeVidas--;
+                        PlaySound(rm.somMorte);
+                    }
                     j->invulneravel = true;
                 }
 
