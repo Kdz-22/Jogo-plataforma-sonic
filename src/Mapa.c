@@ -113,7 +113,7 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
 
                     inserirObstaculo(novoMapa, el);
-                    
+
                     Obstaculo *obs = (Obstaculo *)el->objeto;
                     if (c == 'N' || c == 'Q' || c == 'R' || c == 'U') {
                         obs->tipoColisao = COLISAO_RAMPA_CIMA_DIREITA;
@@ -130,45 +130,45 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                            c == ',' || c == '.' || c == '<' || c == '>') {
                     // mapeia cada caractere para um tile do cano
                     int deslocamento = 0;
-                    if (c == '!')
+                    if (c == '!') {
                         deslocamento = 0; // topo esquerdo do cano
-                    else if (c == '@')
+                    } else if (c == '@') {
                         deslocamento = 1; // topo direito
-                    else if (c == '#')
+                    } else if (c == '#') {
                         deslocamento = 2; // corpo esquerdo
-                    else if (c == '$')
+                    } else if (c == '$') {
                         deslocamento = 3; // corpo direito
-                    else if (c == '%')
+                    } else if (c == '%') {
                         deslocamento = 4; // corpo direito
-                    else if (c == '&')
+                    } else if (c == '&') {
                         deslocamento = 5; // corpo direito
-                    else if (c == '*')
+                    } else if (c == '*') {
                         deslocamento = 6; // corpo direito
-                    else if (c == '(')
+                    } else if (c == '(') {
                         deslocamento = 7; // corpo direito
-                    else if (c == ')')
+                    } else if (c == ')') {
                         deslocamento = 8; // corpo direito
-                    else if (c == '[')
+                    } else if (c == '[') {
                         deslocamento = 9; // corpo direito
-                    else if (c == ']')
+                    } else if (c == ']') {
                         deslocamento = 10; // corpo direito
-                    else if (c == '{')
+                    } else if (c == '{') {
                         deslocamento = 11; // corpo direito
-                    else if (c == '}')
+                    } else if (c == '}') {
                         deslocamento = 12; // corpo direito
-                    else if (c == '?')
+                    } else if (c == '?') {
                         deslocamento = 13; // corpo direito
-                    else if (c == ';')
+                    } else if (c == ';') {
                         deslocamento = 14; // corpo direito
-                    else if (c == ':')
+                    } else if (c == ':') {
                         deslocamento = 15; // corpo direito
-                    else if (c == ',')
+                    } else if (c == ',') {
                         deslocamento = 16; // corpo direito
-                    else if (c == '.')
+                    } else if (c == '.') {
                         deslocamento = 17; // corpo direito
-                    else if (c == '<')
+                    } else if (c == '<') {
                         deslocamento = 18; // corpo direito
-                    else if (c == '>') {
+                    } else if (c == '>') {
                         deslocamento = 19; // corpo direito
                     }
 
@@ -190,6 +190,13 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
 
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
                     inserirObstaculo(novoMapa, el);
+
+                    Obstaculo *obs = (Obstaculo *)el->objeto;
+                    if (c == '!' || c == ']') {
+                        obs->tipoColisao = COLISAO_RAMPA_BAIXO_DIREITA;
+                    } else if (c == '&' || c == '{') {
+                        obs->tipoColisao = COLISAO_RAMPA_BAIXO_ESQUERDA;
+                    }
 
                 } else if (c == '+') {
                     // pega o deslocamento do tile do cano na spritesheet

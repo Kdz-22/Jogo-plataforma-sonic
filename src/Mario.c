@@ -50,8 +50,7 @@ static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw);
 static const bool MOSTRAR_RETANGULOS = true;
 static PersonagemFuncoes marioFuncoes;
 
-Personagem *criarMario(float x, float y, float w, float h)
-{
+Personagem *criarMario(float x, float y, float w, float h) {
 
     Personagem *p = (Personagem *)malloc(sizeof(Personagem));
 
@@ -518,13 +517,10 @@ Personagem *criarMario(float x, float y, float w, float h)
 /**
  * @brief Destrói um objeto Jogador e libera seus recursos.
  */
-void destruirMario(void *dados)
-{
+void destruirMario(void *dados) {
     Mario *m = (Mario *)dados;
-    if (m != NULL)
-    {
-        for (int i = 0; i < m->quantidadeAnimacoes; i++)
-        {
+    if (m != NULL) {
+        for (int i = 0; i < m->quantidadeAnimacoes; i++) {
             destruirQuadrosAnimacao(m->animacoes[i]);
         }
         free(m);
@@ -534,8 +530,7 @@ void destruirMario(void *dados)
 /**
  * @brief Lê a entrada do usuário e atualiza as velocidades do jogador.
  */
-void entradaMario(void *dados, Personagem *p, float delta)
-{
+void entradaMario(void *dados, Personagem *p, float delta) {
     Mario *m = (Mario *)dados;
 
     // EstadoJogador estadoAnterior = m->estado;
@@ -558,183 +553,125 @@ void entradaMario(void *dados, Personagem *p, float delta)
                         IsGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN));
     bool shiftDown = IsKeyDown(KEY_LEFT_SHIFT);
 
-    if (direitaDown)
-    {
+    if (direitaDown) {
 
-        if (!shiftDown)
-        {
-            if (m->vel.x < 0)
-            {
+        if (!shiftDown) {
+            if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
                     // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x > 0)
-                {
+                if (m->vel.x > 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x += m->aceleracao * delta;
-                if (m->vel.x > m->velAndando)
-                {
+                if (m->vel.x > m->velAndando) {
                     m->vel.x = m->velAndando;
                 }
             }
             m->olhandoParaDireita = true;
-        }
-        else
-        {
-            if (m->vel.x < 0)
-            {
+        } else {
+            if (m->vel.x < 0) {
                 m->vel.x += m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
                     // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x > 0)
-                {
+                if (m->vel.x > 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x += m->aceleracao * delta;
-                if (m->vel.x > m->velCorrendo)
-                {
+                if (m->vel.x > m->velCorrendo) {
                     m->vel.x = m->velCorrendo;
                 }
             }
             m->olhandoParaDireita = true;
         }
-    }
-    else if (esquerdaDown)
-    {
+    } else if (esquerdaDown) {
 
-        if (!shiftDown)
-        {
-            if (m->vel.x > 0)
-            {
+        if (!shiftDown) {
+            if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_ANDANDO) {
                     // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
-                if (m->vel.x < 0)
-                {
+                if (m->vel.x < 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            {
+            } else {
                 m->vel.x -= m->aceleracao * delta;
-                if (m->vel.x < -m->velAndando)
-                {
+                if (m->vel.x < -m->velAndando) {
                     m->vel.x = -m->velAndando;
                 }
             }
             m->olhandoParaDireita = false;
-        }
-        else
-        { // shiftdown
-            if (m->vel.x > 0)
-            {
+        } else { // shiftdown
+            if (m->vel.x > 0) {
                 m->vel.x -= m->frenagem * delta;
-                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO)
-                {
+                if (!m->freando && m->estado == ESTADO_MARIO_CORRENDO) {
                     // PlaySound(rm.somFrenagem);
                     m->freando = true;
                 }
 
-                if (m->vel.x < 0)
-                {
+                if (m->vel.x < 0) {
                     m->vel.x = 0;
                     m->freando = false;
                 }
-            }
-            else
-            { // velo > 0
+            } else { // velo > 0
                 m->vel.x -= m->aceleracao * delta;
-                if (m->vel.x < -m->velCorrendo)
-                {
+                if (m->vel.x < -m->velCorrendo) {
                     m->vel.x = -m->velCorrendo;
                 }
             }
             m->olhandoParaDireita = false;
         }
-    }
-    else
-    { // esquerdadown
-        if (m->vel.x > 0)
-        {
+    } else { // esquerdadown
+        if (m->vel.x > 0) {
             m->vel.x -= m->desaceleracao * delta;
-            if (m->vel.x < 0)
-            {
+            if (m->vel.x < 0) {
                 m->vel.x = 0;
             }
-        }
-        else if (m->vel.x < 0)
-        {
+        } else if (m->vel.x < 0) {
             m->vel.x += m->desaceleracao * delta;
-            if (m->vel.x > 0)
-            {
+            if (m->vel.x > 0) {
                 m->vel.x = 0;
             }
         }
     }
 
     float absVelX = fabsf(m->vel.x);
-    if (m->quantidadePulos > 0)
-    {
-        if (m->pulandoGirando)
-        {
+    if (m->quantidadePulos > 0) {
+        if (m->pulandoGirando) {
             m->estado = ESTADO_MARIO_PULANDO_GIRANDO;
-        }
-        else if (m->vel.y < 0)
-        {
-            if (absVelX <= m->velAndando)
-            {
+        } else if (m->vel.y < 0) {
+            if (absVelX <= m->velAndando) {
                 m->estado = ESTADO_MARIO_PULANDO;
-            }
-            else
-            {
+            } else {
                 m->estado = ESTADO_MARIO_PULANDO_CORRENDO;
             }
-        }
-        else
-        {
+        } else {
             m->estado = ESTADO_MARIO_CAINDO;
         }
-    }
-    else if (baixoDown)
-    {
+    } else if (baixoDown) {
         m->estado = ESTADO_MARIO_ABAIXADO;
         m->vel.x = 0;
-    }
-    else if (absVelX < 1.0f)
-    {
+    } else if (absVelX < 1.0f) {
         m->estado = ESTADO_MARIO_PARADO;
-    }
-    else if (absVelX <= m->velAndando)
-    {
+    } else if (absVelX <= m->velAndando) {
         m->estado = ESTADO_MARIO_ANDANDO;
-    }
-    else
-    {
+    } else {
         m->estado = ESTADO_MARIO_CORRENDO;
     }
 
     if ((puloPressed || pulandoGirandoPressed) &&
-        m->quantidadePulos < m->quantidadeMaxPulos)
-    {
+        m->quantidadePulos < m->quantidadeMaxPulos) {
         m->vel.y = m->velPulo;
         m->quantidadePulos++;
         m->pulandoGirando = pulandoGirandoPressed;
@@ -753,17 +690,14 @@ void entradaMario(void *dados, Personagem *p, float delta)
 /**
  * @brief Aplica física e resolve colisões do jogador com o mundo.
  */
-void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
-{
+void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta) {
     Mario *m = (Mario *)dados;
 
-    if (m->estado < ESTADO_MARIO_PULANDO)
-    {
+    if (m->estado < ESTADO_MARIO_PULANDO) {
         p->comboAereo = 0;
     }
     if (m->estado == ESTADO_MARIO_CRESCENDO &&
-        m->animacaoCrescendo.finalizada)
-    {
+        m->animacaoCrescendo.finalizada) {
         m->estado = ESTADO_MARIO_PARADO;
         m->invulneravel = false;
         // aqui você redimensiona o ret para o tamanho grande
@@ -777,11 +711,10 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
         m->piscaPisca = false;
 
         m->contadorTempoInvulnerabilidade += delta;
-        if (m->contadorTempoInvulnerabilidade >= m->tempoInvulnerabilidade)
-        {
+        if (m->contadorTempoInvulnerabilidade >= m->tempoInvulnerabilidade) {
             m->contadorTempoInvulnerabilidade = 0.0f;
             m->invulneravel = false;
-            m->piscaPisca = true;
+            m->piscaPisca = false;
         }
     }
 
@@ -794,8 +727,7 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
 
     // fase Y: aplica gravidade, move verticalmente e resolve colisões verticais
     m->vel.y += gw->gravidade * delta;
-    if (m->vel.y > m->velMaxQueda)
-    {
+    if (m->vel.y > m->velMaxQueda) {
         m->vel.y = m->velMaxQueda;
     }
     m->ret.y += m->vel.y * delta;
@@ -809,19 +741,16 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta)
 /**
  * @brief Desenha o jogador.
  */
-void desenharMario(void *dados)
-{
+void desenharMario(void *dados) {
 
     Mario *m = (Mario *)dados;
 
-    if (!m->piscaPisca)
-    {
+    if (!m->piscaPisca) {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
         desenharQuadroAnimacaoMario(m, qa, WHITE);
     }
 
-    if (MOSTRAR_RETANGULOS)
-    {
+    if (MOSTRAR_RETANGULOS) {
         DrawRectangleRec(m->ret, Fade(m->cor, 0.5f));
         DrawRectangleLines(m->ret.x, m->ret.y, m->ret.width, m->ret.height,
                            BLACK);
@@ -840,10 +769,8 @@ void resetarMario(void *dados, Personagem *p) {
     m->estado = ESTADO_MARIO_PARADO;
 
     // reseta animações pequenas
-    for (int i = 0; i < ESTADO_MARIO_CRESCENDO + 1; i++)
-    {
-        if (m->animacoes[i] != NULL)
-        {
+    for (int i = 0; i < ESTADO_MARIO_CRESCENDO + 1; i++) {
+        if (m->animacoes[i] != NULL) {
             m->animacoes[i]->quadroAtual = 0;
             m->animacoes[i]->contadorTempoQuadro = 0.0f;
             m->animacoes[i]->finalizada = false;
@@ -851,10 +778,8 @@ void resetarMario(void *dados, Personagem *p) {
     }
 
     // reseta animações grandes
-    for (int i = 0; i < ESTADO_MARIO_ABAIXADO + 1; i++)
-    {
-        if (m->animacoesGrande[i] != NULL)
-        {
+    for (int i = 0; i < ESTADO_MARIO_ABAIXADO + 1; i++) {
+        if (m->animacoesGrande[i] != NULL) {
             m->animacoesGrande[i]->quadroAtual = 0;
             m->animacoesGrande[i]->contadorTempoQuadro = 0.0f;
             m->animacoesGrande[i]->finalizada = false;
@@ -871,11 +796,9 @@ static PersonagemFuncoes marioFuncoes = {
     entradaMario, atualizarMario, desenharMario, destruirMario, resetarMario};
 
 static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa,
-                                        Color tonalidade)
-{
+                                        Color tonalidade) {
 
-    if (qa != NULL)
-    {
+    if (qa != NULL) {
 
         DrawTexturePro(rm.texturaMario,
                        (Rectangle){qa->fonte.x, qa->fonte.y,
@@ -884,8 +807,7 @@ static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa,
                                    qa->fonte.height},
                        m->ret, (Vector2){0}, 0.0f, tonalidade);
 
-        if (MOSTRAR_RETANGULOS)
-        {
+        if (MOSTRAR_RETANGULOS) {
             float xDesenho = m->olhandoParaDireita
                                  ? m->ret.x + qa->retColisao.x
                                  : m->ret.x + m->ret.width - qa->retColisao.x -
@@ -897,19 +819,15 @@ static void desenharQuadroAnimacaoMario(Mario *m, QuadroAnimacao *qa,
     }
 }
 
-static QuadroAnimacao *getQuadroAnimacaoAtualMario(Mario *m)
-{
+static QuadroAnimacao *getQuadroAnimacaoAtualMario(Mario *m) {
     return getQuadroAtualAnimacao(getAnimacaoAtualMario(m));
 }
 
-static Animacao *getAnimacaoAtualMario(Mario *m)
-{
-    if (m->estado == ESTADO_MARIO_CRESCENDO)
-    {
+static Animacao *getAnimacaoAtualMario(Mario *m) {
+    if (m->estado == ESTADO_MARIO_CRESCENDO) {
         return &m->animacaoCrescendo;
     }
-    if (m->grande)
-    {
+    if (m->grande) {
         return m->animacoesGrande[m->estado];
     }
     return m->animacoes[m->estado];
@@ -918,13 +836,11 @@ static Animacao *getAnimacaoAtualMario(Mario *m)
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo X.
  */
-static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
-{
+static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa) {
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
@@ -940,25 +856,19 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido)
-        {
+        if (!o->solido) {
             el = el->proximo;
             continue;
         }
-        if (o->tipoColisao != COLISAO_RETANGULO)
-        {
+        if (o->tipoColisao != COLISAO_RETANGULO) {
             el = el->proximo;
             continue;
         }
-        if (checarColisaoComObstaculo(retColCalculado, o))
-        {
+        if (checarColisaoComObstaculo(retColCalculado, o)) {
             if (retColCalculado.x + retColCalculado.width / 2 <
-                o->ret.x + o->ret.width / 2)
-            {
+                o->ret.x + o->ret.width / 2) {
                 m->ret.x = o->ret.x - qa->retColisao.width - deslocamentoX;
-            }
-            else
-            {
+            } else {
                 m->ret.x = o->ret.x + o->ret.width - deslocamentoX;
             }
             m->vel.x = 0;
@@ -971,13 +881,11 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa)
 /**
  * @brief Resolve colisões do jogador com o mapa no eixo Y.
  */
-static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
-{
+static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
 
     ElementoMapa *el = mapa->obstaculos;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
@@ -993,8 +901,7 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
 
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (!o->solido)
-        {
+        if (!o->solido) {
             el = el->proximo;
             continue;
         }
@@ -1011,8 +918,7 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
             if ((o->eBlocoGiratorio && vindoDeBaixo &&
                  m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando) ||
                 (o->eBlocoGiratorio && vindoDeCima &&
-                 m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando))
-            {
+                 m->estado == ESTADO_MARIO_PULANDO_GIRANDO && !o->quebrando)) {
 
                 m->vel.y = m->velPulo;
                 o->quebrando = true;
@@ -1025,32 +931,25 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
             }
 
             // tratamento especial para rampas
-            if (o->tipoColisao != COLISAO_RETANGULO)
-            {
+            if (o->tipoColisao != COLISAO_RETANGULO) {
                 float xRelativo =
                     (retColCalculado.x + retColCalculado.width / 2) - o->ret.x;
                 float proporcao = xRelativo / o->ret.width;
                 proporcao = Clamp(proporcao, 0.0f, 1.0f);
                 float alturaChao;
 
-                if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA)
-                {
+                if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA) {
                     alturaChao = o->ret.y + (o->ret.height * proporcao);
-                }
-                else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA)
-                {
+                } else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA) {
                     alturaChao =
                         o->ret.y + (o->ret.height * (1.0f - proporcao));
-                }
-                else
-                {
+                } else {
                     alturaChao = o->ret.y + (o->ret.height * proporcao);
                 }
 
                 float basePersonagem =
                     retColCalculado.y + retColCalculado.height;
-                if (basePersonagem >= alturaChao && m->vel.y >= 0)
-                {
+                if (basePersonagem >= alturaChao && m->vel.y >= 0) {
                     m->ret.y =
                         alturaChao - qa->retColisao.height - deslocamentoY;
                     m->vel.y = 0;
@@ -1063,14 +962,11 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
             }
 
             if (retColCalculado.y + retColCalculado.height / 2 <
-                o->ret.y + o->ret.height / 2)
-            {
+                o->ret.y + o->ret.height / 2) {
                 m->ret.y = o->ret.y - qa->retColisao.height - deslocamentoY;
                 m->quantidadePulos = 0;
                 m->pulandoGirando = false;
-            }
-            else
-            {
+            } else {
                 m->ret.y = o->ret.y + o->ret.height - deslocamentoY;
             }
             m->vel.y = 0;
@@ -1080,13 +976,11 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa)
     }
 }
 
-static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
-{
+static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa) {
 
     ElementoMapa *el = mapa->itens;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
 
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
@@ -1102,14 +996,12 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
 
         Item *item = (Item *)el->objeto;
 
-        if (item->tipo == TIPO_ITEM_ANEL)
-        {
+        if (item->tipo == TIPO_ITEM_ANEL) {
 
             ItemAnel *itemAnel = (ItemAnel *)item->objeto;
 
             if (!itemAnel->ativo ||
-                itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO)
-            {
+                itemAnel->estado == ESTADO_ITEM_ANEL_COLETADO) {
                 el = el->proximo;
                 continue;
             }
@@ -1121,22 +1013,18 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                 itemAnel->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemAnel->estado = ESTADO_ITEM_ANEL_COLETADO;
                 p->quantidadeAneis++;
                 p->score += 10;
                 PlaySound(rm.somAnel);
             }
-        }
-        else if (item->tipo == TIPO_ITEM_ANEL_AZUL)
-        {
+        } else if (item->tipo == TIPO_ITEM_ANEL_AZUL) {
 
             ItemAnelAzul *itemAnelAzul = (ItemAnelAzul *)item->objeto;
 
             if (!itemAnelAzul->ativo ||
-                itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO)
-            {
+                itemAnelAzul->estado == ESTADO_ITEM_ANEL_AZUL_COLETADO) {
                 el = el->proximo;
                 continue;
             }
@@ -1149,24 +1037,20 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                 itemAnelAzul->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemAnelAzul->estado = ESTADO_ITEM_ANEL_AZUL_COLETADO;
                 p->quantidadeAneis += 10;
                 p->score += 100;
                 PlaySound(rm.somAnel);
             }
-        }
-        else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO)
-        {
+        } else if (item->tipo == TIPO_ITEM_COGUMELO_VERMELHO) {
 
             ItemCogumeloVermelho *itemCogumeloVermelho =
                 (ItemCogumeloVermelho *)item->objeto;
 
             if (!itemCogumeloVermelho->ativo ||
                 itemCogumeloVermelho->estado ==
-                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO)
-            {
+                    ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO) {
                 el = el->proximo;
                 continue;
             }
@@ -1179,8 +1063,7 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                 itemCogumeloVermelho->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 itemCogumeloVermelho->estado =
                     ESTADO_ITEM_COGUMELO_VERMELHO_COLETADO;
                 p->quantidadeAneis += 10;
@@ -1189,8 +1072,7 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                 printf("Cogumelo vermelho coletado!\n");
 
                 // faz o Mario crescer
-                if (!m->grande)
-                {
+                if (!m->grande) {
                     m->grande = true;
                     m->estado = ESTADO_MARIO_CRESCENDO;
                     m->invulneravel = true;
@@ -1201,14 +1083,11 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                     p->temCogumeloReserva = true;
                 }
             }
-        }
-        else if (item->tipo == TIPO_ITEM_FLOR_PRETA)
-        {
+        } else if (item->tipo == TIPO_ITEM_FLOR_PRETA) {
             ItemFlorPreta *florPreta = (ItemFlorPreta *)item->objeto;
 
             if (!florPreta->ativo ||
-                florPreta->estado == ESTADO_ITEM_FLOR_PRETA_PARADA)
-            {
+                florPreta->estado == ESTADO_ITEM_FLOR_PRETA_PARADA) {
                 el = el->proximo;
                 continue;
             }
@@ -1221,28 +1100,21 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
                 florPreta->ret.y + qaItem->retColisao.y,
                 qaItem->retColisao.width, qaItem->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColItemCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColItemCalculado)) {
                 // Flor Preta só faz dano quando está ATACANDO (COLETADA)
                 if (florPreta->estado == ESTADO_ITEM_FLOR_PRETA_COLETADA &&
-                    !m->invulneravel)
-                {
-                    if (m->grande)
-                    {
+                    !m->invulneravel) {
+                    if (m->grande) {
                         m->grande = false;
                         m->ret.width = m->retOriginal.width;
                         m->ret.height = m->retOriginal.height;
                         m->invulneravel = true;
                         m->ret.y -= m->ret.height;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else if (p->quantidadeAneis > 0)
-                    {
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -1257,14 +1129,12 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa)
 }
 
 static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
-                                             Mapa *mapa)
-{
+                                             Mapa *mapa) {
     ElementoMapa *el = mapa->inimigos;
     // Max = 7 inimigos mortos em sequencia
     static int tabelaComboAereo[] = {100, 200, 500, 1000, 2000, 5000, 10000};
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
         QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
         float deslocamentoX =
@@ -1283,13 +1153,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
         bool *olhandoParaDireita = NULL;
         Rectangle *ret = NULL;
 
-        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG)
-        {
+        if (inimigo->tipo == TIPO_INIMIGO_MOTOBUG) {
             InimigoMotobug *motobug = (InimigoMotobug *)inimigo->objeto;
 
             if (!motobug->ativo ||
-                motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO)
-            {
+                motobug->estado == ESTADO_INIMIGO_MOTOBUG_MORRENDO) {
                 el = el->proximo;
                 continue;
             }
@@ -1308,13 +1176,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
                     m->estado == ESTADO_MARIO_CAINDO ||
-                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
-                {
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     motobug->estado = ESTADO_INIMIGO_MOTOBUG_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1335,14 +1201,10 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         m->invulneravel = true;
                         m->ret.y -= m->ret.height;
                         PlaySound(rm.somHitComAnel); // ou um som de encolher
-                    }
-                    else if (p->quantidadeAneis > 0)
-                    {
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -1351,14 +1213,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
 
                 return; // um inimigo de cada vez!
             }
-        }
-        else if (inimigo->tipo == TIPO_INIMIGO_SPIKES)
-        {
+        } else if (inimigo->tipo == TIPO_INIMIGO_SPIKES) {
             InimigoSpikes *spikes = (InimigoSpikes *)inimigo->objeto;
 
             if (!spikes->ativo ||
-                spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO)
-            {
+                spikes->estado == ESTADO_INIMIGO_SPIKES_MORRENDO) {
                 el = el->proximo;
                 continue;
             }
@@ -1377,13 +1236,11 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
                     m->estado == ESTADO_MARIO_CAINDO ||
-                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
-                {
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
                     spikes->estado = ESTADO_INIMIGO_SPIKES_MORRENDO;
                     PlaySound(rm.somHitInimigo);
@@ -1404,27 +1261,20 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         m->invulneravel = true;
                         m->ret.y -= m->ret.height;
                         PlaySound(rm.somHitComAnel); // ou um som de encolher
-                    }
-                    else if (p->quantidadeAneis > 0)
-                    {
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
                     m->invulneravel = true;
                 }
             }
-        }
-        else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED)
-        {
+        } else if (inimigo->tipo == TIPO_INIMIGO_KOOPARED) {
             InimigoKoopaRed *koopared = (InimigoKoopaRed *)inimigo->objeto;
 
-            if (!koopared->ativo)
-            {
+            if (!koopared->ativo) {
                 el = el->proximo;
                 continue;
             }
@@ -1443,18 +1293,15 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 // Verifica se o Mario está pulando (ataque bem-sucedido)
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
                     m->estado == ESTADO_MARIO_CAINDO ||
-                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
-                {
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     m->vel.y = m->velPulo;
 
-                    if (koopared->estado == ESTADO_KOOPA_ANDANDO)
-                    {
+                    if (koopared->estado == ESTADO_KOOPA_ANDANDO) {
                         // Transforma em casco parado
                         koopared->estado = ESTADO_KOOPA_CASCO_PARADO;
                         koopared->ret.width = 32;
@@ -1466,23 +1313,21 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
                         p->score += tabelaComboAereo[idx];
                         p->comboAereo++;
-                    }
-                    // Quando pular em cima do casco parado
-                    else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
-                    {
+                        // Quando pular em cima do casco parado
+                    } else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO) {
                         // Ativa o casco correndo com animação de 4 quadros
                         koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
                         koopared->velAndando = 350;
 
-                        // Define a direção baseado na posição do Mario em relação ao casco
+                        // Define a direção baseado na posição do Mario em
+                        // relação ao casco
                         if (retColCalculado.x + retColCalculado.width / 2 <
-                            koopared->ret.x + koopared->ret.width / 2)
-                        {
-                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
-                        }
-                        else
-                        {
-                            koopared->olhandoParaDireita = true; // Casco vai para a direita
+                            koopared->ret.x + koopared->ret.width / 2) {
+                            koopared->olhandoParaDireita =
+                                false; // Casco vai para a esquerda
+                        } else {
+                            koopared->olhandoParaDireita =
+                                true; // Casco vai para a direita
                         }
 
                         // Ganha pontos por chutar o casco
@@ -1491,81 +1336,73 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         p->score += tabelaComboAereo[idx];
                         p->comboAereo++;
                     }
-                    // Se o casco estiver correndo e o Mario pular em cima, ele quebra/morre
-                    else if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO)
-                    {
+                    // Se o casco estiver correndo e o Mario pular em cima, ele
+                    // quebra/morre
+                    else if (koopared->estado == ESTADO_KOOPA_CASCO_CORRENDO) {
                         // Mario destrói o casco correndo
                         koopared->estado = ESTADO_KOOPA_MORRENDO;
-                        koopared->ativo = false; // Ou deixa a animação de morte tocar
+                        koopared->ativo =
+                            false; // Ou deixa a animação de morte tocar
 
                         PlaySound(rm.somHitInimigo);
                         int idx = p->comboAereo >= 6 ? 6 : p->comboAereo;
-                        p->score += tabelaComboAereo[idx] * 2; // Bônus maior por destruir o casco
+                        p->score += tabelaComboAereo[idx] *
+                                    2; // Bônus maior por destruir o casco
                         p->comboAereo++;
                     }
-                }
-                else
-                {
-                    // Koopa Red SEMPRE causa dano, mesmo se estiver invulnerável
-                    bool causouDano = false;
+                } else {
 
-                    // Caso especial: Se o Koopa estiver em casco parado e o Mario trombar
-                    // pelas laterais, ele chuta o casco em vez de tomar dano
-                    if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO)
-                    {
+                    // Caso especial: Se o Koopa estiver em casco parado e o
+                    // Mario trombar pelas laterais, ele chuta o casco em vez de
+                    // tomar dano
+                    if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO) {
                         // Mario chuta o casco parado
                         koopared->estado = ESTADO_KOOPA_CASCO_CORRENDO;
                         koopared->velAndando = 350;
 
                         // Define a direção baseado em qual lado o Mario está
                         if (retColCalculado.x + retColCalculado.width / 2 <
-                            koopared->ret.x + koopared->ret.width / 2)
-                        {
-                            koopared->olhandoParaDireita = false; // Casco vai para a esquerda
-                        }
-                        else
-                        {
-                            koopared->olhandoParaDireita = true; // Casco vai para a direita
+                            koopared->ret.x + koopared->ret.width / 2) {
+                            koopared->olhandoParaDireita =
+                                false; // Casco vai para a esquerda
+                        } else {
+                            koopared->olhandoParaDireita =
+                                true; // Casco vai para a direita
                         }
 
                         PlaySound(rm.somHitInimigo);
                         // Não ganha pontos por chutar, apenas evita o dano
-                    }
-                    else
-                    {
-                        // Casco correndo OU Koopa andando -> causa dano
-                        if (m->grande)
-                        {
+                    } else if (!m->invulneravel) {
+                        // Rex faz dano no Mario
+                        if (p->temCogumeloReserva) {
+                            p->temCogumeloReserva = false; // consome a reserva
+                            m->invulneravel = true; // não perde vida nem anel
+                            PlaySound(rm.somHitComAnel);
+
+                        } else if (m->grande) {
                             m->grande = false;
                             m->ret.width = m->retOriginal.width;
                             m->ret.height = m->retOriginal.height;
                             m->ret.y -= m->ret.height;
                             PlaySound(rm.somHitComAnel);
-                        }
-                        else if (p->quantidadeAneis > 0)
-                        {
+                        } else if (p->quantidadeAneis > 0) {
                             p->quantidadeAneis = 0;
                             PlaySound(rm.somHitComAnel);
-                        }
-                        else
-                        {
+                        } else {
                             p->quantidadeVidas--;
                             PlaySound(rm.somMorte);
                         }
-                        m->invulneravel = true;
-                        causouDano = true;
+                        m->invulneravel =
+                            true; // Torna invulnerável após tomar dano
                     }
                 }
                 return; // Processa apenas uma colisão por frame
             }
-        }
-        else if (inimigo->tipo == TIPO_INIMIGO_REX)
-        {
+        } else if (inimigo->tipo == TIPO_INIMIGO_REX) {
 
             InimigoRex *rex = (InimigoRex *)inimigo->objeto;
 
-            if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO)
-            {
+            if (!rex->ativo || rex->estado == ESTADO_INIMIGO_REX_MORRENDO) {
                 el = el->proximo;
                 continue;
             }
@@ -1584,14 +1421,12 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
                 // Verifica se o Mario está pulando/atacando de cima
                 if (m->estado == ESTADO_MARIO_PULANDO ||
                     m->estado == ESTADO_MARIO_PULANDO_CORRENDO ||
                     m->estado == ESTADO_MARIO_CAINDO ||
-                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
-                {
+                    m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     // Mata o Rex
                     m->vel.y = m->velPulo;
                     rex->estado = ESTADO_INIMIGO_REX_MORRENDO;
@@ -1612,28 +1447,22 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         m->ret.height = m->retOriginal.height;
                         m->ret.y -= m->ret.height;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else if (p->quantidadeAneis > 0)
-                    {
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
-                    m->invulneravel = true; // Torna invulnerável após tomar dano
+                    m->invulneravel =
+                        true; // Torna invulnerável após tomar dano
                 }
                 return;
             }
-        }
-        else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO)
-        {
+        } else if (inimigo->tipo == TIPO_INIMIGO_NEGOPRETO) {
             InimigoNegoPreto *negoPreto = (InimigoNegoPreto *)inimigo->objeto;
 
-            if (!negoPreto->ativo)
-            {
+            if (!negoPreto->ativo) {
                 el = el->proximo;
                 continue;
             }
@@ -1653,10 +1482,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                 ret->x + deslocamentoX, ret->y + deslocamentoY,
                 qaInimigo->retColisao.width, qaInimigo->retColisao.height};
 
-            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado))
-            {
-                if (m->estado == ESTADO_MARIO_PULANDO_GIRANDO)
-                {
+            if (CheckCollisionRecs(retColCalculado, retColInimigoCalculado)) {
+                if (m->estado == ESTADO_MARIO_PULANDO_GIRANDO) {
                     // Mario mata o Nego Preto com spin jump
                     m->vel.y = m->velPulo;
                     negoPreto->ativo = false;
@@ -1682,14 +1509,10 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                         m->invulneravel = true;
                         m->ret.y -= m->ret.height;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else if (p->quantidadeAneis > 0)
-                    {
+                    } else if (p->quantidadeAneis > 0) {
                         p->quantidadeAneis = 0;
                         PlaySound(rm.somHitComAnel);
-                    }
-                    else
-                    {
+                    } else {
                         p->quantidadeVidas--;
                         PlaySound(rm.somMorte);
                     }
@@ -1704,22 +1527,18 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
     }
 }
 
-static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw)
-{
+static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw) {
 
-    if (!IsKeyPressed(KEY_DOWN) && !IsKeyPressed(KEY_S))
-    {
+    if (!IsKeyPressed(KEY_DOWN) && !IsKeyPressed(KEY_S)) {
         return;
     }
 
     ElementoMapa *el = gw->mapa->obstaculos;
 
-    while (el != NULL)
-    {
+    while (el != NULL) {
         Obstaculo *o = (Obstaculo *)el->objeto;
 
-        if (o->eCanoSaida)
-        {
+        if (o->eCanoSaida) {
             QuadroAnimacao *qa = getQuadroAnimacaoAtualMario(m);
 
             float deslocamentoX =
@@ -1735,8 +1554,7 @@ static void resolverEntradaCanoMapa(Mario *m, Personagem *p, GameWorld *gw)
             // checa se o mario está em pé em cima do cano
             Rectangle retTopoSaida = {o->ret.x, o->ret.y - 4, o->ret.width, 8};
 
-            if (CheckCollisionRecs(retColCalculado, retTopoSaida))
-            {
+            if (CheckCollisionRecs(retColCalculado, retTopoSaida)) {
                 strncpy(gw->proximaFase, o->proximaFase, 255);
                 gw->proximaFase[255] = '\0';
                 gw->estado = ESTADO_JOGO_PROXIMA_FASE;
