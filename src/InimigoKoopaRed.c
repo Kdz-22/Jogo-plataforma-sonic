@@ -29,9 +29,7 @@ static const bool MOSTRAR_RETANGULOS = false;
  */
 InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor)
 {
-
-    InimigoKoopaRed *novoInimigo =
-        (InimigoKoopaRed *)malloc(sizeof(InimigoKoopaRed));
+    InimigoKoopaRed *novoInimigo = (InimigoKoopaRed *)malloc(sizeof(InimigoKoopaRed));
 
     novoInimigo->ret = ret;
     novoInimigo->vel = (Vector2){0};
@@ -39,68 +37,127 @@ InimigoKoopaRed *criarInimigoKoopaRed(Rectangle ret, Color cor)
 
     novoInimigo->velAndando = 100;
     novoInimigo->velMaxQueda = 600;
-    novoInimigo->estado = ESTADO_KOOPA_ANDANDO; // Inicializa andando
+    novoInimigo->estado = ESTADO_KOOPA_ANDANDO;
     novoInimigo->ativo = true;
     novoInimigo->olhandoParaDireita = false;
 
     int quantidadeAnimacoes = 0;
 
-    // No tamanho original de SNES, os Koopas andando usam 2 quadros
+    //ANIMAÇÃO ANDANDO
     novoInimigo->animacaoAndando.quantidadeQuadros = 2;
     novoInimigo->animacaoAndando.quadroAtual = 0;
     novoInimigo->animacaoAndando.contadorTempoQuadro = 0.0f;
     novoInimigo->animacaoAndando.pararNoUltimoQuadro = false;
     novoInimigo->animacaoAndando.executarUmaVez = false;
     novoInimigo->animacaoAndando.finalizada = false;
-
     criarQuadrosAnimacao(&novoInimigo->animacaoAndando,
                          novoInimigo->animacaoAndando.quantidadeQuadros);
-
     inicializarQuadrosAnimacao(
         novoInimigo->animacaoAndando.quadros,
         novoInimigo->animacaoAndando.quantidadeQuadros,
-        250,                             // duração de cada frame (ms)
-        1, 115,                          // Início X, Y na Texture
-        16, 28,                          // Dimensões do sprite (Largura, Altura de SNES)
-        1,                               // Separação de pixels entre frames
-        false, (Rectangle){2, 2, 68, 58} // Hitbox interna relativa ao sprite
-    );
+        250,
+        1, 115,
+        16, 28,
+        1,
+        false,
+        (Rectangle){2, 2, 68, 58});
 
-    novoInimigo->animacaoCasco.quantidadeQuadros = 1;
-    novoInimigo->animacaoCasco.quadroAtual = 0;
-    novoInimigo->animacaoCasco.contadorTempoQuadro = 0.0f;
-    novoInimigo->animacaoCasco.pararNoUltimoQuadro = true;
-    novoInimigo->animacaoCasco.executarUmaVez = false;
-    novoInimigo->animacaoCasco.finalizada = false;
-
-    criarQuadrosAnimacao(&novoInimigo->animacaoCasco,
-                         novoInimigo->animacaoCasco.quantidadeQuadros);
-
+    //ANIMAÇÃO CASCO PARADO
+    novoInimigo->animacaoCascoParado.quantidadeQuadros = 1;
+    novoInimigo->animacaoCascoParado.quadroAtual = 0;
+    novoInimigo->animacaoCascoParado.contadorTempoQuadro = 0.0f;
+    novoInimigo->animacaoCascoParado.pararNoUltimoQuadro = true;
+    novoInimigo->animacaoCascoParado.executarUmaVez = false;
+    novoInimigo->animacaoCascoParado.finalizada = false;
+    criarQuadrosAnimacao(&novoInimigo->animacaoCascoParado,
+                         novoInimigo->animacaoCascoParado.quantidadeQuadros);
     inicializarQuadrosAnimacao(
-        novoInimigo->animacaoCasco.quadros,
-        novoInimigo->animacaoCasco.quantidadeQuadros,
-        1000,                     // duração padrão para o quadro estático (1 segundo)
-        35, 113,                  // início (coordenadas X, Y do editor)
-        32, 34,                   // dimensões reais do novo casco (Largura, Altura)
-        0,                        // separação (não há outros frames colados)
-        false,                    // de trás para frente
-        (Rectangle){2, 2, 32, 34} // retângulo de colisão cobrindo o casco inteiro
-    );
+        novoInimigo->animacaoCascoParado.quadros,
+        novoInimigo->animacaoCascoParado.quantidadeQuadros,
+        1000,
+        35, 113,
+        32, 34,
+        0,
+        false,
+        (Rectangle){2, 2, 32, 34});
 
-    novoInimigo->animacoes[ESTADO_KOOPA_ANDANDO] =
-        &novoInimigo->animacaoAndando;
+    //ANIMAÇÃO CASCO CORRENDO
+    novoInimigo->animacaoCascoCorrendo.quantidadeQuadros = 4;
+    novoInimigo->animacaoCascoCorrendo.quadroAtual = 0;
+    novoInimigo->animacaoCascoCorrendo.contadorTempoQuadro = 0.0f;
+    novoInimigo->animacaoCascoCorrendo.pararNoUltimoQuadro = false;
+    novoInimigo->animacaoCascoCorrendo.executarUmaVez = false;
+    novoInimigo->animacaoCascoCorrendo.finalizada = false;
+    criarQuadrosAnimacao(&novoInimigo->animacaoCascoCorrendo,
+                         novoInimigo->animacaoCascoCorrendo.quantidadeQuadros);
 
-    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_PARADO] =
-        &novoInimigo->animacaoCasco;
+    // Inicializa os 4 quadros do casco girando
+    inicializarQuadrosAnimacao(
+        novoInimigo->animacaoCascoCorrendo.quadros,
+        novoInimigo->animacaoCascoCorrendo.quantidadeQuadros,
+        50,      // duração de cada quadro (mais rápido = mais giro)
+        1, 331, // posição inicial do primeiro quadro
+        32, 32,  // dimensões de cada quadro
+        1,       // separação entre quadros
+        false,
+        (Rectangle){2, 2, 32, 32});
 
-    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_CORRENDO] =
-        &novoInimigo->animacaoCasco; // Usa o mesmo casco para correr por enquanto
+    // SE OS QUADROS ESTIVEREM EM POSIÇÕES DIFERENTES, USE ISSO:
+    /*
+    // Quadro 0
+    novoInimigo->animacaoCascoCorrendo.quadros[0].fonte = (Rectangle){35, 113, 32, 34};
+    novoInimigo->animacaoCascoCorrendo.quadros[0].duracao = 50;
+    novoInimigo->animacaoCascoCorrendo.quadros[0].retColisao = (Rectangle){2, 2, 32, 34};
 
-    novoInimigo->animacoes[ESTADO_KOOPA_MORRENDO] =
-        &novoInimigo->animacaoCasco;
-    // Usa o mesmo casco para o estado morrendo
-    // Atualiza a quantidade total de animações mapeadas no array
-    novoInimigo->quantidadeAnimacoes = 4;
+    // Quadro 1
+    novoInimigo->animacaoCascoCorrendo.quadros[1].fonte = (Rectangle){67, 113, 32, 34};
+    novoInimigo->animacaoCascoCorrendo.quadros[1].duracao = 50;
+    novoInimigo->animacaoCascoCorrendo.quadros[1].retColisao = (Rectangle){2, 2, 32, 34};
+
+    // Quadro 2
+    novoInimigo->animacaoCascoCorrendo.quadros[2].fonte = (Rectangle){99, 113, 32, 34};
+    novoInimigo->animacaoCascoCorrendo.quadros[2].duracao = 50;
+    novoInimigo->animacaoCascoCorrendo.quadros[2].retColisao = (Rectangle){2, 2, 32, 34};
+
+    // Quadro 3
+    novoInimigo->animacaoCascoCorrendo.quadros[3].fonte = (Rectangle){131, 113, 32, 34};
+    novoInimigo->animacaoCascoCorrendo.quadros[3].duracao = 50;
+    novoInimigo->animacaoCascoCorrendo.quadros[3].retColisao = (Rectangle){2, 2, 32, 34};
+    */
+
+    // ===== ANIMAÇÃO MORRENDO =====
+    novoInimigo->animacaoMorrendo.quantidadeQuadros = 4;
+    novoInimigo->animacaoMorrendo.quadroAtual = 0;
+    novoInimigo->animacaoMorrendo.contadorTempoQuadro = 0.0f;
+    novoInimigo->animacaoMorrendo.pararNoUltimoQuadro = true;
+    novoInimigo->animacaoMorrendo.executarUmaVez = true;
+    novoInimigo->animacaoMorrendo.finalizada = false;
+    criarQuadrosAnimacao(&novoInimigo->animacaoMorrendo,
+                         novoInimigo->animacaoMorrendo.quantidadeQuadros);
+    inicializarQuadrosAnimacao(
+        novoInimigo->animacaoMorrendo.quadros,
+        novoInimigo->animacaoMorrendo.quantidadeQuadros,
+        100,
+        67, 113, // posição inicial (ajuste conforme sua sprite sheet)
+        32, 34,
+        0,
+        false,
+        (Rectangle){0});
+
+    // ===== REGISTRAR ANIMAÇÕES =====
+    novoInimigo->animacoes[ESTADO_KOOPA_ANDANDO] = &novoInimigo->animacaoAndando;
+    quantidadeAnimacoes++;
+
+    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_PARADO] = &novoInimigo->animacaoCascoParado;
+    quantidadeAnimacoes++;
+
+    novoInimigo->animacoes[ESTADO_KOOPA_CASCO_CORRENDO] = &novoInimigo->animacaoCascoCorrendo;
+    quantidadeAnimacoes++;
+
+    novoInimigo->animacoes[ESTADO_KOOPA_MORRENDO] = &novoInimigo->animacaoMorrendo;
+    quantidadeAnimacoes++;
+
+    novoInimigo->quantidadeAnimacoes = quantidadeAnimacoes;
 
     return novoInimigo;
 }
@@ -112,15 +169,13 @@ void destruirInimigoKoopaRed(InimigoKoopaRed *inimigo)
 {
     if (inimigo != NULL)
     {
-        printf("    Destruindo structs reais de animacao...\n");
-
-        // Libera apenas as duas estruturas reais de memória criadas
+        // Libera todas as animações
         destruirQuadrosAnimacao(&inimigo->animacaoAndando);
-        destruirQuadrosAnimacao(&inimigo->animacaoCasco);
+        destruirQuadrosAnimacao(&inimigo->animacaoCascoParado);
+        destruirQuadrosAnimacao(&inimigo->animacaoCascoCorrendo);
+        destruirQuadrosAnimacao(&inimigo->animacaoMorrendo);
 
-        printf("    liberando inimigo...\n");
         free(inimigo);
-        printf("    liberado!\n");
     }
 }
 
@@ -185,9 +240,11 @@ void atualizarInimigoKoopaRed(InimigoKoopaRed *inimigo, GameWorld *gw,
 
         if (inimigo->estado == ESTADO_KOOPA_MORRENDO)
         {
-            inimigo->ativo = false;
-            // O gerenciador de listas do jogo agora sabe que pode chamar o
-            // destruirInimigoKoopaRed de forma totalmente segura fora dos loops!
+            // A animação de morte pode tocar antes de desativar
+            if (inimigo->animacaoMorrendo.finalizada)
+            {
+                inimigo->ativo = false;
+            }
         }
     }
 }

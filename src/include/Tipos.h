@@ -381,7 +381,9 @@ typedef struct InimigoKoopaRed {
     Animacao *animacoes[20];
     int quantidadeAnimacoes;
     Animacao animacaoAndando;
-    Animacao animacaoCasco;
+    Animacao animacaoCascoParado;  
+    Animacao animacaoCascoCorrendo;  //animação com 4 quadros
+    Animacao animacaoMorrendo;
 
 } InimigoKoopaRed;
 
