@@ -17,7 +17,7 @@
 #include "ResourceManager.h"
 #include "Tipos.h"
 
-static const bool MOSTRAR_RETANGULOS = false;
+static const bool MOSTRAR_RETANGULOS = true;
 
 static Animacao *getAnimacaoAtualInimigoNegoPreto(InimigoNegoPreto *inimigo)
 {
@@ -83,7 +83,7 @@ InimigoNegoPreto *criarInimigoNegoPreto(Rectangle ret, Color cor)
         128, 128, 
         0,      
         false,
-        (Rectangle){0, 64, 128, 64} 
+        (Rectangle){0, 0, 128, 128} 
     );
 
     novoInimigo->animacoes[ESTADO_INIMIGO_NEGOPRETO_VOANDO] = &novoInimigo->animacaoVoando;
