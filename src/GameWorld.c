@@ -11,6 +11,7 @@
 
 #include "GameWindow.h"
 #include "GameWorld.h"
+#include "ItemCoguVerm.h"
 #include "Macros.h"
 #include "Mapa.h"
 #include "Mario.h"
@@ -147,7 +148,8 @@ void updateGameWorld(GameWorld *gw, float delta) {
                 gw->personagem->score = 0;
                 gw->personagem->comboAereo = 0;
                 gw->personagem->time = 0.0f;
-                gw->personagem->funcoes->resetar(gw->personagem->dados);
+                gw->personagem->funcoes->resetar(gw->personagem->dados,
+                                                 gw->personagem);
             }
 
             // Reposiciona o personagem no início
@@ -205,7 +207,7 @@ void updateGameWorld(GameWorld *gw, float delta) {
         printf("carregando novo mapa...\n");
         gw->mapa = carregarMapa(gw->proximaFase);
         printf("resetando personagem...\n");
-        gw->personagem->funcoes->resetar(gw->personagem->dados);
+        gw->personagem->funcoes->resetar(gw->personagem->dados, gw->personagem);
         printf("reposicionando mario...\n");
         Mario *m = (Mario *)gw->personagem->dados;
         m->ret.x = GetScreenWidth() / 2 + 144;
@@ -233,17 +235,17 @@ void drawGameWorld(GameWorld *gw) {
         if (gw->personagemSelecionado == 1) {
 
             ClearBackground((Color){36, 0, 180, 255});
-    
+
             BeginMode2D(gw->camera);
             desenharFundo(gw);
             desenharMapa(gw->mapa);
             gw->personagem->funcoes->desenhar(gw->personagem->dados);
             EndMode2D();
-    
+
             DrawText("VOL", 900, 50, 25, WHITE);
             desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
                               (Vector2){960, 48});
-    
+
             // Score
             DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
                            (Rectangle){20, 15, 80, 32}, (Vector2){0, 0}, 0.0f,
@@ -256,9 +258,9 @@ void drawGameWorld(GameWorld *gw) {
             DrawTexturePro(rm.texturaHUD, (Rectangle){24, 480, 40, 16},
                            (Rectangle){20, 75, 80, 32}, (Vector2){0, 0}, 0.0f,
                            WHITE);
-    
+
             Vector2 posVidas = {20, 500};
-    
+
             // Life (fotinha do Sonic)
             DrawTexturePro(rm.texturaHUD, (Rectangle){40, 400, 16, 16},
                            (Rectangle){posVidas.x, posVidas.y, 32, 32},
@@ -268,31 +270,63 @@ void drawGameWorld(GameWorld *gw) {
                            (Rectangle){posVidas.x + 40, posVidas.y, 80, 16},
                            (Vector2){0, 0}, 0.0f, WHITE);
             // Multiplicador "X"
-            DrawTexturePro(rm.texturaHUD, (Rectangle){62, 410, 8, 8},
-                           (Rectangle){posVidas.x + 36, posVidas.y + 18, 16, 16},
-                           (Vector2){0, 0}, 0.0f, WHITE);
+            DrawTexturePro(
+                rm.texturaHUD, (Rectangle){62, 410, 8, 8},
+                (Rectangle){posVidas.x + 36, posVidas.y + 18, 16, 16},
+                (Vector2){0, 0}, 0.0f, WHITE);
             // Número de vidas
             desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeVidas,
                               (Vector2){posVidas.x + 50, posVidas.y + 16});
-    
+
             desenharPontuacao(rm.texturaHUD, gw->personagem->score,
                               (Vector2){110, 15});
             desenharTempo(rm.texturaHUD, (int)gw->personagem->time,
                           (Vector2){94, 45});
             desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeAneis,
                               (Vector2){110, 75});
-        } else if ( gw->personagemSelecionado == 0 ) {
+        } else if (gw->personagemSelecionado == 0) {
             ClearBackground((Color){36, 0, 180, 255});
-    
+
             BeginMode2D(gw->camera);
             desenharFundo(gw);
             desenharMapa(gw->mapa);
             gw->personagem->funcoes->desenhar(gw->personagem->dados);
             EndMode2D();
-    
+
             DrawText("VOL", 900, 50, 25, WHITE);
             desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
                               (Vector2){960, 48});
+            // hud superior
+            DrawTexturePro(rm.texturaHUDmario, (Rectangle){188, 129, 672, 84},
+                           (Rectangle){GetScreenWidth() / 2 - 336, 15, 672, 84},
+                           (Vector2){0, 0}, 0.0f, WHITE);
+            // vida
+            desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeVidas,
+                              (Vector2){GetScreenWidth() / 2 - 336 + 72, 57});
+
+            // tempo
+            desenharTempo(rm.texturaHUD, (int)gw->personagem->time,
+                          (Vector2){GetScreenWidth() / 2 + 75, 57});
+
+            // score
+            desenharPontuacao(rm.texturaHUD, gw->personagem->score,
+                              (Vector2){GetScreenWidth() / 2 + 75 + 97, 57});
+
+            // anais
+            desenharPontuacao(
+                rm.texturaHUD, gw->personagem->quantidadeAneis,
+                (Vector2){GetScreenWidth() / 2 + 75 + 97 + 120, 57 - 24});
+
+            if (gw->personagem->temCogumeloReserva) {
+                DrawTexturePro(
+                    rm.texturaHUDmario, (Rectangle){285, 241, 96, 96},
+                    (Rectangle){452, 9, 96, 96}, (Vector2){0, 0}, 0.0f, WHITE);
+            } else {
+
+                DrawTexturePro(
+                    rm.texturaHUDmario, (Rectangle){186, 241, 96, 96},
+                    (Rectangle){452, 9, 96, 96}, (Vector2){0, 0}, 0.0f, WHITE);
+            }
         }
     } else if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM) {
 
@@ -540,7 +574,7 @@ static void reiniciar(GameWorld *gw) {
         gw->personagem->score = 0;
         gw->personagem->comboAereo = 0;
         gw->personagem->time = 0.0f;
-        gw->personagem->funcoes->resetar(gw->personagem->dados);
+        gw->personagem->funcoes->resetar(gw->personagem->dados, gw->personagem);
     }
 
     printf("=== REINICIO CONCLUÍDO ===\n");

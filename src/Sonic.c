@@ -27,7 +27,7 @@ static void _destruir( void *dados ) {
     destruirJogador( (Jogador*) dados );
 }
 
-static void _resetar( void *dados ) {
+static void _resetar( void *dados, Personagem *p ) {
     Jogador *j = (Jogador*) dados;
     j->invulneravel = false;
     j->contadorTempoInvulnerabilidade = 0.0f;

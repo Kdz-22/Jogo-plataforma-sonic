@@ -20,7 +20,7 @@ typedef struct ResourceManager {
     Texture2D texturaFundo;
     Texture2D texturaCanos;
     Texture2D texturaHUD;
-    Texture2D texturaHUD2;
+    Texture2D texturaHUDmario;
     Texture2D texturaGameOver;
     Texture2D texturaItensAnimadosMario;
     Texture2D texturaTelaInicial;

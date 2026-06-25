@@ -20,10 +20,18 @@ typedef struct InfoPersonagem {
     FuncaoCriarPersonagem criar;
 } InfoPersonagem;
 
+
+static Personagem *criarSonicWrapper(float x, float y) {
+    return criarSonic(x, y, 96, 96);
+}
+
+static Personagem *criarMarioWrapper(float x, float y) {
+    return criarMario(x, y, 96, 96);
+}
 // lista dos personagens do jogo
 static InfoPersonagem personagensDisponiveis[] = {
-    { "Sonic", criarSonic },
-    { "Mario", criarMario },
+    { "Sonic", criarSonicWrapper },
+    { "Mario", criarMarioWrapper },
 };
 
 static int totalPersonagens = 2;

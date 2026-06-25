@@ -77,6 +77,17 @@ void loadResourcesResourceManager(void)
         },
         2);
 
+    rm.texturaHUDmario = carregarTexturaAlterandoCores(
+        "resources/imagens/hud/hud-mario.png",
+        (Color[]){
+            {147, 187, 236, 255},
+
+        },
+        (Color[]){
+            BLANK,
+        },
+        1);
+
     rm.texturaItensAnimadosMario = carregarTexturaAlterandoCores(
         "resources/imagens/itens/itens-animados-mario.png",
         (Color[]){
@@ -111,7 +122,7 @@ void loadResourcesResourceManager(void)
     SetTextureFilter(rm.texturaTerreno, TEXTURE_FILTER_POINT);
     SetTextureFilter(rm.texturaFundo, TEXTURE_FILTER_POINT);
     SetTextureFilter(rm.texturaHUD, TEXTURE_FILTER_POINT);
-    SetTextureFilter(rm.texturaHUD2, TEXTURE_FILTER_POINT);
+    SetTextureFilter(rm.texturaHUDmario, TEXTURE_FILTER_POINT);
     SetTextureFilter(rm.texturaCanos, TEXTURE_FILTER_POINT);
     SetTextureFilter(rm.texturaItensAnimadosMario, TEXTURE_FILTER_POINT);
     SetTextureFilter(rm.texturaTelaInicial, TEXTURE_FILTER_POINT);
@@ -138,7 +149,7 @@ void unloadResourcesResourceManager(void)
     UnloadTexture(rm.texturaTerreno);
     UnloadTexture(rm.texturaFundo);
     UnloadTexture(rm.texturaHUD);
-    UnloadTexture(rm.texturaHUD2);
+    UnloadTexture(rm.texturaHUDmario);
     UnloadTexture(rm.texturaCanos);
     UnloadTexture(rm.texturaItensAnimadosMario);
     UnloadTexture(rm.texturaTelaInicial);

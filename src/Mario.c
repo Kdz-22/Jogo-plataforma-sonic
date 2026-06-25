@@ -85,6 +85,7 @@ Personagem *criarMario(float x, float y, float w, float h) {
     m->invulneravel = false;
     m->tempoInvulnerabilidade = 3.0f;
     m->contadorTempoInvulnerabilidade = 0.0f;
+    p->temCogumeloReserva = false;
 
     m->piscaPisca = false;
     m->tempoPiscaPisca = 0.05f;
@@ -704,6 +705,7 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta) {
         m->ret.width *= 1.2;
         m->ret.height *= 1.2;
     }
+
     if (m->invulneravel) {
 
         m->piscaPisca = false;
@@ -712,7 +714,7 @@ void atualizarMario(void *dados, Personagem *p, GameWorld *gw, float delta) {
         if (m->contadorTempoInvulnerabilidade >= m->tempoInvulnerabilidade) {
             m->contadorTempoInvulnerabilidade = 0.0f;
             m->invulneravel = false;
-            m->piscaPisca = false;
+            m->piscaPisca = true;
         }
     }
 
@@ -755,10 +757,11 @@ void desenharMario(void *dados) {
     }
 }
 
-void resetarMario(void *dados) {
+void resetarMario(void *dados, Personagem *p) {
     Mario *m = (Mario *)dados;
 
     m->invulneravel = false;
+    p->temCogumeloReserva = false;
     m->contadorTempoInvulnerabilidade = 0.0f;
     m->contadorTempoPiscaPisca = 0.0f;
     m->piscaPisca = false;
@@ -903,7 +906,6 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
             continue;
         }
 
-        
         if (checarColisaoComObstaculo(retColCalculado, o)) {
 
             bool vindoDeBaixo =
@@ -1077,6 +1079,8 @@ static void resolverColisaoMarioItensMapa(Mario *m, Personagem *p, Mapa *mapa) {
                     m->ret.y -= m->ret.height; // sobe para não entrar no chão
                     m->ret.height *= 1.2;
                     m->ret.width *= 1.2;
+                } else {
+                    p->temCogumeloReserva = true;
                 }
             }
         } else if (item->tipo == TIPO_ITEM_FLOR_PRETA) {
@@ -1184,8 +1188,12 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
                 } else if (!m->invulneravel) {
+                    if (p->temCogumeloReserva) {
+                        p->temCogumeloReserva = false; // consome a reserva
+                        m->invulneravel = true; // não perde vida nem anel
+                        PlaySound(rm.somHitComAnel);
 
-                    if (m->grande) {
+                    } else if (m->grande) {
                         // encolhe ao invés de perder vida
                         m->grande = false;
                         m->ret.width = m->retOriginal.width;
@@ -1240,8 +1248,12 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     p->score += tabelaComboAereo[idx];
                     p->comboAereo++;
                 } else if (!m->invulneravel) {
+                    if (p->temCogumeloReserva) {
+                        p->temCogumeloReserva = false; // consome a reserva
+                        m->invulneravel = true; // não perde vida nem anel
+                        PlaySound(rm.somHitComAnel);
 
-                    if (m->grande) {
+                    } else if (m->grande) {
                         // encolhe ao invés de perder vida
                         m->grande = false;
                         m->ret.width = m->retOriginal.width;
@@ -1296,8 +1308,8 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     } else if (koopared->estado == ESTADO_KOOPA_CASCO_PARADO) {
                         // Casco -> Mario pula no casco vai de F
                         koopared->estado = ESTADO_KOOPA_MORRENDO;
-                        koopared->vel.y = -200; // Dá um pequeno impulso para
-                                                // cima antes de cair
+                        koopared->vel.y = -200; // Dá um pequeno impulso
+                                                // para cima antes de cair
                         koopared->vel.x = 0;
                     }
                     PlaySound(rm.somHitInimigo);
@@ -1342,7 +1354,12 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
                     p->comboAereo++;
                 } else if (!m->invulneravel) {
                     // Rex faz dano no Mario
-                    if (m->grande) {
+                    if (p->temCogumeloReserva) {
+                        p->temCogumeloReserva = false; // consome a reserva
+                        m->invulneravel = true; // não perde vida nem anel
+                        PlaySound(rm.somHitComAnel);
+
+                    } else if (m->grande) {
                         m->grande = false;
                         m->ret.width = m->retOriginal.width;
                         m->ret.height = m->retOriginal.height;
@@ -1394,10 +1411,15 @@ static void resolverColisaoMarioInimigosMapa(Mario *m, Personagem *p,
 
                     return;
                 } else {
-                    // REMOVA O "if (!m->invulneravel)" - O NEGO PRETO SEMPRE
-                    // CAUSA DANO! Mario toma dano (mesmo se estiver
+                    // REMOVA O "if (!m->invulneravel)" - O NEGO PRETO
+                    // SEMPRE CAUSA DANO! Mario toma dano (mesmo se estiver
                     // invulnerável)
-                    if (m->grande) {
+                    if (p->temCogumeloReserva) {
+                        p->temCogumeloReserva = false; // consome a reserva
+                        m->invulneravel = true; // não perde vida nem anel
+                        PlaySound(rm.somHitComAnel);
+
+                    } else if (m->grande) {
                         m->grande = false;
                         m->ret.width = m->retOriginal.width;
                         m->ret.height = m->retOriginal.height;

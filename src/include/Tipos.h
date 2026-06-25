@@ -577,7 +577,7 @@ typedef struct PersonagemFuncoes {
                       float delta);
     void (*desenhar)(void *dados);
     void (*destruir)(void *dados);
-    void (*resetar)(void *dados);
+    void (*resetar)(void *dados, Personagem *p);
 } PersonagemFuncoes;
 
 struct Personagem {
@@ -589,6 +589,7 @@ struct Personagem {
     int score;
     float time;
     int comboAereo;
+    bool temCogumeloReserva;
 };
 /**
  * @brief Representa o mundo do jogo e seus elementos.
