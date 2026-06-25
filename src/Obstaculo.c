@@ -25,6 +25,7 @@ Obstaculo *criarObstaculo( Rectangle ret, Color cor, Rectangle fonte, Texture2D 
     novoObstaculo->fonte = fonte;
     novoObstaculo->textura = textura;
     novoObstaculo->solido = solido;
+    novoObstaculo->tipoColisao = COLISAO_RETANGULO;
 
     novoObstaculo->eBlocoGiratorio = false;
     novoObstaculo->quebrando = false;
@@ -95,4 +96,37 @@ void atualizarObstaculo( Obstaculo *o, float delta ) {
             }
         }
     }
+}
+
+bool checarColisaoComObstaculo(Rectangle retCol, Obstaculo *o) {
+    if (o->tipoColisao == COLISAO_RETANGULO) {
+        return CheckCollisionRecs(retCol, o->ret);
+    }
+
+    int divisoes = 8;
+    float alturaFaixa = o->ret.height / divisoes;
+
+    for (int i = 0; i < divisoes; i++) {
+        Rectangle faixa;
+
+        if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA) {
+            float largura = o->ret.width * (divisoes - i) / divisoes;
+            float x = o->ret.x + (o->ret.width - largura);
+            faixa = (Rectangle){x, o->ret.y + alturaFaixa * i, largura, alturaFaixa};
+
+        } else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA) {
+            float largura = o->ret.width * (i + 1) / divisoes;
+            float x = o->ret.x + (o->ret.width - largura);
+            faixa = (Rectangle){x, o->ret.y + alturaFaixa * i, largura, alturaFaixa};
+
+        } else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_ESQUERDA) {
+            float largura = o->ret.width * (i + 1) / divisoes;
+            faixa = (Rectangle){o->ret.x, o->ret.y + alturaFaixa * i, largura, alturaFaixa};
+        }
+
+        if (CheckCollisionRecs(retCol, faixa)) {
+            return true;
+        }
+    }
+    return false;
 }

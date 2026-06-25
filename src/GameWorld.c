@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "GameWorld.h"
 #include "GameWindow.h"
+#include "GameWorld.h"
 #include "Macros.h"
 #include "Mapa.h"
 #include "Mario.h"
@@ -39,8 +39,7 @@ static void desenharTelaInicial(GameWorld *gw);
 /**
  * @brief Cria uma instância alocada dinamicamente da struct GameWorld.
  */
-GameWorld *createGameWorld(void)
-{
+GameWorld *createGameWorld(void) {
     GameWorld *gw = (GameWorld *)malloc(sizeof(GameWorld));
     inicializar(gw);
 
@@ -56,16 +55,12 @@ GameWorld *createGameWorld(void)
 /**
  * @brief Destrói um objeto GameWorld e suas dependências.
  */
-void destroyGameWorld(GameWorld *gw)
-{
-    if (gw != NULL)
-    {
-        if (gw->mapa != NULL)
-        {
+void destroyGameWorld(GameWorld *gw) {
+    if (gw != NULL) {
+        if (gw->mapa != NULL) {
             destruirMapa(gw->mapa);
         }
-        if (gw->personagem != NULL)
-        {
+        if (gw->personagem != NULL) {
             gw->personagem->funcoes->destruir(gw->personagem->dados);
             free(gw->personagem);
         }
@@ -76,97 +71,77 @@ void destroyGameWorld(GameWorld *gw)
 /**
  * @brief Lê a entrada do usuário e atualiza o estado do jogo.
  */
-void updateGameWorld(GameWorld *gw, float delta)
-{
+void updateGameWorld(GameWorld *gw, float delta) {
 
-    if (!IsMusicStreamPlaying(rm.musicaFase01))
-    {
+    if (!IsMusicStreamPlaying(rm.musicaFase01)) {
         PlayMusicStream(rm.musicaFase01);
-    }
-    else
-    {
+    } else {
         UpdateMusicStream(rm.musicaFase01);
     }
-    if (IsMusicStreamPlaying(rm.musicaFase01))
-    {
+    if (IsMusicStreamPlaying(rm.musicaFase01)) {
 
-        if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT))
-        {
+        if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT)) {
             rm.volumeMusicaFase01 =
                 Clamp(rm.volumeMusicaFase01 - 0.01f, 0.0f, 1.0f);
             SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
-        }
-        else if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD))
-        {
+        } else if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD)) {
             rm.volumeMusicaFase01 =
                 Clamp(rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f);
             SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
         }
     }
 
-    if (gw->estado == ESTADO_JOGO_TELA_INICIAL)
-    {
+    if (gw->estado == ESTADO_JOGO_TELA_INICIAL) {
         atualizarTelaInicial(gw, delta);
         return;
     }
 
-    if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM)
-    {
-        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT))
-        {
+    if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM) {
+        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_RIGHT)) {
             // alterna entre 0 e 1
             gw->personagemSelecionado = !gw->personagemSelecionado;
         }
-        if (IsKeyPressed(KEY_ENTER))
-        {
+        if (IsKeyPressed(KEY_ENTER)) {
             inicializar(gw);
             gw->estado = ESTADO_JOGO_JOGANDO;
         }
         return;
     }
 
-    if (gw->estado == ESTADO_JOGO_JOGANDO)
-    {
-        if (IsKeyPressed(KEY_R))
-        {
+    if (gw->estado == ESTADO_JOGO_JOGANDO) {
+        if (IsKeyPressed(KEY_R)) {
             reiniciar(gw);
             return;
         }
 
-        if (gw->mapa != NULL && gw->personagem != NULL)
-        {
+        if (gw->mapa != NULL && gw->personagem != NULL) {
             atualizarMapa(gw->mapa, gw, delta);
-            gw->personagem->funcoes->entrada(gw->personagem->dados, gw->personagem,
-                                             delta);
+            gw->personagem->funcoes->entrada(gw->personagem->dados,
+                                             gw->personagem, delta);
             gw->personagem->funcoes->atualizar(gw->personagem->dados,
                                                gw->personagem, gw, delta);
 
             gw->personagem->time += delta;
 
-            if (gw->estado == ESTADO_JOGO_JOGANDO)
-            {
+            if (gw->estado == ESTADO_JOGO_JOGANDO) {
                 atualizarCamera(gw);
             }
             // GAMEOVER
-            if (gw->personagem->quantidadeVidas < 0)
-            {
+            if (gw->personagem->quantidadeVidas < 0) {
                 gw->estado = ESTADO_JOGO_GAMEOVER;
                 gw->tempoTelaInicial = 0.0f;
             }
         }
-    }
-    else if (gw->estado == ESTADO_JOGO_GAMEOVER)
-    {
+    } else if (gw->estado == ESTADO_JOGO_GAMEOVER) {
         gw->tempoTelaInicial += delta;
 
-        // Se GAMEOVER apertar R para reiniciar (versão simples - sem destruir nada)
-        if (IsKeyPressed(KEY_R))
-        {
+        // Se GAMEOVER apertar R para reiniciar (versão simples - sem destruir
+        // nada)
+        if (IsKeyPressed(KEY_R)) {
             printf("=== REINICIANDO JOGO (SIMPLES) ===\n");
 
             // Reseta os dados do personagem
-            if (gw->personagem != NULL)
-            {
+            if (gw->personagem != NULL) {
                 gw->personagem->quantidadeVidas = 3;
                 gw->personagem->quantidadeAneis = 0;
                 gw->personagem->score = 0;
@@ -176,13 +151,11 @@ void updateGameWorld(GameWorld *gw, float delta)
             }
 
             // Reposiciona o personagem no início
-            if (gw->personagem != NULL && gw->mapa != NULL)
-            {
+            if (gw->personagem != NULL && gw->mapa != NULL) {
                 int alturaMapa = calcularAlturaMapa(gw->mapa);
                 int screenWidth = GetScreenWidth();
 
-                if (gw->personagemSelecionado == 0)
-                {
+                if (gw->personagemSelecionado == 0) {
                     Mario *m = (Mario *)gw->personagem->dados;
                     m->ret.x = screenWidth / 2 + 144;
                     m->ret.y = alturaMapa - 400;
@@ -195,9 +168,7 @@ void updateGameWorld(GameWorld *gw, float delta)
                     m->freando = false;
                     // Reseta o retOriginal
                     m->retOriginal = m->ret;
-                }
-                else
-                {
+                } else {
                     Jogador *j = (Jogador *)gw->personagem->dados;
                     j->ret.x = screenWidth / 2 + 144;
                     j->ret.y = alturaMapa - 400;
@@ -215,22 +186,18 @@ void updateGameWorld(GameWorld *gw, float delta)
             return;
         }
         // Se apertar M, volta para a tela inicial
-        else if (IsKeyPressed(KEY_M))
-        {
+        else if (IsKeyPressed(KEY_M)) {
             printf("=== VOLTANDO AO MENU ===\n");
             gw->estado = ESTADO_JOGO_TELA_INICIAL;
             gw->tempoTelaInicial = 0.0f;
             gw->teclaPressionada = false;
 
-            if (IsMusicStreamPlaying(rm.musicaFase01))
-            {
+            if (IsMusicStreamPlaying(rm.musicaFase01)) {
                 StopMusicStream(rm.musicaFase01);
             }
             return;
         }
-    }
-    else if (gw->estado == ESTADO_JOGO_PROXIMA_FASE)
-    {
+    } else if (gw->estado == ESTADO_JOGO_PROXIMA_FASE) {
         printf("proximaFase = %s\n", gw->proximaFase);
         printf("destruindo mapa...\n");
         destruirMapa(gw->mapa);
@@ -252,74 +219,82 @@ void updateGameWorld(GameWorld *gw, float delta)
 /**
  * @brief Desenha o estado do jogo.
  */
-void drawGameWorld(GameWorld *gw)
-{
+void drawGameWorld(GameWorld *gw) {
 
     BeginDrawing();
 
-    if (gw->estado == ESTADO_JOGO_TELA_INICIAL)
-    {
+    if (gw->estado == ESTADO_JOGO_TELA_INICIAL) {
         desenharTelaInicial(gw);
         EndDrawing();
         return;
     }
 
-    if (gw->estado == ESTADO_JOGO_JOGANDO)
-    {
-        ClearBackground((Color){36, 0, 180, 255});
+    if (gw->estado == ESTADO_JOGO_JOGANDO) {
+        if (gw->personagemSelecionado == 1) {
 
-        BeginMode2D(gw->camera);
-        desenharFundo(gw);
-        desenharMapa(gw->mapa);
-        gw->personagem->funcoes->desenhar(gw->personagem->dados);
-        EndMode2D();
-
-        DrawText("VOL", 640, 45, 25, WHITE);
-        DrawText("AUMENTAR = +", 640, 75, 20, YELLOW);
-        DrawText("DIMINUIR = -", 640, 105, 20, YELLOW);
-        desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
-                          (Vector2){700, 45});
-
-        // Score
-        DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
-                       (Rectangle){20, 15, 80, 32}, (Vector2){0, 0}, 0.0f,
-                       WHITE);
-        // Time
-        DrawTexturePro(rm.texturaHUD, (Rectangle){24, 456, 32, 16},
-                       (Rectangle){20, 45, 64, 32}, (Vector2){0, 0}, 0.0f,
-                       WHITE);
-        // Rings
-        DrawTexturePro(rm.texturaHUD, (Rectangle){24, 480, 40, 16},
-                       (Rectangle){20, 75, 80, 32}, (Vector2){0, 0}, 0.0f,
-                       WHITE);
-
-        Vector2 posVidas = {20, 380};
-
-        // Life (fotinha do Sonic)
-        DrawTexturePro(rm.texturaHUD, (Rectangle){40, 400, 16, 16},
-                       (Rectangle){posVidas.x, posVidas.y, 32, 32},
-                       (Vector2){0, 0}, 0.0f, WHITE);
-        // Texto "Sonic"
-        DrawTexturePro(rm.texturaHUD, (Rectangle){57, 401, 31, 7},
-                       (Rectangle){posVidas.x + 40, posVidas.y, 80, 16},
-                       (Vector2){0, 0}, 0.0f, WHITE);
-        // Multiplicador "X"
-        DrawTexturePro(rm.texturaHUD, (Rectangle){62, 410, 8, 8},
-                       (Rectangle){posVidas.x + 36, posVidas.y + 18, 16, 16},
-                       (Vector2){0, 0}, 0.0f, WHITE);
-        // Número de vidas
-        desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeVidas,
-                          (Vector2){posVidas.x + 50, posVidas.y + 16});
-
-        desenharPontuacao(rm.texturaHUD, gw->personagem->score,
-                          (Vector2){110, 15});
-        desenharTempo(rm.texturaHUD, (int)gw->personagem->time,
-                      (Vector2){94, 45});
-        desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeAneis,
-                          (Vector2){110, 75});
-    }
-    else if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM)
-    {
+            ClearBackground((Color){36, 0, 180, 255});
+    
+            BeginMode2D(gw->camera);
+            desenharFundo(gw);
+            desenharMapa(gw->mapa);
+            gw->personagem->funcoes->desenhar(gw->personagem->dados);
+            EndMode2D();
+    
+            DrawText("VOL", 900, 50, 25, WHITE);
+            desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
+                              (Vector2){960, 48});
+    
+            // Score
+            DrawTexturePro(rm.texturaHUD, (Rectangle){24, 432, 40, 16},
+                           (Rectangle){20, 15, 80, 32}, (Vector2){0, 0}, 0.0f,
+                           WHITE);
+            // Time
+            DrawTexturePro(rm.texturaHUD, (Rectangle){24, 456, 32, 16},
+                           (Rectangle){20, 45, 64, 32}, (Vector2){0, 0}, 0.0f,
+                           WHITE);
+            // Rings
+            DrawTexturePro(rm.texturaHUD, (Rectangle){24, 480, 40, 16},
+                           (Rectangle){20, 75, 80, 32}, (Vector2){0, 0}, 0.0f,
+                           WHITE);
+    
+            Vector2 posVidas = {20, 500};
+    
+            // Life (fotinha do Sonic)
+            DrawTexturePro(rm.texturaHUD, (Rectangle){40, 400, 16, 16},
+                           (Rectangle){posVidas.x, posVidas.y, 32, 32},
+                           (Vector2){0, 0}, 0.0f, WHITE);
+            // Texto "Sonic"
+            DrawTexturePro(rm.texturaHUD, (Rectangle){57, 401, 31, 7},
+                           (Rectangle){posVidas.x + 40, posVidas.y, 80, 16},
+                           (Vector2){0, 0}, 0.0f, WHITE);
+            // Multiplicador "X"
+            DrawTexturePro(rm.texturaHUD, (Rectangle){62, 410, 8, 8},
+                           (Rectangle){posVidas.x + 36, posVidas.y + 18, 16, 16},
+                           (Vector2){0, 0}, 0.0f, WHITE);
+            // Número de vidas
+            desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeVidas,
+                              (Vector2){posVidas.x + 50, posVidas.y + 16});
+    
+            desenharPontuacao(rm.texturaHUD, gw->personagem->score,
+                              (Vector2){110, 15});
+            desenharTempo(rm.texturaHUD, (int)gw->personagem->time,
+                          (Vector2){94, 45});
+            desenharPontuacao(rm.texturaHUD, gw->personagem->quantidadeAneis,
+                              (Vector2){110, 75});
+        } else if ( gw->personagemSelecionado == 0 ) {
+            ClearBackground((Color){36, 0, 180, 255});
+    
+            BeginMode2D(gw->camera);
+            desenharFundo(gw);
+            desenharMapa(gw->mapa);
+            gw->personagem->funcoes->desenhar(gw->personagem->dados);
+            EndMode2D();
+    
+            DrawText("VOL", 900, 50, 25, WHITE);
+            desenharPontuacao(rm.texturaHUD, (int)(rm.volumeMusicaFase01 * 100),
+                              (Vector2){960, 48});
+        }
+    } else if (gw->estado == ESTADO_JOGO_SELECAO_PERSONAGEM) {
 
         ClearBackground(BLACK);
 
@@ -366,9 +341,7 @@ void drawGameWorld(GameWorld *gw)
         int tamConfirmar = MeasureText("ENTER PARA CONFIRMAR", 20);
         DrawText("ENTER PARA CONFIRMAR", larguraTela / 2 - tamConfirmar / 2,
                  alturaTela - 60, 20, LIGHTGRAY);
-    }
-    else if (gw->estado == ESTADO_JOGO_GAMEOVER)
-    {
+    } else if (gw->estado == ESTADO_JOGO_GAMEOVER) {
         ClearBackground(BLACK);
 
         int larguraTela = GetScreenWidth();
@@ -380,11 +353,11 @@ void drawGameWorld(GameWorld *gw)
         // Título GAME OVER
         int tamTexto1 = MeasureText("GAME OVER", 60);
         DrawText("GAME OVER", larguraTela / 2 - tamTexto1 / 2,
-                 alturaTela / 2 - 80, 60, (Color){255, 0, 0, (unsigned char)(alpha * 255)});
+                 alturaTela / 2 - 80, 60,
+                 (Color){255, 0, 0, (unsigned char)(alpha * 255)});
 
         // Mensagem para reiniciar (piscando)
-        if ((int)(gw->tempoTelaInicial * 1.5f) % 2 == 0)
-        {
+        if ((int)(gw->tempoTelaInicial * 1.5f) % 2 == 0) {
             int tamTexto2 = MeasureText("PRESSIONE 'R' PARA REINICIAR", 25);
             DrawText("PRESSIONE 'R' PARA REINICIAR",
                      larguraTela / 2 - tamTexto2 / 2, alturaTela / 2 + 20, 25,
@@ -400,26 +373,22 @@ void drawGameWorld(GameWorld *gw)
     EndDrawing();
 }
 
-static void atualizarTelaInicial(GameWorld *gw, float delta)
-{
+static void atualizarTelaInicial(GameWorld *gw, float delta) {
     gw->tempoTelaInicial += delta;
 
     // Verifica se alguma tecla foi pressionada ou mouse clicado
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) ||
-        IsKeyPressed(KEY_I) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
+        IsKeyPressed(KEY_I) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         gw->estado = ESTADO_JOGO_SELECAO_PERSONAGEM;
         gw->teclaPressionada = true;
     }
 }
 
-static void desenharTelaInicial(GameWorld *gw)
-{
+static void desenharTelaInicial(GameWorld *gw) {
     ClearBackground(BLACK);
 
     // Verifica se a textura foi carregada
-    if (rm.texturaTelaInicial.id != 0)
-    {
+    if (rm.texturaTelaInicial.id != 0) {
         Texture2D textura = rm.texturaTelaInicial;
 
         // Calcula a escala para caber na tela mantendo a proporção
@@ -432,18 +401,14 @@ static void desenharTelaInicial(GameWorld *gw)
         float destX = (GetScreenWidth() - destWidth) / 2;
         float destY = (GetScreenHeight() - destHeight) / 2;
 
-        DrawTexturePro(
-            textura,
-            (Rectangle){0, 0, textura.width, textura.height},
-            (Rectangle){destX, destY, destWidth, destHeight},
-            (Vector2){0, 0},
-            0.0f,
-            WHITE);
+        DrawTexturePro(textura,
+                       (Rectangle){0, 0, textura.width, textura.height},
+                       (Rectangle){destX, destY, destWidth, destHeight},
+                       (Vector2){0, 0}, 0.0f, WHITE);
     }
 
     // Texto "Pressione qualquer tecla" com efeito de pisca-pisca
-    if ((int)(gw->tempoTelaInicial * 2) % 2 == 0)
-    {
+    if ((int)(gw->tempoTelaInicial * 2) % 2 == 0) {
         const char *msg = "Pressione ENTER ou clique para continuar";
         int fontSize = 30;
         int textWidth = MeasureText(msg, fontSize);
@@ -452,8 +417,7 @@ static void desenharTelaInicial(GameWorld *gw)
     }
 }
 
-static void desenharFundo(GameWorld *gw)
-{
+static void desenharFundo(GameWorld *gw) {
 
     int larguraFundo = rm.texturaFundo.width;
     int larguraMapa = calcularLarguraMapa(gw->mapa);
@@ -463,25 +427,20 @@ static void desenharFundo(GameWorld *gw)
     int deslocamentoParallax =
         (int)((gw->camera.target.x / (float)larguraMapa) * 200);
 
-    for (int i = 0; i <= repeticoes; i++)
-    {
+    for (int i = 0; i <= repeticoes; i++) {
         DrawTexture(rm.texturaFundo, larguraFundo * i - deslocamentoParallax,
                     alturaMapa - rm.texturaFundo.height, WHITE);
     }
 }
 
-static void atualizarCamera(GameWorld *gw)
-{
+static void atualizarCamera(GameWorld *gw) {
 
     Rectangle ret;
 
-    if (gw->personagemSelecionado == 0)
-    {
+    if (gw->personagemSelecionado == 0) {
         Mario *m = (Mario *)gw->personagem->dados;
         ret = m->ret;
-    }
-    else
-    {
+    } else {
         Jogador *j = (Jogador *)gw->personagem->dados;
         ret = j->ret;
     }
@@ -494,32 +453,26 @@ static void atualizarCamera(GameWorld *gw)
     c->target.x = roundf(ret.x + ret.width / 2.0f);
     c->target.y = roundf(ret.y + ret.height / 2.0f);
 
-    int minX = GetScreenWidth() / 2;
-    int maxX = calcularLarguraMapa(gw->mapa) - GetScreenWidth() / 2;
-    int maxY = calcularAlturaMapa(gw->mapa) - GetScreenHeight() / 2;
+    int minX = GetScreenWidth() / 2 + 105;
+    int maxX = calcularLarguraMapa(gw->mapa) - (GetScreenWidth() / 2);
+    int maxY = calcularAlturaMapa(gw->mapa) - (GetScreenHeight() / 2) - 50;
 
-    if (c->target.x < minX)
-    {
+    if (c->target.x < minX) {
         c->target.x = minX;
-    }
-    else if (c->target.x > maxX)
-    {
+    } else if (c->target.x > maxX) {
         c->target.x = maxX;
     }
 
-    if (c->target.y > maxY)
-    {
+    if (c->target.y > maxY) {
         c->target.y = maxY;
     }
 }
 
-static void inicializar(GameWorld *gw)
-{
+static void inicializar(GameWorld *gw) {
     // Carrega o mapa
     gw->mapa = carregarMapa("resources/mapas/yoshi-island-1.txt");
 
-    if (gw->mapa == NULL)
-    {
+    if (gw->mapa == NULL) {
         printf("ERRO: Não foi possível carregar o mapa!\n");
         return;
     }
@@ -527,39 +480,30 @@ static void inicializar(GameWorld *gw)
     int alturaMapa = calcularAlturaMapa(gw->mapa);
     int screenWidth = GetScreenWidth();
 
-    if (gw->personagemSelecionado == 0)
-    {
-        gw->personagem = criarMario(screenWidth / 2 + 144,
-                                    alturaMapa - 400, 96, 96);
-    }
-    else
-    {
-        gw->personagem = criarSonic(screenWidth / 2 + 144,
-                                    alturaMapa - 400, 96, 96);
+    if (gw->personagemSelecionado == 0) {
+        gw->personagem =
+            criarMario(screenWidth / 2 + 144, alturaMapa - 400, 96, 96);
+    } else {
+        gw->personagem =
+            criarSonic(screenWidth / 2 + 144, alturaMapa - 400, 96, 96);
     }
 
-    if (gw->personagem == NULL)
-    {
+    if (gw->personagem == NULL) {
         printf("ERRO: Não foi possível criar o personagem!\n");
         return;
     }
 
     gw->camera = (Camera2D){
-        .offset = {0},
-        .target = {0},
-        .rotation = 0.0f,
-        .zoom = 0.9f};
+        .offset = {0}, .target = {0}, .rotation = 0.0f, .zoom = 0.9f};
 
     gw->gravidade = 900;
 }
 
-static void reiniciar(GameWorld *gw)
-{
+static void reiniciar(GameWorld *gw) {
     printf("=== REINICIANDO JOGO (DURANTE O JOGO) ===\n");
 
     // Para a música se estiver tocando
-    if (IsMusicStreamPlaying(rm.musicaFase01))
-    {
+    if (IsMusicStreamPlaying(rm.musicaFase01)) {
         StopMusicStream(rm.musicaFase01);
         printf("Música parada.\n");
     }
@@ -568,8 +512,7 @@ static void reiniciar(GameWorld *gw)
     int personagemSelecionado = gw->personagemSelecionado;
 
     // Destroi o mapa atual
-    if (gw->mapa != NULL)
-    {
+    if (gw->mapa != NULL) {
         printf("Destruindo mapa...\n");
         destruirMapa(gw->mapa);
         gw->mapa = NULL;
@@ -577,8 +520,7 @@ static void reiniciar(GameWorld *gw)
     }
 
     // Destroi o personagem atual
-    if (gw->personagem != NULL)
-    {
+    if (gw->personagem != NULL) {
         printf("Destruindo personagem...\n");
         gw->personagem->funcoes->destruir(gw->personagem->dados);
         free(gw->personagem);
@@ -592,8 +534,7 @@ static void reiniciar(GameWorld *gw)
     inicializar(gw);
 
     // Reseta os dados do personagem (vidas, anéis, score, etc)
-    if (gw->personagem != NULL)
-    {
+    if (gw->personagem != NULL) {
         gw->personagem->quantidadeVidas = 3;
         gw->personagem->quantidadeAneis = 0;
         gw->personagem->score = 0;
@@ -605,8 +546,7 @@ static void reiniciar(GameWorld *gw)
     printf("=== REINICIO CONCLUÍDO ===\n");
 }
 
-static void desenharPontuacao(Texture2D hud, int valor, Vector2 posicao)
-{
+static void desenharPontuacao(Texture2D hud, int valor, Vector2 posicao) {
 
     char buffer[16];
     sprintf(buffer, "%d", valor);
@@ -616,8 +556,7 @@ static void desenharPontuacao(Texture2D hud, int valor, Vector2 posicao)
     int inicioY = 432;
     int espacamento = 8;
 
-    for (int i = 0; buffer[i] != '\0'; i++)
-    {
+    for (int i = 0; buffer[i] != '\0'; i++) {
         int digito = buffer[i] - '0';
 
         Rectangle origem = {(digito * (digitoW + espacamento)) + 72, inicioY,
@@ -630,8 +569,7 @@ static void desenharPontuacao(Texture2D hud, int valor, Vector2 posicao)
     }
 }
 
-static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao)
-{
+static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao) {
 
     int minutos = tempo / 60;
     int segundos = tempo % 60;
@@ -644,11 +582,9 @@ static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao)
     int inicioY = 432;
     int espacamento = 8;
 
-    for (int i = 0; buffer[i] != '\0'; i++)
-    {
+    for (int i = 0; buffer[i] != '\0'; i++) {
 
-        if (buffer[i] == ':')
-        {
+        if (buffer[i] == ':') {
             DrawRectangle(posicao.x + i * (digitoW * 2) + 6, posicao.y + 8, 4,
                           4, WHITE);
 
@@ -671,8 +607,7 @@ static void desenharTempo(Texture2D hud, int tempo, Vector2 posicao)
 }
 
 static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
-                          float escala)
-{
+                          float escala) {
 
     int charW = 7;
     int charH = 11;
@@ -681,18 +616,14 @@ static void desenharTexto(Texture2D hud, const char *texto, Vector2 posicao,
     int espacamento = 2;
     int cursor = 0;
 
-    for (int i = 0; texto[i] != '\0'; i++)
-    {
+    for (int i = 0; texto[i] != '\0'; i++) {
 
         char c = texto[i];
         int idx = -1;
 
-        if (c >= 'A' && c <= 'Z')
-        {
+        if (c >= 'A' && c <= 'Z') {
             idx = c - 'A';
-        }
-        else if (c == ' ')
-        {
+        } else if (c == ' ') {
             cursor++;
             continue;
         }

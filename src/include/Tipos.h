@@ -84,8 +84,7 @@ typedef enum EstadoInimigoRex {
     ESTADO_INIMIGO_REX_MORRENDO,
 } EstadoInimigoRex;
 
-typedef enum EstadoInimigoNegoPreto
-{
+typedef enum EstadoInimigoNegoPreto {
     ESTADO_INIMIGO_NEGOPRETO_VOANDO,
 } EstadoInimigoNegoPreto;
 
@@ -134,6 +133,13 @@ typedef enum TipoItem {
     TIPO_ITEM_COGUMELO_VERMELHO,
     TIPO_ITEM_FLOR_PRETA,
 } TipoItem;
+
+typedef enum TipoColisaoObstaculo {
+    COLISAO_RETANGULO,
+    COLISAO_RAMPA_CIMA_DIREITA,
+    COLISAO_RAMPA_BAIXO_DIREITA,
+    COLISAO_RAMPA_BAIXO_ESQUERDA,
+} TipoColisaoObstaculo;
 
 /**
  * @brief Representa o tipo de um elemento do mapa
@@ -400,13 +406,13 @@ typedef struct InimigoRex {
 
 } InimigoRex;
 
-typedef struct InimigoNegoPreto
-{
+typedef struct InimigoNegoPreto {
 
     Rectangle ret;
+    float retXInicial;
     Vector2 vel;
     Color cor;
-
+    float distanciaAtivacao; // <-- novo: distância da câmera pra ativar
     float velVoo;
 
     EstadoInimigoNegoPreto estado;
@@ -498,7 +504,6 @@ typedef struct ItemFlorPreta {
     Animacao animacaoSaindoDoBloco;
     Animacao animacaoColetando;
 
-
 } ItemFlorPreta;
 
 /**
@@ -519,7 +524,7 @@ typedef struct Obstaculo {
     Rectangle fonte;
     Rectangle fonteUsado;
     Texture2D *textura;
-    
+    TipoColisaoObstaculo tipoColisao;
 
     bool solido;
     bool eBlocoInterrogacao;
@@ -604,7 +609,7 @@ struct GameWorld {
 
     char proximaFase[256];
 
-    //tela inicial
+    // tela inicial
     float tempoTelaInicial;
     bool teclaPressionada;
 };

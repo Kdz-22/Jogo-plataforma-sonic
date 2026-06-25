@@ -27,3 +27,6 @@ void destruirObstaculo( Obstaculo *o );
 void desenharObstaculo( Obstaculo *o );
 
 void atualizarObstaculo( Obstaculo *o, float delta );
+
+// Obstaculo.h
+bool checarColisaoComObstaculo(Rectangle retCol, Obstaculo *o);

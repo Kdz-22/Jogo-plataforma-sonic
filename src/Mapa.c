@@ -113,6 +113,16 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                     el->tipo = TIPO_ELEMENTO_MAPA_OBSTACULO;
 
                     inserirObstaculo(novoMapa, el);
+                    
+                    Obstaculo *obs = (Obstaculo *)el->objeto;
+                    if (c == 'N' || c == 'Q' || c == 'R' || c == 'U') {
+                        obs->tipoColisao = COLISAO_RAMPA_CIMA_DIREITA;
+                    } else if (c == 'O' || c == 'W') {
+                        obs->tipoColisao = COLISAO_RAMPA_BAIXO_DIREITA;
+                    } else if (c == 'P' || c == 'S' || c == 'Z') {
+                        obs->tipoColisao = COLISAO_RAMPA_BAIXO_ESQUERDA;
+                    }
+
                 } else if (c == '!' || c == '@' || c == '#' || c == '$' ||
                            c == '%' || c == '&' || c == '*' || c == '(' ||
                            c == ')' || c == '[' || c == ']' || c == '{' ||
@@ -433,7 +443,8 @@ Mapa *carregarMapa(const char *caminhoArquivo) {
                             (Rectangle){.x = novoMapa->dimensaoPadraoElementos *
                                              colunaAtual,
                                         .y = novoMapa->dimensaoPadraoElementos *
-                                                 linhaAtual -21,
+                                                 linhaAtual -
+                                             21,
                                         .width = 128,
                                         .height = 128},
                             BLUE);

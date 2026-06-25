@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "raylib/raylib.h"
+#include "raylib/raymath.h"
 
 #include "Animacao.h"
 #include "Inimigo.h"
@@ -29,6 +30,7 @@
 #include "Jogador.h"
 #include "Macros.h"
 #include "Mario.h"
+#include "Obstaculo.h"
 #include "ResourceManager.h"
 #include "Tipos.h"
 
@@ -855,7 +857,11 @@ static void resolverColisaoMarioObstaculosMapaX(Mario *m, Mapa *mapa) {
             el = el->proximo;
             continue;
         }
-        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+        if (o->tipoColisao != COLISAO_RETANGULO) {
+            el = el->proximo;
+            continue;
+        }
+        if (checarColisaoComObstaculo(retColCalculado, o)) {
             if (retColCalculado.x + retColCalculado.width / 2 <
                 o->ret.x + o->ret.width / 2) {
                 m->ret.x = o->ret.x - qa->retColisao.width - deslocamentoX;
@@ -896,7 +902,9 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
             el = el->proximo;
             continue;
         }
-        if (CheckCollisionRecs(retColCalculado, o->ret)) {
+
+        
+        if (checarColisaoComObstaculo(retColCalculado, o)) {
 
             bool vindoDeBaixo =
                 retColCalculado.y + retColCalculado.height / 2 >=
@@ -912,14 +920,43 @@ static void resolverColisaoMarioObstaculosMapaY(Mario *m, Mapa *mapa) {
 
                 m->vel.y = m->velPulo;
                 o->quebrando = true;
-                o->solido = false; // remove a colisão na hora, Mario atravessa
+                o->solido = false;
                 o->quadroQuebra = 0;
                 o->tempoQuadroQuebra = 0.0f;
-                // PlaySound(rm.somHitInimigo); // troque por um som de quebra
-                // se tiver
 
                 el = el->proximo;
-                continue; // não aplica a correção normal de posição
+                continue;
+            }
+
+            // tratamento especial para rampas
+            if (o->tipoColisao != COLISAO_RETANGULO) {
+                float xRelativo =
+                    (retColCalculado.x + retColCalculado.width / 2) - o->ret.x;
+                float proporcao = xRelativo / o->ret.width;
+                proporcao = Clamp(proporcao, 0.0f, 1.0f);
+                float alturaChao;
+
+                if (o->tipoColisao == COLISAO_RAMPA_CIMA_DIREITA) {
+                    alturaChao = o->ret.y + (o->ret.height * proporcao);
+                } else if (o->tipoColisao == COLISAO_RAMPA_BAIXO_DIREITA) {
+                    alturaChao =
+                        o->ret.y + (o->ret.height * (1.0f - proporcao));
+                } else {
+                    alturaChao = o->ret.y + (o->ret.height * proporcao);
+                }
+
+                float basePersonagem =
+                    retColCalculado.y + retColCalculado.height;
+                if (basePersonagem >= alturaChao && m->vel.y >= 0) {
+                    m->ret.y =
+                        alturaChao - qa->retColisao.height - deslocamentoY;
+                    m->vel.y = 0;
+                    m->quantidadePulos = 0;
+                    m->pulandoGirando = false;
+                }
+
+                el = el->proximo;
+                continue;
             }
 
             if (retColCalculado.y + retColCalculado.height / 2 <
