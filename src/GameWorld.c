@@ -74,13 +74,15 @@ void destroyGameWorld(GameWorld *gw) {
  */
 void updateGameWorld(GameWorld *gw, float delta) {
 
-    if (!IsMusicStreamPlaying(rm.musicaFase01)) {
-        PlayMusicStream(rm.musicaFase01);
-    } else {
-        UpdateMusicStream(rm.musicaFase01);
-    }
-    if (IsMusicStreamPlaying(rm.musicaFase01)) {
-
+    if ( gw->personagemSelecionado == 1 ) {
+        
+        if (!IsMusicStreamPlaying(rm.musicaFase01)) {
+            PlayMusicStream(rm.musicaFase01);
+        } else {
+            UpdateMusicStream(rm.musicaFase01);
+        }
+        if (IsMusicStreamPlaying(rm.musicaFase01)) {
+            
         if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT)) {
             rm.volumeMusicaFase01 =
                 Clamp(rm.volumeMusicaFase01 - 0.01f, 0.0f, 1.0f);
@@ -88,7 +90,25 @@ void updateGameWorld(GameWorld *gw, float delta) {
         } else if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD)) {
             rm.volumeMusicaFase01 =
                 Clamp(rm.volumeMusicaFase01 + 0.01f, 0.0f, 1.0f);
-            SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
+                SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
+            }
+        }
+    } else {
+        if (!IsMusicStreamPlaying(rm.musicaFaseMario)) {
+            PlayMusicStream(rm.musicaFaseMario);
+        } else {
+            UpdateMusicStream(rm.musicaFaseMario);
+        }
+        if (IsMusicStreamPlaying(rm.musicaFaseMario)) {
+            if (IsKeyDown(KEY_MINUS) || IsKeyDown(KEY_KP_SUBTRACT)) {
+                rm.volumeMusicaFaseMario =
+                    Clamp(rm.volumeMusicaFaseMario - 0.01f, 0.0f, 1.0f);
+                SetMusicVolume(rm.musicaFaseMario, rm.volumeMusicaFaseMario);
+            } else if (IsKeyDown(KEY_EQUAL) || IsKeyDown(KEY_KP_ADD)) {
+                rm.volumeMusicaFaseMario =
+                    Clamp(rm.volumeMusicaFaseMario + 0.01f, 0.0f, 1.0f);
+                SetMusicVolume(rm.musicaFaseMario, rm.volumeMusicaFaseMario);
+            }
         }
     }
 
@@ -537,7 +557,10 @@ static void reiniciar(GameWorld *gw) {
     printf("=== REINICIANDO JOGO (DURANTE O JOGO) ===\n");
 
     // Para a música se estiver tocando
-    if (IsMusicStreamPlaying(rm.musicaFase01)) {
+    if ( gw->personagemSelecionado == 0 ) {
+        StopMusicStream(rm.musicaFaseMario);
+        printf("Música parada.\n");
+    } else {
         StopMusicStream(rm.musicaFase01);
         printf("Música parada.\n");
     }

@@ -133,10 +133,18 @@ void loadResourcesResourceManager(void)
     rm.somHitInimigo = LoadSound("resources/sons/efeitos/hit-inimigo.wav");
     rm.somMorte = LoadSound("resources/sons/efeitos/morte.wav");
     rm.somPulo = LoadSound("resources/sons/efeitos/pulo.wav");
+    rm.som1Up = LoadSound("resources/sons/efeitos/smw_1-up.wav");
+    rm.somMorrendo = LoadSound("resources/sons/efeitos/smw_lost_a_life.wav");
+    rm.somPowerUp = LoadSound("resources/sons/efeitos/smw_power-up.wav");
+    rm.somPuloMario = LoadSound("resources/sons/efeitos/smw_jump.wav");
+    rm.somPuloGirando = LoadSound("resources/sons/efeitos/smw_spin_jump.wav");
 
+    rm.musicaFaseMario = LoadMusicStream("resources/sons/musicas/yoshi-island.mp3");
     rm.musicaFase01 = LoadMusicStream("resources/sons/musicas/green-hill-zone.mp3");
     rm.volumeMusicaFase01 = 0.0f;
+    rm.volumeMusicaFaseMario = 0.0f;
     SetMusicVolume(rm.musicaFase01, rm.volumeMusicaFase01);
+    SetMusicVolume(rm.musicaFaseMario, rm.volumeMusicaFaseMario);
 }
 
 void unloadResourcesResourceManager(void)
@@ -160,6 +168,12 @@ void unloadResourcesResourceManager(void)
     UnloadSound(rm.somHitInimigo);
     UnloadSound(rm.somMorte);
     UnloadSound(rm.somPulo);
+    UnloadSound(rm.som1Up);
+    UnloadSound(rm.somMorrendo);
+    UnloadSound(rm.somPowerUp);
+    UnloadSound(rm.somPuloMario);
+    UnloadSound(rm.somPuloGirando);
 
     UnloadMusicStream(rm.musicaFase01);
+    UnloadMusicStream(rm.musicaFaseMario);
 }

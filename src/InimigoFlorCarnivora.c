@@ -38,8 +38,8 @@ InimigoFlorCarnivora *criarInimigoFlorCarnivora(Rectangle ret, Color cor)
     flor->vel = (Vector2){0};
     flor->cor = cor;
 
-    flor->alturaMinima = ret.y;
-    flor->alturaMaxima = ret.y - 60;
+    flor->alturaMinima = ret.y + 80;
+    flor->alturaMaxima = ret.y - 80;
     flor->velocidadeMovimento = 60.0f;
     flor->tempoEstado = 0.0f;
     flor->tempoEspera = 1.5f;

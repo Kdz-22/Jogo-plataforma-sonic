@@ -32,8 +32,16 @@ typedef struct ResourceManager {
     Sound somMorte;
     Sound somPulo;
 
+    Sound somPowerUp;
+    Sound somPuloMario;
+    Sound somMorrendo;
+    Sound som1Up;
+    Sound somPuloGirando;
+
+    Music musicaFaseMario;
     Music musicaFase01;
     float volumeMusicaFase01;
+    float volumeMusicaFaseMario;
 
 } ResourceManager;
 
