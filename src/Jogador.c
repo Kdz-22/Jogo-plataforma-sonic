@@ -50,7 +50,7 @@ static void resolverColisaoJogadorInimigosMapa(Jogador *j, Personagem *p,
 
 static void resolverEntradaCanoMapa(Jogador *j, Personagem *p, GameWorld *gw);
 
-static const bool MOSTRAR_RETANGULOS = true;
+static const bool MOSTRAR_RETANGULOS = false;
 
 /**
  * @brief Cria uma instância alocada dinamicamente da struct Jogador.
